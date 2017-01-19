@@ -1,0 +1,20 @@
+Organisms	Age
+Mus musculus	5
+Murinae	25
+Euarchontoglires	92
+Eutheria	104
+Theria	162
+Mammalia	167
+Tetrapoda	371
+Euteleostomi	441
+Bilateria	937
+Chordata	722
+Sarcopterygii	414
+Amniota	296
+Sciurognathi	74
+Rodentia	77
+Glires	86
+Vertebrata	535
+Opisthokonta	1215
+
+

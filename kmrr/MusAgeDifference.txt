@@ -1,0 +1,12 @@
+Organisms Age
+Mus 5
+Platypus 220
+Opossum 176
+Chicken 325
+Macaca 91
+Gorilla 91
+Cow 97
+Frog 361
+Rat 25
+Hum 91
+Fly 910

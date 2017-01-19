@@ -1,0 +1,21 @@
+Organisms	Age
+Homo sapiens	3
+Hominoidea	20
+Euarchontoglires	92
+Mammalia	167
+Homininae	8
+Simiiformes	42
+Primates	74
+Amniota	296
+Vertebrata	535
+Eutheria	104
+Bilateria	937
+Catarrhini	29
+Chordata	722
+Euteleostomi	441
+Haplorrhini	65
+Hominidae	15
+Opisthokonta	1215
+Sarcopterygii	414
+Tetrapoda	371
+Theria	162
