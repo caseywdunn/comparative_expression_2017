@@ -1,0 +1,351 @@
+---
+output:
+  github_document: default
+---
+# Levin *et al.* reanalyses
+
+```{r setup, echo=FALSE, warning=FALSE, message=FALSE}
+
+```
+
+by [Casey W. Dunn](http://dunnlab.org/)
+
+Please see the [git repository](https://github.com/caseywdunn/levin2016) for additional files related to this document, including data and [source code for all analyses](https://github.com/caseywdunn/levin2016/blob/master/reanalyses.rmd).
+
+This notebook describes reanalyses of Levin *et al*. 2016:
+
+> Levin M, Anavy L, Cole AG, Winter E, Mostov N, Khair S, Senderovich N, Kovalev E, Silver DH, Feder M, et al. 2016. The mid-developmental transition and the evolution of animal body plans. Nature 531: 637-641. [doi:10.1038/nature16994](http://dx.doi.org/10.1038/nature16994)
+
+We addressed concerns regarding the study design of Levin *et al*. in a previous manuscript:
+
+> Hejnol A, Dunn CW, 2016. Animal Evolution: Are Phyla Real? Current Biology 26:R424-R426. [doi:10.1016/j.cub.2016.03.058](http://dx.doi.org/10.1016/j.cub.2016.03.058)
+
+Here we examine support for their central finding - the inverse hourglass model.
+
+## Figure 4d data
+
+This box plot corresponds to that of Levin *et al.* [Figure 4d](http://www.nature.com/nature/journal/v531/n7596/fig_tab/nature16994_F4.html):
+```{r preprocess, echo=FALSE}
+D = read.table("data_processed/Figure_4d_data.txt", header=T)
+
+# Replace taxon indeces with taxon names
+
+taxa = c("Porifera", "Nematodes", "Arthropods", "Platyhelminthes", "Tardigrades", "Cnidaria", "Annelides", "Echinodermata", "Chordata", "Ctenophores") # from Figure 4d data.xlsx
+D$Species_A = as.factor( sapply(D$Species_A, function(x) taxa[x]) )
+D$Species_B = as.factor( sapply(D$Species_B, function(x) taxa[x]) )
+
+
+boxplot(as.matrix(D[,3:5]))
+```
+
+The KS p-value for the early-mid comparison is `r format(ks.test(D$Early, D$Mid)$p.value, digits=3)`, while the p-value for the late-mid comparison is `r format(ks.test(D$Late, D$Mid)$p.value, digits=3, scientific=TRUE)`.
+The KS tests as reproduced here are still significant, but the p values are much less significant than those published by Levin *et al.*:
+
+> we found that the mid-developmental transition profiles are significantly less conserved than the early and late phase expression (Fig. 4d, P<10-6 compared with the early phase and P<10-12 with the late phase, Kolmogorov–Smirnov test)
+
+Question: How was the published P value calculated? Was it two sided? Was it on a different data set?
+
+Levin *et al.* answer: They used a a two-sided KS test in matlab:
+
+    [i,j]=kstest2(S(:,2),S(:,1)); ['P-value: early to switch: ' mat2str(j)]
+    [i,j]=kstest2(S(:,2),S(:,3)); ['P-value: late to switch: ' mat2str(j)]
+
+To compare my new results as closely as possible with their published results, I ran the following in matlab (version R2016a):
+
+    # With duplicated values
+    B = tdfread('Figure_4d_data_full.txt')
+    [i,p]=kstest2(B.Early,B.Mid)
+    # p = 3.1161e-06
+    [i,p]=kstest2(B.Late,B.Mid)
+    # p = 5.3257e-12
+    
+
+    
+The matlab ks test p values are the same orders of magnitude as the published results (10<sup>-6</sup> for early-mid and 10<sup>-12</sup> for early-late) when analyzing the `Figure_4d_data_full.txt` file obtained from the authors. This shows I can reproduce their result. The problem, though, is that every pairwise comparison is represented twice in this file. Each species was compared to every other species, but both reciprocal comparisons (which have the same values) were retained. For example, there is an entry for both a `Nematodes` to `Arthropods` comparison and a `Arthropods` to `Nematodes` comparison. Both these comparisons have the same values. As a consequence, there are 90 entries for the 45 pairwise comparisons. These duplicate values inflates the p values by several orders of magnitude as it seems that twice the actual data are available.
+
+I derived the `Figure_4d_data.txt` file from `Figure_4d_data_full.txt` by removing duplicate pairwise comparisons. The KS test on this non-redundant file returns p values that are orders of magnitude greater (i.e., less significant) than those published (0.002 for early-mid and 10<sup>-6</sup> for early-late):
+
+    # Without duplicated values
+    A = tdfread('Figure_4d_data.txt')
+    [i,p]=kstest2(A.Early,A.Mid)
+    # p = 0.0022
+    [i,p]=kstest2(A.Late,A.Mid)
+    # p = 2.5199e-06
+
+The R and matlab results are consistent with each other when analyzing `Figure_4d_data.txt`, indicating that my results don't differ from those of Levin *et al.* due to software differences and that the discrepancy is due to the duplicated values.
+
+
+### Evaluating the test method
+
+The primary result of Levin *et al.*, *i.e.* support for the inverse hourglass model, is based on the box plot in their [Figure 4d](http://www.nature.com/nature/journal/v531/n7596/fig_tab/nature16994_F4.html) and the corresponding KS tests. In this figure, the box plots for each temporal phase largely overlap and there is little differentiation between the distributions. The published KS tests did reject the hypothesis that the early and late distributions are drawn from the same distribution as the mid phase, though the result was much less significant when correcting for duplicate values as described above. There are a couple fundamental problems using the KS test in this context, though:
+
+- The KS test does not just test whether one distribution is greater than the other, it tests if the distributions are the same. This takes into consideration other features, such as distribution shape. This is a much more specific null hypothesis than that discussed in the paper (that they have the same mean). The null hypothesis would be rejected if the two distributions had the same mean but different variances, for example.
+
+- The samples in this dataset are matched - for each pairwise comparison there is a early, mid, and late expression value. The KS test is for unmatched samples. In this study, the question is not whether the distributions are the same, as the KS test can evaluate, but whether each value in one phase (early, late) tends to be higher than its matched value in the mid phase. The Wilcoxon test is appropriate for this question.
+
+Here I rerun the analyses taking the matched samples into account.
+
+```{r matched_test, echo=FALSE}
+
+# hist(D$Early - D$Mid)
+w_early = wilcox.test(D$Early, D$Mid, alternative="greater", paired=T)$p.value
+
+# hist(D$Late - D$Mid)
+w_late = wilcox.test(D$Late, D$Mid, alternative="greater", paired=T)$p.value
+```
+
+The p-values for the Wilcoxon test are `r format(w_early, digits=3)` for the early-mid comparison, which is barely significant, and `r format(w_late, digits=3, scientific=TRUE)` for the late-mid comparison.
+
+Levin *et al.* comment: "I think you make a good point regarding the KS test, that significance could result even when the means are the same. We used it in the paper as two-sided non-parametric test to quantify a P-value for the distributions which we found to have different means (Figure 4d)."
+
+
+### Evaluation of support across taxa
+
+Their [Figure 4d](http://www.nature.com/nature/journal/v531/n7596/fig_tab/nature16994_F4.html) shows that the the medians are close in value for the three phases, but the mid phase includes three low outliers. These outliers are much lower than any values in the other phases.
+
+Here I order the matrix by Mid to identify these values:
+
+```{r sorted_mid}
+D[order(D[,4]),]
+
+
+
+```
+
+The five lowest mid values, including the three outliers, are pairwise comparisons that include the ctenophore. Here I rerun the analyses without ctenophores:
+
+```{r no_cteno}
+D_no_ct = D[ ((D$Species_A != "Ctenophores") &   (D$Species_B != "Ctenophores")), ]
+boxplot(as.matrix(D_no_ct[,3:5]))
+wilcox.test(D_no_ct$Early, D_no_ct$Mid, alternative="greater", paired=T)
+wilcox.test(D_no_ct$Late, D_no_ct$Mid, alternative="greater", paired=T)
+
+```
+
+There is no significant difference between the early and mid phase.
+
+
+### Summary figures
+
+```{r echo=FALSE}
+
+# Multiple plot function
+#
+# ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
+# - cols:   Number of columns in layout
+# - layout: A matrix specifying the layout. If present, 'cols' is ignored.
+#
+# If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE),
+# then plot 1 will go in the upper left, 2 will go in the upper right, and
+# 3 will go all the way across the bottom.
+#
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+ if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+
+```
+
+
+```{r summary, echo=FALSE, message=FALSE}
+
+library(ggplot2)
+library(reshape2)
+library(grid)
+
+limits=c(-0.4, 0.75)
+
+Dm = melt(D, id=c("Species_A", "Species_B"), variable.name = "phase", value.name = "similarity")
+Dm_no_ct = melt(D_no_ct, id=c("Species_A", "Species_B"), variable.name = "phase", value.name = "similarity")
+
+has_cteno = (Dm$Species_A == "Ctenophores") | (Dm$Species_B == "Ctenophores")
+alpha = rep(0.4, length(has_cteno))
+alpha[has_cteno] = 0.9
+color = rep("black", length(has_cteno))
+color[has_cteno] = "red"
+
+pa = ggplot(Dm, aes(phase, similarity)) +
+    geom_boxplot(outlier.shape=NA)+ # Outliers are drawn in bellow with jitter, so supress them here so they aren't duplicated
+    scale_y_continuous(limits=limits) +
+    geom_jitter(shape=16, position=position_jitter(0.2), alpha=alpha, color=color)
+
+pa = pa + coord_flip() + ggtitle("(a) Original, with ctenophore in red")
+
+
+pb = ggplot(Dm_no_ct, aes(phase, similarity)) +
+    geom_boxplot(outlier.shape=NA)+ # Outliers are drawn in bellow with jitter, so supress them here so they aren't duplicated
+    scale_y_continuous(limits=limits) +
+    geom_jitter(shape=16, position=position_jitter(0.2), alpha=0.4)
+
+pb = pb + coord_flip() + ggtitle("(b) New, without ctenophore")
+
+#pa
+#ggplotly()
+
+multiplot(pa, pb, cols=1)
+
+pdf("Figure_levin_raw.pdf", width=4, height=4)
+multiplot(pa, pb, cols=1)
+dev.off()
+
+# Plots without points
+pa = ggplot(Dm, aes(phase, similarity)) + geom_boxplot()  + ggtitle("(a) Original, with ctenophore") + scale_y_continuous(limits=limits) + coord_flip()
+pb = ggplot(Dm_no_ct, aes(phase, similarity)) + geom_boxplot() + ggtitle("(b) New, without ctenophore") +  scale_y_continuous(limits=limits) + coord_flip() 
+#multiplot(pa, pb, cols=1)
+
+```
+
+### Overview of comparisons
+
+<a name="overview"></a>
+
+Based in the results shown in their [Figure 4d](http://www.nature.com/nature/journal/v531/n7596/fig_tab/nature16994_F4.html), Levin *et al.* concluded that the "mid" distribution was significantly less than the "early" and "late" distributions, and that a low "mid" value is a general evolutionary pattern for animals. 
+
+When all the annotated points are shown in the interactive plot below, however, it becomes apparent that minimum similarity at the "mid" point is not a general pattern. Many pairwise comparisons show other patterns, and the low values in the "mid" distribution are dominated by comparisons that include the ctenophore (shown in red).
+
+```{r matched, echo=FALSE}
+
+
+ggplot(data=Dm, aes(x=phase,y=similarity, group=interaction(Species_A, Species_B), text=paste(Species_A, Species_B, sep="-")))  + geom_line(size=0.5) + geom_point(color=color)
+
+inverse_hourglass = D[ (D$Mid<D$Early) & (D$Mid < D$Late),]
+
+
+```
+
+Only `r nrow(inverse_hourglass)` of the `r nrow(D)` comparisons show an inverse hourglass pattern. Of these, `r nrow(inverse_hourglass[inverse_hourglass$Species_B == "Ctenophores",])` are for pairs that include the ctenophore. 
+
+The results for the subset of comparisons that show the inverse hourglass pattern is below.
+
+```{r matched_table, echo=FALSE}
+
+inverse_hourglass
+
+table(c(as.character(inverse_hourglass$Species_A), as.character(inverse_hourglass$Species_B)))
+
+```
+
+
+## Figure 4c data
+
+These data are an upstream intermediate that the 4d data are derived from. I explored these data a bit to better understand the broader analysis workflow.
+
+```{r preprocess_4c}
+Phase = as.matrix(read.table("data_processed/Figure_4c_mode.txt", header=T))
+Ortho = as.matrix(read.table("data_processed/Figure_4c_orthology.txt", header=T))
+
+dim(Phase)
+dim(Ortho)
+```
+
+First, check to see if there are any elements that are 0 in one table but not the other.
+
+```{r comare_4c}
+sum((Phase>0) != (Ortho>0))
+
+table(Phase)
+
+nrow(Phase[rowSums(Phase)>0,]) # number of nonzero rows
+
+```
+
+There aren't. This verifies that every annotated ortholog present in each species is categorized as belonging to one of the three phases.
+
+From Levin et al:
+
+> To compare gene expression across these species, we delineated 11,139 orthologous protein families, with each orthologous family having representatives from an average of six species.
+
+Question: What is the source of the discrepancy between the reported number 11,139 in the manuscript and the number of genes (ie, rows) in this Figure_4c matrix, ie `r nrow(Phase[rowSums(Phase)>0,])`? Were there additional filters applied?
+
+Levin *et al.* answer: "The 11,139 refers to the number ortholog families, not the number of genes (rows)."
+
+### C. elegans and D. melanogaster comparison
+
+Here I try to replicate the example described by Levin et al.:
+
+> Finally, we measured the extent of evolutionary change within the two conserved phases and the mid-developmental transition by determining whether orthologues annotated for a particular temporal category in one species are also annotated to the same temporal category in another species. Figure 4c shows an example of this analysis for D. melanogaster and C. elegans. For 4,395 orthologues delineated between these two species, the early phase, mid-developmental transition, and the late phase expression account for 51%, 14%, and 35% of the C. elegans orthologues, respectively. A total of 28% of the orthologues are annotated to the early phase in both C. elegans and D. melanogaster, while by chance only 22% are expected given the fraction of genes in each category across the species (Fig. 4c). In contrast, 3% were expected to be conserved at the mid-developmental transition at random, and 3% were observed. The log-odds ratios between observed and expected for the early phase and the mid-developmental transition between C. elegans and D. melanogaster are thus 0.35 and 0, respectively.
+
+```{r DC_pre}
+# Sample the columns for these two species
+DC = Phase[,c(2,3)]
+colnames(DC)
+
+# sample only rows that have phase annotations for both
+
+DC = DC[(DC[,1]>0) & (DC[,2]>0),]
+nrow(DC)
+```
+
+So the number of genes selected is consistent with the reported number.
+
+Now calculate the fraction of genes in each phase for each species.
+
+```{r frac_4c_ce}
+colnames(DC)[1]
+ce = table(DC[,1])/sum(table(DC[,1]))
+ce
+```
+
+These values do correspond to the 51%, 14%, and 35% reported in the manuscript for C. elegans.
+
+
+```{r frac_4c_dm}
+colnames(DC)[2]
+dm = table(DC[,2])/sum(table(DC[,2]))
+dm
+```
+
+```{r scores}
+expected = dm * ce
+
+observed = c( sum(DC[,1] ==1 & DC[,2] ==1), sum(DC[,1] ==2 & DC[,2] ==2), sum(DC[,1] ==3 & DC[,2] ==3) )
+observed = observed / nrow(DC)
+observed
+
+observed/expected
+
+log(observed/expected, 2) # have not yet verified the base
+
+```
+
+
+## Software versions
+
+This document can be executed to an html file in RStudio (or with the `knitr` package at the command line).
+
+This document was computed on `r format(Sys.time(), "%a %b %d %X %Y")` with the following R package versions.
+
+```{r session_summary, echo=FALSE, comment=NA}
+	sessionInfo()
+```
