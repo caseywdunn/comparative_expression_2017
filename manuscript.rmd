@@ -21,7 +21,7 @@ Casey W. Dunn^1^*, Felipe Zapata^1,2^, Cat Munro^1^, Stefan Siebert^1,3^, Andrea
 
 ^3^ Current address: Department of Molecular & Cellular Biology, University of California at Davis, Davis, CA, USA
 
-^4^ Sars Institute, Bergen, Norway
+^4^ Sars International Centre for Marine Molecular Biology, University of Bergen, Bergen, Norway
 
 
 \* Corresponding author, casey_dunn@brown.edu
