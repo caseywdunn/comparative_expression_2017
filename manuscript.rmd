@@ -8,7 +8,9 @@ output:
 ---
 
 ```{r setup, cache=TRUE, message=F, echo=FALSE, warning=F}
-knitr::opts_chunk$set(echo = TRUE)
+
+	knitr::opts_chunk$set( echo = TRUE )
+
 ```
 
 # The importance of phylogenetic methods when comparing functional genomic data across species
@@ -41,26 +43,26 @@ One reason that CFG has not yet embraced phylogenetic approaches is that it has 
 
 Most CFG studies to date compare gene expression across species, often between distinct tissues or developmental time points. Gene expression has been a popular target of CFG studies because, with the advent of RNA-Seq and related transcriptome sequencing methods, it is the most readily collected functional genomics trait across diverse species. Here we reconsider two recent comparative analyses of gene expression data [@KryuchkovaMostacci:2016iw; @Levin:2016bp]. 
 
-Kryuchkova-Mostacci and Robinson-Rechavi (KMRR) 2016 [@KryuchkovaMostacci:2016iw] analyzed multiple vertebrate expression datasets to test the ortholog conjecture - the hypothesis that orthologs tend of have more conserved attributes (specificity of expression across organs in this case) than do paralogs [@Nehrt:2011bm]. Using pairwise comparisons (Fig. 1A), they found lower expression correlation between paralogs than between orthologs and interpreted this as strong support for the ortholog conjecture. 
+The first study, Kryuchkova-Mostacci and Robinson-Rechavi (KMRR) 2016 [@KryuchkovaMostacci:2016iw], analyzed multiple vertebrate expression datasets to test the ortholog conjecture - the hypothesis that orthologs tend of have more conserved attributes (specificity of expression across organs in this case) than do paralogs [@Nehrt:2011bm]. Using pairwise comparisons (Fig. 1A), they found lower expression correlation between paralogs than between orthologs and interpreted this as strong support for the ortholog conjecture. 
 
 The second CFG study we evaluate here is Levin *et al.* [@Levin:2016bp]. This study analyzed gene expression through the course of embryonic development for ten animal species, each from a different phylum. They concluded that these animals exhibit an "inverse hourglass" model for the evolution of gene expression, where there is more evolutionary variance in gene expression at a mid phase of development than there is at early and late phases (Fig. 2). This contrasts with the "hourglass" model previously proposed for closely related species [@Kalinka:2010dw]. Levin *et al.* conclude that this provides biological justification for the concept of phyla and may provide a definition of phyla. We previously described concerns with their interpretations of these results [@Hejnol:2016hw]. Here we directly address the analyses themselves by examining the structure of the pairwise comparisons. 
 
 ![Figure Overview](Figure_overview.png?raw=true)
 
-> Figure 1 | Pairwise and phylogenetic comparative approaches. (a) Many comparative functional genomic studies across species rely on pairwise comparisons, where traits of each gene are compared to traits of every other gene. This leads to many more comparisons than unique observations, making each comparison non-independent. (b) Comparative phylogenetic methods, including phylogenetic independent contrasts [@Felsenstein:1985ua], make a smaller number of independent comparisons, where each contrast measures changes along different branches. Phylogenetic approaches are rarely used for functional genomics studies. 
+> Figure 1 | Pairwise and phylogenetic comparative approaches. (a) Many comparative functional genomic studies rely on pairwise comparisons, where traits of each gene are compared to traits of other genes (such as orthologs and paralogs). This leads to many more comparisons than unique observations, making each comparison non-independent. (b) Comparative phylogenetic methods, including phylogenetic independent contrasts [@Felsenstein:1985ua], make a smaller number of independent comparisons, where each contrast measures independent changes along different branches. Phylogenetic approaches are rarely used for functional genomics studies. 
 
 
 ## Results and Discussion
 
 ### KMRR Reanalysis
 
-#### Original pairwise analyses
+#### Original pairwise test of the ortholog conjecture
 
-The KMRR study [@KryuchkovaMostacci:2016iw] sought to test the ortholog conjecture. The ortholog conjecture [@Nehrt:2011bm] is the proposition that orthologs (genes that diverged from each other due to a speciation event) have more similar attributes than do paralogs (genes that diverged from each other due to a gene duplication event). The ortholog conjecture has important biological and technical implications. It shapes our understanding of the functional diversity of gene families. It is used to relate findings from well-studied genes to related genes that haven't been investigated in detail. It can be applied to any trait of genes, from gene seqeunce to biochemical properties to expression. While the ortholog conjecture describes a specific pattern of functional diversity across genes, it can also be considered a hypothesis about the process of evolution. Specifically, it postulates that there is greater evolutionary change in gene attributes following a duplication event than a speciation event. 
+The KMRR study [@KryuchkovaMostacci:2016iw] sought to test the ortholog conjecture. The ortholog conjecture [@Nehrt:2011bm] is the proposition that orthologs (genes that diverged from each other due to a speciation event) have more similar attributes than do paralogs (genes that diverged from each other due to a gene duplication event). The ortholog conjecture has important biological and technical implications. It shapes our understanding of the functional diversity of gene families. It is used to relate findings from well-studied genes to related genes that have not been investigated in detail. It can be applied to any trait of genes, from gene seqeunce to biochemical properties to expression. While the ortholog conjecture describes a specific pattern of functional diversity across genes, it is also articulated as a hypothesis about the process of evolution-- that there is greater evolutionary change in gene attributes following a duplication event than a speciation event. 
 
-Despite its importance, there have been relatively few tests of the ortholog conjecture. Previous work has shown that ontology annotations are not sufficient to test the ortholog conjecture [@Chen:2012jz; @Thomas:2012hz]. Analyses of domain structure were consistent with ortholog conjecture [@Forslund:2011cw]. There have been few tests of the ortholog conjecture with regards to gene expression [@Chen:2012jz], and KMRR is the most thorough expression study to date.
+Despite its importance, there have been relatively few tests of the ortholog conjecture. Previous work has shown that ontology annotations are not sufficient to test the ortholog conjecture [@Chen:2012jz; @Thomas:2012hz]. Analyses of domain structure were consistent with ortholog conjecture [@Forslund:2011cw]. There have been few tests of the ortholog conjecture with regards to gene expression [@Chen:2012jz], and KMRR is the most thorough such expression study to date.
 
-The KMRR study considered several publicly available datasets. Here we consider their conclusions in the context of Brawand *et al.* 2011 [@Brawand:2011du], one of the studies they considered. This dataset of gene expression for six organs across 10 species (nine mammals and a bird) is the best sampled in their reanalyses. Their expression summary statistic is Tau [@Yanai:2005dh, @KryuchkovaMostacci:2016in], an indicator of tissue specificity of gene expression. It can range from a value of 0, which indicates no specificity (*i.e.*, uniform expression across tissues), to a value of 1, which indicates high specificity (*i.e.*, expression in only one tissue). It is convenient in that it is a single number of defined range for each gene, though of course since the original expression is multidimensional this means much information is discarded. For example, it does not convey which tissue expression is specific to. Homologous genes could each have a tau value of 1, but one gene could have expression that is specific to the kidney and the other to the brain, for example. 
+The KMRR study considered several publicly available datasets. Here we consider their conclusions in the context of one of these studies, Brawand *et al.* 2011 [@Brawand:2011du]. This dataset of gene expression for six organs across 10 species (nine mammals and a bird) is the best sampled in their analyses. Their expression summary statistic is Tau [@Yanai:2005dh, @KryuchkovaMostacci:2016in], an indicator of tissue specificity of gene expression. It can range from a value of 0, which indicates no specificity (*i.e.*, uniform expression across tissues), to a value of 1, which indicates high specificity (*i.e.*, expression in only one tissue). It is convenient in that it is a single number of defined range for each gene, though of course since the original expression is multidimensional this means much information is discarded. For example, it does not convey which tissue expression is specific to. Homologous genes could each have a tau value of 1, but one gene could have expression that is specific to the kidney and the other to the brain, for example. 
 
 KMRR's published analyses are based on pairwise comparisons (Figure 1a) between tau within each gene family. They found the correlation of tau for orthologs to be significantly greater than the correlation of tau for paralogs, *i.e.* that orthologs tend to be more similar to each other than paralogs. From this they concluded that their analyses support the ortholog conjecture. They also went one step further. They concluded that this pattern provides support for a particular evolutionary process, that "tissue-specificity evolves very slowly in the absence of duplication, while immediately after duplication the new gene copy differs".
 
@@ -114,50 +116,51 @@ When we reanalyze the data with phylogenetic independent contrasts (Fig. 1B), we
 		"PlatypusBrawandTScomparisonTable_9_6pPC.txt"
 	)
 	
-	expression_file_names %<>% paste(kmrr_directory, ., sep="")
+	expression_file_names %<>% paste( kmrr_directory, ., sep="" )
 	
-	gene_tree_name %<>% paste(kmrr_directory, ., sep="")
+	gene_tree_name %<>% paste( kmrr_directory, ., sep="" )
 	
 	
 	# These are from the KMRR code
 	calibration_times = data.frame(
 		age.min =
-			c(20, 92, 167, 8, 42, 74, 296, 535, 104, 937, 29, 722, 441, 65, 15, 1215, 
-				414, 371, 162, 25, 74, 77, 86), 
-		clade = c("Hominoidea", "Euarchontoglires", "Mammalia", "Homininae", 
-							"Simiiformes", "Primates", "Amniota", "Vertebrata", "Eutheria", 
-							"Bilateria", "Catarrhini", "Chordata", "Euteleostomi", 
-							"Haplorrhini", "Hominidae", "Opisthokonta", "Sarcopterygii", 
-							"Tetrapoda", "Theria", "Murinae", "Sciurognathi", "Rodentia", "Glires"),
+			c( 20, 92, 167, 8, 42, 74, 296, 535, 104, 937, 29, 722, 441, 65, 15, 1215, 
+				414, 371, 162, 25, 74, 77, 86 ), 
+		clade = 
+			c("Hominoidea", "Euarchontoglires", "Mammalia", "Homininae", 
+					"Simiiformes", "Primates", "Amniota", "Vertebrata", "Eutheria", 
+					"Bilateria", "Catarrhini", "Chordata", "Euteleostomi", 
+					"Haplorrhini", "Hominidae", "Opisthokonta", "Sarcopterygii", 
+					"Tetrapoda", "Theria", "Murinae", "Sciurognathi", "Rodentia", "Glires"
+			),
 		stringsAsFactors=FALSE
 	)
-	
-	
+
 	
 	# Functions
 	
 	# Returns a logical vector indicating which rows in nhx_tags are for tips
 	is.tip.nhx = function( nhx ) {
-	  is.tip = rep( FALSE, nrow( nhx@data ) )
-	  is.tip[ 1:length( nhx@phylo$tip.label ) ] = TRUE
-	  is.tip
+		is.tip = rep( FALSE, nrow( nhx@data ) )
+		is.tip[ 1:length( nhx@phylo$tip.label ) ] = TRUE
+		is.tip
 	}
 	
 	# put node ages in @data
 	store_node_age = function( nhx ) {
-  
-	  if ( class( nhx ) != "treedata" ) {
-	    return( nhx )
-	  }
-	  
-	  node_age = hutan::distance_from_tip( nhx@phylo )
-	  
-	  # make sure the dataframe is ordered by consecutive nodes
-	  stopifnot( all( nhx@data$node == 1:length( nhx@data$node ) ) )
-	  
-	  nhx@data$node_age = node_age 
-	  
-	  return( nhx )
+
+		if ( class( nhx ) != "treedata" ) {
+			return( nhx )
+		}
+		
+		node_age = hutan::distance_from_tip( nhx@phylo )
+		
+		# make sure the dataframe is ordered by consecutive nodes
+		stopifnot( all( nhx@data$node == 1:length( nhx@data$node ) ) )
+		
+		nhx@data$node_age = node_age 
+		
+		return( nhx )
 	}
 	
 	# Make tree ultrametric, calibrating speciation nodes to consistent times
@@ -165,15 +168,18 @@ When we reanalyze the data with phylogenetic independent contrasts (Fig. 1B), we
 			
 			# Create calibration matrix for speciation nodes
 			calibration = 
-				nhx@data[ !is.tip.nhx( nhx ) ,  ] %>%
-				filter( D=="N" ) %>%
+				nhx@data[ !is.tip.nhx( nhx ), ] %>%
+				filter( D == "N" ) %>%
 				left_join( calibration_times, c( "label" = "clade" ) ) %>%
 				select( node, age.min ) %>%
 				mutate( age.max = age.min ) %>% 
 				mutate( soft.bounds = NA )
 			
-			tree = try( ape::chronos( nhx@phylo, calibration=calibration, model="correlated" ) )
-			if( "phylo" %in% class(tree) ){
+			tree = try( 
+				ape::chronos( nhx@phylo, calibration=calibration, model="correlated" ) 
+			)
+
+			if( "phylo" %in% class( tree ) ){
 				class( tree ) = "phylo"
 				nhx@phylo = tree
 				return( nhx )
@@ -186,10 +192,16 @@ When we reanalyze the data with phylogenetic independent contrasts (Fig. 1B), we
 ```
 
 ```{r load_expression, echo=FALSE, message=F, warning=F}
-	expression = lapply(
-		expression_file_names, read.table, stringsAsFactors=FALSE, header=TRUE
+
+	expression = 
+	lapply(
+		expression_file_names, 
+		read.table, 
+		stringsAsFactors=FALSE, 
+		header=TRUE
 	) %>%
 	bind_rows()
+
 ```
 
 ```{r load_trees, echo=FALSE, cache=TRUE, message=F, warning=F}
@@ -202,7 +214,7 @@ When we reanalyze the data with phylogenetic independent contrasts (Fig. 1B), we
 		lines,
 		function( x ){
 			tree_tc = textConnection( x )
-			tree <- treeio::read.nhx( tree_tc )
+			tree = treeio::read.nhx( tree_tc )
 			close( tree_tc )
 			tree@data$label = c( tree@phylo$tip.label, tree@phylo$node.label )
 			return( tree )
@@ -212,43 +224,52 @@ When we reanalyze the data with phylogenetic independent contrasts (Fig. 1B), we
 
 
 ```{r add_expression_to_trees, echo=FALSE, cache=TRUE, message=F, warning=F}
+
 	gene_trees_annotated = mclapply(
 		gene_trees,
 		function( tree ){
-			tree@data %<>% left_join( expression, by = c("G" = "Ensembl.Gene.ID") )
+			tree@data %<>% left_join( expression, by = c( "G" = "Ensembl.Gene.ID" ) )
 			return( tree )
-		}, mc.cores=cores
+		}, 
+		mc.cores=cores
 	)
+
 ```
 
 ```{r prep_trees, echo=FALSE, cache=TRUE, message=F, warning=F}
+
 	drop_empty_tips = function( nhx ) {
-	  to_drop = which( is.na( nhx@data[ 1:length(nhx@phylo$tip.label), ]$Tau ) )
-	  remaining = length(nhx@phylo$tip.label) - length(to_drop)
-	  
-	  if( remaining > 3 ){
-	  	pruned = treeio::drop.tip( nhx, to_drop )
-	  	return( pruned )
-	  }
-	  else{
-	  	return( NA )
-	  }
+		to_drop = which( is.na( nhx@data[ 1:length( nhx@phylo$tip.label ), ]$Tau ) )
+		remaining = length( nhx@phylo$tip.label ) - length( to_drop )
+	
+		if( remaining > 3 ){
+			pruned = treeio::drop.tip( nhx, to_drop )
+			return( pruned )
+		}
+		else{
+			return( NA )
+		}
 	}
 
 	gene_trees_sub = mclapply( gene_trees_annotated, drop_empty_tips, mc.cores=cores )
 	gene_trees_sub = gene_trees_sub[ ! is.na( gene_trees_sub ) ]
 	
-	
-	gene_trees_calibrated = mclapply( 
-		gene_trees_sub,
-		calibrate_tree, 
-		calibration_times=calibration_times,
-		mc.cores=cores
-	)
+	gene_trees_calibrated = 
+		mclapply( 
+			gene_trees_sub,
+			calibrate_tree, 
+			calibration_times=calibration_times,
+			mc.cores=cores
+		)
 	
 	gene_trees_calibrated = gene_trees_calibrated[ ! is.na( gene_trees_calibrated ) ]
 	
-	gene_trees_calibrated = mclapply( gene_trees_calibrated, store_node_age, mc.cores=cores )
+	gene_trees_calibrated = 
+		mclapply( 
+			gene_trees_calibrated, 
+			store_node_age, 
+			mc.cores=cores 
+		)
 	
 ```
 
@@ -257,26 +278,27 @@ Of the `r length(gene_trees)` trees that were parsed, `r length(gene_trees_sub)`
 ```{r contrasts, cache=TRUE, echo=FALSE, message=F, warning=F}
 
 	pic.nhx = function( nhx ) {
-  
-	  p = pic( nhx@data$Tau[ is.tip.nhx( nhx ) ], nhx@phylo, var.contrasts=TRUE )
-	  
-	  nhx@data$pic = c( rep( NA, length( nhx@phylo$tip.label ) ), p[ ,1 ] )
-	  nhx@data$var_exp = c( rep( NA, length( nhx@phylo$tip.label ) ), p[ ,2 ] )
-	  
-	  return( nhx )
+
+		p = pic( nhx@data$Tau[ is.tip.nhx( nhx ) ], nhx@phylo, var.contrasts=TRUE )
+	
+		nhx@data$pic = c( rep( NA, length( nhx@phylo$tip.label ) ), p[ ,1 ] )
+		nhx@data$var_exp = c( rep( NA, length( nhx@phylo$tip.label ) ), p[ ,2 ] )
+	
+		return( nhx )
 	}
 
-	gene_trees_pic = mclapply( gene_trees_calibrated,  pic.nhx, mc.cores=cores )
+	gene_trees_pic = mclapply( gene_trees_calibrated, pic.nhx, mc.cores=cores )
 	
-	all_nodes = lapply( 
-	      gene_trees_pic, 
-	  		function( nhx ){
-	  			tags = nhx@data
-	  			tags$gene = digest( nhx )
-	  			tags %<>% select( -(B) ) # B has inconsistent types, remove it
-	  			return(tags)
-	  		}
-  		) %>%
+	all_nodes = 
+		lapply( 
+			gene_trees_pic, 
+			function( nhx ){
+				tags = nhx@data
+				tags$gene = digest( nhx )
+				tags %<>% select( -( B ) ) # B has inconsistent types, remove it
+				return( tags )
+			}
+		) %>%
 		bind_rows()
 	
 	all_nodes$Event = NA
@@ -292,22 +314,22 @@ Of the `r length(gene_trees)` trees that were parsed, `r length(gene_trees_sub)`
 
 	nodes_contrast = 
 		all_nodes %>%
-		filter( ! is.na(pic) ) %>%
-		mutate( pic=abs(pic) ) %>%
-		filter( ! is.na(D) )
+		filter( ! is.na( pic ) ) %>%
+		mutate( pic = abs( pic ) ) %>%
+		filter( ! is.na( D ) )
 
 	nodes_contrast %>%
 		ggplot( aes( x=pic, y=..density.., col=Event ) ) + 
-        geom_freqpoly( binwidth=.001, position="identity" ) +
-        xlab( "Phylogenetic independent \ncontrasts (PIC)" ) +
-				ylab( "Density" ) +
-				xlim( 0, 0.075 ) + 
-				theme_classic()
+		geom_freqpoly( binwidth=.001, position="identity" ) +
+		xlab( "Phylogenetic independent \ncontrasts (PIC)" ) +
+		ylab( "Density" ) +
+		xlim( 0, 0.075 ) + 
+		theme_classic()
 	
 	wilcox_test_result = 
 		wilcox.test( 
-			nodes_contrast %>% filter(D=="Y") %>% .$pic, 
-			nodes_contrast %>% filter(D=="N") %>% .$pic, 
+			nodes_contrast %>% filter( D=="Y" ) %>% .$pic, 
+			nodes_contrast %>% filter( D=="N" ) %>% .$pic, 
 			alternative="greater" 
 		)
 
@@ -325,22 +347,22 @@ Given the ortholog conjecture, we would expect to see larger expression contrast
 
 	# Examine by node age
 
-  g_age =
-  nodes_contrast %>%
-    ggplot( aes( x=node_age, y=pic, col=Event ) ) + 
-		  geom_point( alpha=0.2 ) + 
-		  xlab( "Node age (millions of years)" ) + 
-		  ylab("Phylogenetic independent contrasts (PIC)\n of differential expression") +
-		  ylim(0,0.3) +
-			xlim(0,1000) +
-		  ggtitle( "(a)" ) +
-		  theme_classic()	
+	g_age =
+		nodes_contrast %>%
+		ggplot( aes( x=node_age, y=pic, col=Event ) ) + 
+			geom_point( alpha=0.2 ) + 
+			xlab( "Node age (millions of years)" ) + 
+			ylab( "Phylogenetic independent contrasts (PIC)\n of differential expression" ) +
+			ylim( 0, 0.3 ) +
+			xlim( 0, 1000 ) +
+			ggtitle( "(a)" ) +
+			theme_classic()	
 
 	max_speciation_age = 
-    nodes_contrast %>% 
-    filter( D=="N" ) %>%
-    select( node_age ) %>%
-    max( na.rm=TRUE )
+		nodes_contrast %>% 
+		filter( D=="N" ) %>%
+		select( node_age ) %>%
+		max( na.rm=TRUE )
 	
 	nodes_contrast_filtered_age = 
 		nodes_contrast %>% 
@@ -348,32 +370,32 @@ Given the ortholog conjecture, we would expect to see larger expression contrast
 	
 	wilcox_filtered_age = 
 		wilcox.test( 
-			nodes_contrast_filtered_age %>% filter(D=="Y") %>% .$pic, 
-			nodes_contrast_filtered_age %>% filter(D=="N") %>% .$pic, 
+			nodes_contrast_filtered_age %>% filter( D=="Y" ) %>% .$pic, 
+			nodes_contrast_filtered_age %>% filter( D=="N" ) %>% .$pic, 
 			alternative="greater" 
 		)$p.value
 
 	# Examine by expected variance, ie branch length
-  var_exp_max = 
-    nodes_contrast %>% 
-    filter( D=="N" ) %>%
-    select( var_exp ) %>%
-    max( na.rm=TRUE )
+	var_exp_max = 
+		nodes_contrast %>% 
+		filter( D=="N" ) %>%
+		select( var_exp ) %>%
+		max( na.rm=TRUE )
 
-  var_exp_min = 
-    nodes_contrast %>% 
-    filter( D=="N" ) %>%
-    select( var_exp ) %>%
-    min( na.rm=TRUE )
-  
-  nodes_contrast_filtered_var = 
-    nodes_contrast %>% 
-      filter ( var_exp >=var_exp_min & var_exp <=var_exp_max )
-  
+	var_exp_min = 
+		nodes_contrast %>% 
+		filter( D=="N" ) %>%
+		select( var_exp ) %>%
+		min( na.rm=TRUE )
+
+	nodes_contrast_filtered_var = 
+		nodes_contrast %>% 
+		filter ( ( var_exp >= var_exp_min ) & ( var_exp <= var_exp_max ) )
+
 	wilcox_filtered_var = 
 	wilcox.test( 
-		nodes_contrast_filtered_var %>% filter(D=="Y") %>% .$pic, 
-		nodes_contrast_filtered_var %>% filter(D=="N") %>% .$pic, 
+		nodes_contrast_filtered_var %>% filter( D=="Y" ) %>% .$pic, 
+		nodes_contrast_filtered_var %>% filter( D=="N" ) %>% .$pic, 
 		alternative="greater" 
 	)$p.value
 	
@@ -410,30 +432,14 @@ The fact that the expected variance of speciation contrasts is a subset of the r
 		D %<>% mutate ( tau_b = nhx@data$Tau[ D$tip_b ] )
 		D %<>% mutate ( difference = abs( tau_a - tau_b ) )
 		
-		# Calculate the phenotypic difference between the tips with a different method as 
-		# check on parsing
-		D$difference_old = 
-			apply(
-				D,
-				1,
-				function(y) {
-					tau_values = nhx@data$Tau[ c( as.integer(y['tip_a']), as.integer( y['tip_b'] ) ) ]
-					max( tau_values ) - min( tau_values )
-				}
-			)
-		
-		if ( ! all ( near( D$difference, D$difference_old ) ) ){
-			stop( "Inconsistent difference calculations" )
-		} 
-		
 		# For each row, bet the most recent common ancestor of the pairwise tip combination
 		D$mrca = 
 			apply(
 				D, 
 				1, 
-				function(y) ape::getMRCA( 
+				function( y ) ape::getMRCA( 
 					nhx@phylo, 
-					c( as.integer(y['tip_a']), as.integer(y['tip_b'] ))
+					c( as.integer( y['tip_a'] ), as.integer( y['tip_b'] ) )
 				)
 			) %>%
 			as.integer()
@@ -477,20 +483,20 @@ The fact that the expected variance of speciation contrasts is a subset of the r
 	paralog_subset_r = 
 		pairwise_summary %>% 
 		filter( D=="Y" ) %>% 
-		filter( node_age <= max_speciation_age  ) %>% 
+		filter( node_age <= max_speciation_age ) %>% 
 		select( tau_a, tau_b ) %>% 
 		cor( ) %>% 
 		.[ 1, 2 ]
 	
 	ortholog_distance_mean = 
 		pairwise_summary %>% 
-		filter(D=="N") %>% 
+		filter( D=="N" ) %>% 
 		.[["distance"]] %>% 
 		mean()
 	
 	paralog_distance_mean = 
 		pairwise_summary %>% 
-		filter(D=="Y") %>% 
+		filter( D=="Y" ) %>% 
 		.[["distance"]] %>% 
 		mean()
 	
@@ -500,7 +506,7 @@ In order to better understand why our phylogenetic analysis seem to support a di
 
 Why is it that pairwise methods and phylogenetic methods lead to the opposite conclusion? The reason is that they describe different things. Pairwise comparisons describe contemporary patterns, while phylogenetic methods infer historical processes. There need not be a different process of evolution following speciation and duplication for there to be different patterns for orthologs and paralogs. That is because there is one other important link between evolutionary process and contemporary patterns - the structure of the tree. 
 
-Paralogs could be more different from each other than orthologs if they tend to be more distantly related to each other than orthologs are. That would provide more time for differences to accumulate between them, regardless of the history of duplication and speciation.  This is, in fact, what we find in this dataset. While the mean distance between orthologs is `r round( ortholog_distance_mean, 1 )` years, the mean distance between paralogs is `r round( paralog_distance_mean, 1 )` years. This is at least in part because, while the maximum distance between orthologs is two times the depth of the oldest speciation event in the tree, many duplications precede this oldest sampled speciation event. The distance between paralogs resulting from these deeper duplications can be much larger.
+Paralogs could be more different from each other than orthologs if they tend to be more distantly related to each other than orthologs are. That would provide more time for differences to accumulate between them, regardless of the history of duplication and speciation. This is, in fact, what we find in this dataset. While the mean distance between orthologs is `r round( ortholog_distance_mean, 1 )` years, the mean distance between paralogs is `r round( paralog_distance_mean, 1 )` years. This is at least in part because, while the maximum distance between orthologs is two times the depth of the oldest speciation event in the tree, many duplications precede this oldest sampled speciation event. The distance between paralogs resulting from these deeper duplications can be much larger.
 
 If we consider only the paralogs that arise from the duplication events the same age or younger than the oldest speciation event, the observed pattern is very different. The correlation of tau between these shallower paralog pairs, R=`r round( paralog_subset_r, 3)`, is much stronger than for the correlation between all paralog pairs, R=`r round( paralog_r, 3)`. This is much closer to the ortholog comparison, which has R=`r round( ortholog_r, 3) `.
 
@@ -523,7 +529,7 @@ To understand our concerns with their analyses, it is helpful to first outline L
 
 We began by examining the matrix of pairwise comparisons that their KS tests and Figure 4d are based on. As this figure shows (regenerated here as our Figure XXLevin a), there is not a strong distinction between these temporal phases - the distributions for the early, mid, and late distributions overlap considerably. The medians are close in value, and the range of mid phase includes the entire range of the early phase. Further inspection (Figure XXLevin a) reveals that the mid phase distribution has several outliers with very low similarity scores. We found that all five of the lowest values in the mid phase distribution are for pairwise comparisons that include the ctenophore (Figure XXLevin a). When the nine pairwise comparisons that include the ctenophore are removed, the differences between the early and mid phase distributions are greatly reduced (Figure XXLevin b).
 
-We also found several problems with the statistical tests that were used to evaluate the inverse hourglass hypothesis. First, in the published analyses every data point was included twice because both reciprocal comparisons (which have the same values) were retained. For example, there is both a nematode to arthropod comparison and an arthropod to nematode comparison. As a consequence, there are 90 entries for the 45 pairwise comparisons, and by doubling the data the significance of the result appears much stronger than it actually is. After removing the duplicate values, the p values are far less significant, 0.002 for the early-mid comparison and on the order of 10<sup>-6</sup> for early-late. Second, the test they used (KS test) is not appropriate for the hypothesis they seek to evaluate. The KS test does not just evaluate whether one distribution is greater than the other, it also tests whether the shape of the distributions are the same. In addition, the samples in this dataset are matched (*i.e.*, for each pairwise comparison there is a early, mid, and late expression value), which the KS test does not take into account. The Wilcoxon test is instead appropriate in this case. After removing the duplicate scores, removing the ctenophore, and applying the Wilcoxon test, there is no significant difference between the early phase and mid phase distributions (P  = 0.1428 for the early-mid comparison and P < 10<sup>-5</sup> for the late-mid comparison), and the inverse hourglass turns into a wine bottle (Figure XXLevin b). 
+We also found several problems with the statistical tests that were used to evaluate the inverse hourglass hypothesis. First, in the published analyses every data point was included twice because both reciprocal comparisons (which have the same values) were retained. For example, there is both a nematode to arthropod comparison and an arthropod to nematode comparison. As a consequence, there are 90 entries for the 45 pairwise comparisons, and by doubling the data the significance of the result appears much stronger than it actually is. After removing the duplicate values, the p values are far less significant, 0.002 for the early-mid comparison and on the order of 10<sup>-6</sup> for early-late. Second, the test they used (KS test) is not appropriate for the hypothesis they seek to evaluate. The KS test does not just evaluate whether one distribution is greater than the other, it also tests whether the shape of the distributions are the same. In addition, the samples in this dataset are matched (*i.e.*, for each pairwise comparison there is a early, mid, and late expression value), which the KS test does not take into account. The Wilcoxon test is instead appropriate in this case. After removing the duplicate scores, removing the ctenophore, and applying the Wilcoxon test, there is no significant difference between the early phase and mid phase distributions (P = 0.1428 for the early-mid comparison and P < 10<sup>-5</sup> for the late-mid comparison), and the inverse hourglass turns into a wine bottle (Figure XXLevin b). 
 
 Our results highlight the importance of explicitly accounting for phylogenetic relationships when studying character evolution, including developmental [@Telford:2003tsa] and functional genomic traits [@Hejnol:2015gr]. This is particularly true for evolutionary analyses of quantitative gene expression [@Dunn:2013cpa]. Pairwise comparisons result in the same evolutionary changes being counted multiple times in each species pair, as for the ctenophore comparisons that were mistaken for a global pattern here. This is a well understood property of pairwise comparisons that has been specifically addressed by phylogenetic comparative methods [@Felsenstein:1985ua]. This particular case illustrates the shortcomings of *ad hoc* rank-based methods [@DomazetLoso:2010cn] and pairwise comparisons [@Levin:2016bp] for the study of the evolution of gene expression. Phylogenetic analyses of character evolution provide not only a way to avoid these problems, but a richer context for interpreting the biological implications of the results.
 
@@ -558,7 +564,7 @@ All files needed to re-execute the analyses presented in this document are avail
 
 ### KMRR reanalysis
 
-The KMRR study [@KryuchkovaMostacci:2016iw] followed excellent practices in reproducibility. They posted all data and code needed to re-execute their analyses at figshare:  https://figshare.com/articles/Tissue-specificity_of_gene_expression_diverges_slowly_between_orthologs_and_rapidly_between_paralogs/3493010/2 . We slightly altered their `Rscript.R` to simplify file paths. This modified script and their data files are available in the github repository for this paper, as are the intermediate files that were generated by their analysis script that we used in our own analyses. We also obtained the `Compara.75.protein.nh.emf` gene trees [@Herrero:2016jj] from ftp://ftp.ensembl.org/pub/release-75/emf/ensembl-compara/homologies/ and place them in the same directory as this file.
+The KMRR study [@KryuchkovaMostacci:2016iw] followed excellent practices in reproducibility. They posted all data and code needed to re-execute their analyses at figshare: https://figshare.com/articles/Tissue-specificity_of_gene_expression_diverges_slowly_between_orthologs_and_rapidly_between_paralogs/3493010/2 . We slightly altered their `Rscript.R` to simplify file paths. This modified script and their data files are available in the github repository for this paper, as are the intermediate files that were generated by their analysis script that we used in our own analyses. We also obtained the `Compara.75.protein.nh.emf` gene trees [@Herrero:2016jj] from ftp://ftp.ensembl.org/pub/release-75/emf/ensembl-compara/homologies/ and place them in the same directory as this file.
 
 We considered only the data from Brawand *et al.* 2011 [@Brawand:2011du]. KMRR examined multiple subsets of the data. We left in sex chromosome genes and testes expression data, as this corresponded to the analyses that provided the strongest support for the ortholog conjecture and therefore the most conservative reconsideration of it.
 
@@ -577,55 +583,51 @@ Thanks to XX. This work was supported by the National Science Foundation (DEB-12
 
 ### KMRR Analyses
 
-
-
-  
 ```{r ascertainment_plot, cache=TRUE, echo=FALSE, fig.cap="XX_PIC_VAR", warning=FALSE, message=FALSE}
 
-		label_age = str_c( "Wilcoxon p=", wilcox_filtered_age )
+	label_age = str_c( "Wilcoxon p=", wilcox_filtered_age )
 	
-	g_density_filtered_age =   
+	g_density_filtered_age =
 		nodes_contrast_filtered_age %>%
 		ggplot( aes( x=pic, y=..density.., col=Event ) ) + 
-      geom_freqpoly( binwidth=.001, position="identity" ) +
-      xlab("Phylogenetic independent \ncontrasts (PIC)") +
-			ylab("Density") +
-			xlim(0,0.075) + 
-			ggtitle( "(b)" ) +
-			annotate("text", x = Inf, y = Inf, hjust="right", vjust="top", label=label_age ) +
-			theme_classic()
+		geom_freqpoly( binwidth=.001, position="identity" ) +
+		xlab( "Phylogenetic independent \ncontrasts (PIC)" ) +
+		ylab( "Density" ) +
+		xlim( 0, 0.075 ) + 
+		ggtitle( "(b)" ) +
+		annotate( "text", x = Inf, y = Inf, hjust="right", vjust="top", label=label_age ) +
+		theme_classic()
 
 
 	# Examine by expected variance (branch length)
-  g_var_exp =
-    nodes_contrast %>%
-      ggplot( aes( x=var_exp, y=pic, col=Event ) ) + 
-      geom_point( alpha=0.2 ) + 
-      xlab( "Expected variance, \n depends mostly on branch length" ) + 
-      ylab("Phylogenetic independent contrasts (PIC)\n of differential expression") +
-      ylim(0,0.3) +
-			xlim(0,2000) +
-      ggtitle( "(c)" ) +
-      theme_classic()	
-      # theme( legend.justification=c( 1, 1 ), legend.position=c( 1, 1 ) )
+	g_var_exp =
+		nodes_contrast %>%
+		ggplot( aes( x=var_exp, y=pic, col=Event ) ) + 
+		geom_point( alpha=0.2 ) + 
+		xlab( "Expected variance, \n depends mostly on branch length" ) + 
+		ylab( "Phylogenetic independent contrasts (PIC)\n of differential expression" ) +
+		ylim( 0, 0.3 ) +
+		xlim( 0, 2000 ) +
+		ggtitle( "(c)" ) +
+		theme_classic()	
 
 	label_var = str_c( "Wilcoxon p=", wilcox_filtered_var )
 	
-  g_density_filtered_var =   
-    nodes_contrast_filtered_var  %>% 
-    ggplot( aes( x=pic, y=..density.., col=Event ) ) + 
-      geom_freqpoly( binwidth=.001, position="identity" ) + 
-      ggtitle( "(d)" ) +
-      theme( legend.justification=c( 1, 1 ), legend.position=c( 1, 1 ) ) +
-      xlim(0,0.075) + 
-			theme_classic() +
-  		annotate("text", x = Inf, y = Inf, hjust="right", vjust="top", label=label_var ) +
-      xlab("Phylogenetic independent contrasts (PIC)\n of differential expression") +
-  		ylab("Density")
+	g_density_filtered_var =
+		nodes_contrast_filtered_var %>% 
+		ggplot( aes( x=pic, y=..density.., col=Event ) ) + 
+		geom_freqpoly( binwidth=.001, position="identity" ) + 
+		ggtitle( "(d)" ) +
+		theme( legend.justification=c( 1, 1 ), legend.position=c( 1, 1 ) ) +
+		xlim( 0, 0.075 ) + 
+		theme_classic() +
+		annotate( "text", x = Inf, y = Inf, hjust="right", vjust="top", label=label_var ) +
+		xlab( "Phylogenetic independent contrasts (PIC)\n of differential expression" ) +
+		ylab( "Density" )
 
-  grid.arrange(
-  	g_age,
-  	g_density_filtered_age,
+	grid.arrange(
+		g_age,
+		g_density_filtered_age,
 		g_var_exp,
 		g_density_filtered_var,
 		ncol = 2
@@ -638,12 +640,12 @@ Thanks to XX. This work was supported by the National Science Foundation (DEB-12
 		
 ```{r pairwise_plot, echo=FALSE, cache=TRUE, message=F, warning=F}	
 	pairwise_summary %>% 
-		filter( ! is.na(D) ) %>%
-  	ggplot(aes(x=distance, y=difference, color=D)) + 
-  		geom_point(alpha=0.1) +
-  		geom_smooth(method=lm, se=FALSE) +
-			xlim( 0, 2000 )
-	
+	filter( ! is.na( D ) ) %>%
+	ggplot( aes( x=distance, y=difference, color=D ) ) + 
+		geom_point( alpha=0.1 ) +
+		geom_smooth( method=lm, se=FALSE ) +
+		xlim( 0, 2000 )
+
 ```
 
 > Supplementary Figure XXPairwise | Pairwise comparisons
