@@ -15,7 +15,7 @@ output:
 
 # The importance of phylogenetic methods when comparing functional genomic data across species
 
-Casey W. Dunn^1^*, Felipe Zapata^1,2^, Cat Munro^1^, Stefan Siebert^1,3^, Andreas Hejnol^4^
+Casey W. Dunn^1^*, Felipe Zapata^1,2^, Catriona Munro^1^, Stefan Siebert^1,3^, Andreas Hejnol^4^
 
 ^1^ Department of Ecology and Evolutionary Biology, Brown University, Providence, RI, USA
 
