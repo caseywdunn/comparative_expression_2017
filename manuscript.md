@@ -133,7 +133,7 @@ The fact that the first two CFG studies we reanalyzed show serious problems with
 Methods
 -------
 
-All files needed to re-execute the analyses presented in this document are available at <https://github.com/caseywdunn/comparative_expression_2017>. The most recent commit at the time of the analysis presented here was 76bc8841d4f9a50e867b1ed0a9b632130a5a8853.
+All files needed to re-execute the analyses presented in this document are available at <https://github.com/caseywdunn/comparative_expression_2017>. The most recent commit at the time of the analysis presented here was 00bfbf5490f72841e7572a0a84d489f06ea8ef14.
 
 ### KMRR reanalysis
 

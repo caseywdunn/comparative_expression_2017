@@ -122,17 +122,46 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 	# These clade dates are from the KMRR code, they got them from http://timetree.org/
 	calibration_times = data.frame(
 		age.min =
-			c( 92, 167, 8, 296, 29, 162 ), 
+			c(  8, 29, 92, 162, 167, 296 ), 
 		clade = 
-			c( "Euarchontoglires", "Mammalia", "Homininae", 
-					"Amniota", "Catarrhini", "Theria"
-			),
+			c( "Homininae", "Catarrhini", "Euarchontoglires", "Theria", "Mammalia", "Amniota" ),
 		stringsAsFactors=FALSE
 	)
 ```
 
 ```{r define_functions, echo=FALSE, message=F, warning=F}
 	
+	#' Adds some random noise from a normal distribution to calibration
+	#' times
+	#' 
+	#' @param calibration_times A dataframe with two columns: age.min is the age 
+	#' of a clade, and clade is the name of the clade
+	#' @param sd_fraction this is multiplied by each value to set sd of that value 
+	#' @return A dataframe as above, but with noise
+	#' @export
+	add_noise_calibration_times = function( calibration_times, sd_fraction ) {
+		age = calibration_times$age.min
+		new_age = NA
+		
+		while( NA %in% new_age ) {
+			x = sapply( 
+				age,
+				function( i ){
+					rnorm( 1, mean = i, sd = ( sd_fraction * i ) )
+				}
+			)
+			
+			if( ! is.unsorted( x ) ){
+				new_age = x
+			}
+			
+		}
+		
+		calibration_times$age.min = new_age
+		return( calibration_times )
+	}	
+
+
 	#' Get a boolean vector corresponding to all tips and internal nodes of 
 	#' a tree, with value TRUE for tips and FALSE for internal nodes
 	#' 
@@ -217,7 +246,7 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 			mutate( soft.bounds = NA )
 		
 		tree = try( 
-			ape::chronos( nhx@phylo, calibration=calibration ) 
+			ape::chronos( nhx@phylo, calibration=calibration, ... ) 
 		)
 
 		if( "phylo" %in% class( tree ) ){
@@ -310,20 +339,20 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 
 	#' Calibrate a list of gene trees given a set of speciation node dates
 	#' 
-	#' @param gene_trees_sub A list of phylogenetic trees as treeio::treedata objects 
+	#' @param gene_trees_pruned A list of phylogenetic trees as treeio::treedata objects 
 	#' with associated character data
 	#' @param calibration_times A dataframe with two columns: age.min is the age 
 	#' of a clade, and clade is the name of the clade
 	#' @param ... Any additional arguments to pass to ape::chronos()
 	#' @return A list of calibrated phylogenetic trees as treeio::treedata objects. May be 
-	#' shorter than gene_trees_sub if some calibrations fail.
+	#' shorter than gene_trees_pruned if some calibrations fail.
 	#' @export
-	calibrate_trees = function( gene_trees_sub, calibration_times, ... ) {
+	calibrate_trees = function( gene_trees_pruned, calibration_times, ... ) {
 		# Make the trees ultrametric and calibrate the speciation nodes to 
 		# specified times
 		gene_trees_calibrated = 
 			mclapply( 
-				gene_trees_sub,
+				gene_trees_pruned,
 				calibrate_tree, 
 				calibration_times=calibration_times,
 				...,
@@ -418,7 +447,7 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 	)
 
 	# Remove tips from the trees that do not have expression data
-	gene_trees_sub = mclapply( 
+	gene_trees_pruned = mclapply( 
 		gene_trees_annotated, 
 		drop_empty_tips, 
 		min_genes_with_expression=min_genes_with_expression,
@@ -426,14 +455,14 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 	)
 
 	# Remove trees with less than min_genes_with_expression tips with expression data
-	gene_trees_sub = gene_trees_sub[ ! is.na( gene_trees_sub ) ]
+	gene_trees_pruned = gene_trees_pruned[ ! is.na( gene_trees_pruned ) ]
 
 ```
 
 ```{r calibrate_trees, echo=FALSE, cache=TRUE, message=F, warning=F}
 
 	# Time calibrate all speciation nodes to the same years
-	gene_trees_calibrated = calibrate_trees( gene_trees_sub, calibration_times, model="correlated" )
+	gene_trees_calibrated = calibrate_trees( gene_trees_pruned, calibration_times, model="correlated" )
 	
 ```
 
@@ -467,7 +496,7 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 > Figure XXKMRR | Density plot of the magnitude of phylogenetic independent contrast values following duplication and speciation events. These contrasts are not larger following duplication events, as predicted by the ortholog conjecture.
 
 
-When we reanalyze the data with phylogenetic independent contrasts (Fig. 1B), we did not find increased evolutionary change in expression following duplication events (Fig. XXKMRR). Of the `r length(gene_trees)` trees that were parsed from ENSMBL Compara [@Herrero:2016jj], `r length(gene_trees_sub)` passed taxon sampling criteria (`r min_genes_with_expression` genes) after removing tips without Tau values. Of these, `r length(gene_trees_calibrated)` were successfully time calibrated. These calibrated pruned trees were used to calculate phylogenetic independent contrasts for Tau. They contain `r nodes_contrast %>% filter(D=="Y") %>% nrow()` duplication nodes and `r nodes_contrast %>% filter(D=="N") %>% nrow()` speciation nodes.
+When we reanalyze the data with phylogenetic independent contrasts (Fig. 1B), we did not find increased evolutionary change in expression following duplication events (Fig. XXKMRR). Of the `r length(gene_trees)` trees that were parsed from ENSMBL Compara [@Herrero:2016jj], `r length(gene_trees_pruned)` passed taxon sampling criteria (`r min_genes_with_expression` genes) after removing tips without Tau values. Of these, `r length(gene_trees_calibrated)` were successfully time calibrated. These calibrated pruned trees were used to calculate phylogenetic independent contrasts for Tau. They contain `r nodes_contrast %>% filter(D=="Y") %>% nrow()` duplication nodes and `r nodes_contrast %>% filter(D=="N") %>% nrow()` speciation nodes.
 
 Given the ortholog conjecture, we would expect to see larger contrasts following duplication events than speciation events. Instead, we find no such distribution (Figure XXKMRR). The Wilcox rank test does not reject the null hypothesis that the rate of evolution following duplications is the same as or less than the rate following speciation (p value = `r wilcox_test_result`). Our results therefore find no evidence for the ortholog conjecture in this system.
 
