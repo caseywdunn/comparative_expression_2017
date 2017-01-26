@@ -62,7 +62,7 @@ The KMRR study [@KryuchkovaMostacci:2016iw] sought to test the ortholog conjectu
 
 Despite its importance, there have been relatively few tests of the ortholog conjecture. Previous work has shown that ontology annotations are not sufficient to test the ortholog conjecture [@Chen:2012jz; @Thomas:2012hz]. Analyses of domain structure were consistent with the ortholog conjecture [@Forslund:2011cw]. There have been few tests of the ortholog conjecture with regards to gene expression [@Chen:2012jz], and KMRR is the most thorough such expression study to date.
 
-The KMRR study considered several publicly available datasets. Here we consider their conclusions in the context of one of these studies, Brawand *et al.* 2011 [@Brawand:2011du]. This dataset of gene expression for six organs across 10 species (nine mammals and one bird) is the best sampled in their analyses. Their expression summary statistic is Tau [@Yanai:2005dh, @KryuchkovaMostacci:2016in], an indicator of tissue specificity of gene expression. It can range from a value of 0, which indicates no specificity (*i.e.*, uniform expression across tissues), to a value of 1, which indicates high specificity (*i.e.*, expression in only one tissue). It is convenient in that it is a single number of defined range for each gene, though of course since the original expression is multidimensional this means much information is discarded. This includes information about which tissue expression is specific to. For example, if one gene has expression specific to the brain and another expression specific to the kidney, both would have a Tau of 1. 
+The KMRR study considered several publicly available datasets. Here we consider their conclusions in the context of one of these studies, Brawand *et al.* 2011 [@Brawand:2011du]. This dataset of gene expression for six organs across ten species (nine mammals and one bird), eight of which were analyzed by KMRR, is the best sampled in their analyses. Their expression summary statistic is Tau [@Yanai:2005dh, @KryuchkovaMostacci:2016in], an indicator of tissue specificity of gene expression. It can range from a value of 0, which indicates no specificity (*i.e.*, uniform expression across tissues), to a value of 1, which indicates high specificity (*i.e.*, expression in only one tissue). It is convenient in that it is a single number of defined range for each gene, though of course since the original expression is multidimensional this means much information is discarded. This includes information about which tissue expression is specific to. For example, if one gene has expression specific to the brain and another expression specific to the kidney, both would have a Tau of 1. 
 
 KMRR's published analyses are based on pairwise comparisons (Figure 1a) between Tau within each gene family. They found the correlation of Tau for orthologs to be significantly greater than the correlation of Tau for paralogs, *i.e.* that orthologs tend to be more similar to each other than paralogs. From this they concluded that their analyses support the ortholog conjecture. They also concluded that this pattern provides support for a particular evolutionary process, that "tissue-specificity evolves very slowly in the absence of duplication, while immediately after duplication the new gene copy differs".
 
@@ -95,12 +95,10 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 	}
 	set.seed( 23456 )
 	
-	# Set biology starting parameters, including files
-
+	# Name of the compara gene trees file
 	gene_tree_name = "Compara.75.protein.nhx.emf"
 	
-	kmrr_directory = "kmrr/"
-	
+	# Files priduced by KMRR Rscript.R with Tau values and other expression statistics
 	expression_file_names = c(
 		"ChickenBrawandTScomparisonTable_9_6chPC.txt", 
 		"ChimpBrawandTScomparisonTable_9_6cmPC.txt", 
@@ -112,14 +110,14 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 		"PlatypusBrawandTScomparisonTable_9_6pPC.txt"
 	)
 	
+	kmrr_directory = "kmrr/"
 	expression_file_names %<>% paste( kmrr_directory, ., sep="" )
-	
 	gene_tree_name %<>% paste( kmrr_directory, ., sep="" )
 	
 	# The minimum number of genes with expression data that a gene needs to have to be considered
 	min_genes_with_expression = 4
 	
-	# These are from the KMRR code
+	# These clade dates are from the KMRR code, they got them from http://timetree.org/
 	calibration_times = data.frame(
 		age.min =
 			c( 20, 92, 167, 8, 42, 74, 296, 535, 104, 937, 29, 722, 441, 65, 15, 1215, 
@@ -137,14 +135,25 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 	
 	# Functions
 	
-	# Returns a logical vector indicating which rows in nhx_tags are for tips
+	#' Get a boolean vector corresponding to all tips and internal nodes of 
+	#' a tree, with value TRUE for tips and FALSE for internal nodes
+	#' 
+	#' @param nhx A phylogenetic tree as a treeio::treedata object
+	#' @return A boolean vector
+	#' @export
 	is.tip.nhx = function( nhx ) {
 		is.tip = rep( FALSE, nrow( nhx@data ) )
 		is.tip[ 1:length( nhx@phylo$tip.label ) ] = TRUE
 		is.tip
 	}
 	
-	# put node ages in @data
+	#' Record the distance from a tip for each node in a tree in 
+	#' the data slot
+	#' 
+	#' @param nhx A phylogenetic tree as a  treeio::treedata
+	#' @return A treeio::treedata object, with an additional node_age column
+	#' in the data slot, or the original object if it was not of class treedata
+	#' @export
 	store_node_age = function( nhx ) {
 
 		if ( class( nhx ) != "treedata" ) {
@@ -161,36 +170,92 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 		return( nhx )
 	}
 	
-	# Make tree ultrametric, calibrating speciation nodes to consistent times
+	#' Adjust branch lengths of a phylogenetic tree to make it ultrametric and 
+	#' to time calibrate the speciation nodes to fixed values
+	#' 
+	#' @param nhx A phylogenetic tree as a treeio::treedata object, with speciation 
+	#' nodes annotated with a value of "N" in @data$D
+	#' @param calibration_times A dataframe with two columns: age.min is the age 
+	#' of a clade, and clade is the name of the clade
+	#' @return A treeio::treedata object if successfully calibrated
+	#' @export
 	calibrate_tree = function ( nhx, calibration_times ) {
 			
-			# Create calibration matrix for speciation nodes
-			calibration = 
-				nhx@data[ !is.tip.nhx( nhx ), ] %>%
-				filter( D == "N" ) %>%
-				left_join( calibration_times, c( "label" = "clade" ) ) %>%
-				select( node, age.min ) %>%
-				mutate( age.max = age.min ) %>% 
-				mutate( soft.bounds = NA )
-			
-			tree = try( 
-				ape::chronos( nhx@phylo, calibration=calibration, model="correlated" ) 
-			)
+		# Create calibration matrix for speciation nodes
+		calibration = 
+			nhx@data[ !is.tip.nhx( nhx ), ] %>%
+			filter( D == "N" ) %>%
+			left_join( calibration_times, c( "label" = "clade" ) ) %>%
+			select( node, age.min ) %>%
+			mutate( age.max = age.min ) %>% 
+			mutate( soft.bounds = NA )
+		
+		tree = try( 
+			ape::chronos( nhx@phylo, calibration=calibration, model="correlated" ) 
+		)
 
-			if( "phylo" %in% class( tree ) ){
-				class( tree ) = "phylo"
-				nhx@phylo = tree
-				return( nhx )
-			}
-			else{
-				return( NA )
-			}
+		if( "phylo" %in% class( tree ) ){
+			class( tree ) = "phylo"
+			nhx@phylo = tree
+			return( nhx )
 		}
+		else{
+			return( NA )
+		}
+	}
+	
+	
+	#' Drop tips without expression data from a tree 
+	#' 
+	#' @param nhx A phylogenetic tree as a treeio::treedata object, with a 
+	#' column @data$Tau containing expression data
+	#' @param min_genes_with_expression The minimum number of tips with 
+	#' expression data for a tree to be retained
+	#' @return A treeio::treedata object, or NA if less than 
+	#' min_genes_with_expression tips would have been retained
+	#' @export
+	drop_empty_tips = function( nhx, min_genes_with_expression ) {
+		
+		# Identify the tips without expression data
+		to_drop = which( is.na( nhx@data[ 1:length( nhx@phylo$tip.label ), ]$Tau ) )
+		
+		# Return the pruned tree if it meets sampling criteria, otherwise return NA
+		remaining = length( nhx@phylo$tip.label ) - length( to_drop )
+		if( remaining >= min_genes_with_expression ){
+			pruned = treeio::drop.tip( nhx, to_drop )
+			return( pruned )
+		}
+		else{
+			return( NA )
+		}
+	}
+	
+	#' Calculate phylogenetic independent contrasts (PIC) with the tree and 
+	#' character data in a treeio::treedata object
+	#' 
+	#' @param nhx A phylogenetic tree as a treeio::treedata object, with a 
+	#' column @data$Tau containing expression data
+	#' @return A treeio::treedata object, with new @data columns pic and var_exp
+	#' @export
+	pic.nhx = function( nhx ) {
+
+		# Calculate the contrasts
+		p = pic( nhx@data$Tau[ is.tip.nhx( nhx ) ], nhx@phylo, var.contrasts=TRUE )
+	
+		# Add the results back to the @data slot, padding the rows that correspond to 
+		# tips with NA
+		nhx@data$pic = c( rep( NA, length( nhx@phylo$tip.label ) ), p[ ,1 ] )
+		nhx@data$var_exp = c( rep( NA, length( nhx@phylo$tip.label ) ), p[ ,2 ] )
+	
+		return( nhx )
+	}
+	
 
 ```
 
 ```{r load_expression, echo=FALSE, message=F, warning=F}
 
+	# Read the expression data for each species and combine into a single tibble
 	expression = 
 	lapply(
 		expression_file_names, 
@@ -203,11 +268,15 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 ```
 
 ```{r load_trees, echo=FALSE, cache=TRUE, message=F, warning=F}
+
+	# Read in the tree file as a vector of strings, one per line
 	lines = readLines( gene_tree_name )
 
-	# Only consider the lines with trees
+	# Only retain strings that are trees
 	lines = lines[ grepl( "^\\(", lines, perl = TRUE ) ]
 
+	# Parse each string to a treeio::treedata object, adding a label column 
+	# for node names
 	gene_trees = mclapply(
 		lines,
 		function( x ){
@@ -223,6 +292,8 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 
 ```{r add_expression_to_trees, echo=FALSE, cache=TRUE, message=F, warning=F}
 
+	# Annotate each tree by joining the corresponding expression data to the 
+	# @data object. This maps the expression data to the tree tips
 	gene_trees_annotated = mclapply(
 		gene_trees,
 		function( tree ){
@@ -236,22 +307,19 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 
 ```{r prep_trees, echo=FALSE, cache=TRUE, message=F, warning=F}
 
-	drop_empty_tips = function( nhx ) {
-		to_drop = which( is.na( nhx@data[ 1:length( nhx@phylo$tip.label ), ]$Tau ) )
-		remaining = length( nhx@phylo$tip.label ) - length( to_drop )
-	
-		if( remaining >= min_genes_with_expression ){
-			pruned = treeio::drop.tip( nhx, to_drop )
-			return( pruned )
-		}
-		else{
-			return( NA )
-		}
-	}
+	# Remove tips from the trees that do not have expression data
+	gene_trees_sub = mclapply( 
+		gene_trees_annotated, 
+		drop_empty_tips, 
+		min_genes_with_expression=min_genes_with_expression,
+		mc.cores=cores 
+	)
 
-	gene_trees_sub = mclapply( gene_trees_annotated, drop_empty_tips, mc.cores=cores )
+	# Remove trees with less than min_genes_with_expression tips with expression data
 	gene_trees_sub = gene_trees_sub[ ! is.na( gene_trees_sub ) ]
 	
+	# Make the trees ultrametric and calibrate the speciation nodes to 
+	# specified times
 	gene_trees_calibrated = 
 		mclapply( 
 			gene_trees_sub,
@@ -260,8 +328,11 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 			mc.cores=cores
 		)
 	
+	# Remove trees that could not be successfully calibrated
 	gene_trees_calibrated = gene_trees_calibrated[ ! is.na( gene_trees_calibrated ) ]
 	
+	# Parse the node ages from the internal @phylo object and store them with the 
+	# corresponding rows in the @data object
 	gene_trees_calibrated = 
 		mclapply( 
 			gene_trees_calibrated, 
@@ -273,32 +344,26 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 
 ```{r contrasts, cache=TRUE, echo=FALSE, message=F, warning=F}
 
-	pic.nhx = function( nhx ) {
-
-		p = pic( nhx@data$Tau[ is.tip.nhx( nhx ) ], nhx@phylo, var.contrasts=TRUE )
-	
-		nhx@data$pic = c( rep( NA, length( nhx@phylo$tip.label ) ), p[ ,1 ] )
-		nhx@data$var_exp = c( rep( NA, length( nhx@phylo$tip.label ) ), p[ ,2 ] )
-	
-		return( nhx )
-	}
-
+	# Calculate independent contrasts for Tau on each tree, storing the results 
+	# back into the @data slot of the tree objects
 	gene_trees_pic = mclapply( gene_trees_calibrated, pic.nhx, mc.cores=cores )
 	
+	# Combine the @data slots across all trees. These have labels, node annotations,
+	# expression data, contrast results, etc...
 	all_nodes = 
 		lapply( 
 			gene_trees_pic, 
 			function( nhx ){
 				tags = nhx@data
-				tags$gene = digest( nhx )
+				tags$gene = digest( nhx ) # Creates a  hash that is unique to each gene tree
 				tags %<>% select( -( B ) ) # B has inconsistent types, remove it
 				return( tags )
 			}
 		) %>%
 		bind_rows()
 	
+	# Make a new human readable column for plots that records speciation/ duplication
 	all_nodes$Event = NA
-	
 	all_nodes$Event[ all_nodes$D == "Y" ] = "Duplication"
 	all_nodes$Event[ all_nodes$D == "N" ] = "Speciation"
 	
@@ -308,12 +373,15 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 
 ```{r show_result, echo=FALSE, cache=TRUE, message=F, warning=F}
 
+	# Create a subset that corresponds to nodes with contrasts. This excludes tips.
+	# Also take the absolute value of the contrast, since we only consider magnitude.
 	nodes_contrast = 
 		all_nodes %>%
 		filter( ! is.na( pic ) ) %>%
 		mutate( pic = abs( pic ) ) %>%
 		filter( ! is.na( D ) )
 
+	# Plot the contrasts for duplication events and speciation events
 	nodes_contrast %>%
 		ggplot( aes( x=pic, y=..density.., col=Event ) ) + 
 		geom_freqpoly( binwidth=.001, position="identity" ) +
@@ -322,6 +390,7 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 		xlim( 0, 0.075 ) + 
 		theme_classic()
 	
+	# Check if the mean rank of duplication pics is greater than speciation pics
 	wilcox_test_result = 
 		wilcox.test( 
 			nodes_contrast %>% filter( D=="Y" ) %>% .$pic, 
@@ -557,7 +626,7 @@ All files needed to re-execute the analyses presented in this document are avail
 
 The KMRR study [@KryuchkovaMostacci:2016iw] followed excellent practices in reproducibility. They posted all data and code needed to re-execute their analyses at figshare: https://figshare.com/articles/Tissue-specificity_of_gene_expression_diverges_slowly_between_orthologs_and_rapidly_between_paralogs/3493010/2 . We slightly altered their `Rscript.R` to simplify file paths. This modified script and their data files are available in the github repository for this paper, as are the intermediate files that were generated by their analysis script that we used in our own analyses. We also obtained the `Compara.75.protein.nh.emf` gene trees [@Herrero:2016jj] from ftp://ftp.ensembl.org/pub/release-75/emf/ensembl-compara/homologies/ and place them in the same directory as this file.
 
-We considered only the data from Brawand *et al.* 2011 [@Brawand:2011du]. KMRR examined multiple subsets of the data. We left in sex chromosome genes and testes expression data, as this corresponded to the analyses that provided the strongest support for the ortholog conjecture and therefore the most conservative reconsideration of it.
+We considered only the data from Brawand *et al.* 2011 [@Brawand:2011du] for the eight taxa included in KMRR. We left in sex chromosome genes and testes expression data, as this corresponded to the analyses that provided the strongest support for the ortholog conjecture and therefore the most conservative reconsideration of it.
 
 Each of these gene trees includes includes homologous sequences derived from a common ancestral sequence. The tip nodes of a gene tree can include both orthologs and paralogs, and each internal node is an inferred speciation or duplication event. Prior to phylogenetic analyses of gene expression, each tree was first pruned to include only tips for which expression data were available. The speciation nodes in the tree were then time calibrated so that branch lengths were consistent across trees. We then calculated the magnitude of the independent contrast for differential expression at each internal node in each of these trees.
 
@@ -575,6 +644,8 @@ Thanks to XX. This work was supported by the National Science Foundation (DEB-12
 ### KMRR Analyses
 
 ```{r ascertainment_plot, cache=TRUE, echo=FALSE, fig.cap="XX_PIC_VAR", warning=FALSE, message=FALSE}
+
+	# Plot results of the ascertainment bias analyses
 
 	label_age = str_c( "Wilcoxon p=", wilcox_filtered_age )
 	
