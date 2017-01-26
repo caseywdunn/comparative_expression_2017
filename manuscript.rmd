@@ -133,9 +133,9 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 			),
 		stringsAsFactors=FALSE
 	)
+```
 
-	
-	# Functions
+```{r define_functions, echo=FALSE, message=F, warning=F}
 	
 	#' Get a boolean vector corresponding to all tips and internal nodes of 
 	#' a tree, with value TRUE for tips and FALSE for internal nodes
@@ -172,40 +172,6 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 		return( nhx )
 	}
 	
-	#' Adjust branch lengths of a phylogenetic tree to make it ultrametric and 
-	#' to time calibrate the speciation nodes to fixed values
-	#' 
-	#' @param nhx A phylogenetic tree as a treeio::treedata object, with speciation 
-	#' nodes annotated with a value of "N" in @data$D
-	#' @param calibration_times A dataframe with two columns: age.min is the age 
-	#' of a clade, and clade is the name of the clade
-	#' @return A treeio::treedata object if successfully calibrated
-	#' @export
-	calibrate_tree = function ( nhx, calibration_times ) {
-			
-		# Create calibration matrix for speciation nodes
-		calibration = 
-			nhx@data[ !is.tip.nhx( nhx ), ] %>%
-			filter( D == "N" ) %>%
-			left_join( calibration_times, c( "label" = "clade" ) ) %>%
-			select( node, age.min ) %>%
-			mutate( age.max = age.min ) %>% 
-			mutate( soft.bounds = NA )
-		
-		tree = try( 
-			ape::chronos( nhx@phylo, calibration=calibration, model="correlated" ) 
-		)
-
-		if( "phylo" %in% class( tree ) ){
-			class( tree ) = "phylo"
-			nhx@phylo = tree
-			return( nhx )
-		}
-		else{
-			return( NA )
-		}
-	}
-	
 	
 	#' Drop tips without expression data from a tree 
 	#' 
@@ -231,6 +197,42 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 			return( NA )
 		}
 	}
+
+
+	#' Adjust branch lengths of a phylogenetic tree to make it ultrametric and 
+	#' to time calibrate the speciation nodes to fixed values
+	#' 
+	#' @param nhx A phylogenetic tree as a treeio::treedata object, with speciation 
+	#' nodes annotated with a value of "N" in @data$D
+	#' @param calibration_times A dataframe with two columns: age.min is the age 
+	#' of a clade, and clade is the name of the clade
+	#' @param ... Any additional arguments to pass to ape::chronos()
+	#' @return A treeio::treedata object if successfully calibrated
+	#' @export
+	calibrate_tree = function ( nhx, calibration_times, ... ) {
+			
+		# Create calibration matrix for speciation nodes
+		calibration = 
+			nhx@data[ !is.tip.nhx( nhx ), ] %>%
+			filter( D == "N" ) %>%
+			left_join( calibration_times, c( "label" = "clade" ) ) %>%
+			select( node, age.min ) %>%
+			mutate( age.max = age.min ) %>% 
+			mutate( soft.bounds = NA )
+		
+		tree = try( 
+			ape::chronos( nhx@phylo, calibration=calibration ) 
+		)
+
+		if( "phylo" %in% class( tree ) ){
+			class( tree ) = "phylo"
+			nhx@phylo = tree
+			return( nhx )
+		}
+		else{
+			return( NA )
+		}
+	}
 	
 	#' Calculate phylogenetic independent contrasts (PIC) with the tree and 
 	#' character data in a treeio::treedata object
@@ -251,7 +253,121 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 	
 		return( nhx )
 	}
+
+	#' Add phylogenetic independent contrasts (PIC) with the tree and 
+	#' character data in a treeio::treedata object
+	#' 
+	#' @param gene_trees_calibrated A list of time calibrated phylogenetic trees 
+	#' as treeio::treedata objects 
+	#' @return A list of time phylogenetic trees with pics 
+	#' as treeio::treedata objects
+	#' @export
+	add_pics_to_trees = function( gene_trees_calibrated ) {
 	
+		# Calculate independent contrasts for Tau on each tree, storing the results 
+		# back into the @data slot of the tree objects
+		gene_trees_pic = mclapply( gene_trees_calibrated, pic.nhx, mc.cores=cores )
+		
+		return( gene_trees_pic )
+	}
+
+
+	#' Add phylogenetic independent contrasts (PIC) with the tree and 
+	#' character data in a treeio::treedata object
+	#' 
+	#' @param gene_trees_pic A list of phylogenetic trees with pics
+	#' as treeio::treedata objects 
+	#' @return A tibble with combined data, including phylogenetic independent 
+	#' contrasts, for internal nodes of all trees
+	#' @export
+	summarize_contrasts = function( gene_trees_pic ) {
+		# Combine the @data slots across all trees. These have labels, node annotations,
+		# expression data, contrast results, etc...
+		all_nodes = 
+			lapply( 
+				gene_trees_pic, 
+				function( nhx ){
+					tags = nhx@data
+					tags$gene = digest( nhx ) # Creates a  hash that is unique to each gene tree
+					tags %<>% select( -( B ) ) # B has inconsistent types, remove it
+					return( tags )
+				}
+			) %>%
+			bind_rows()
+		
+		# Make a new human readable column for plots that records speciation/ duplication
+		all_nodes$Event = NA
+		all_nodes$Event[ all_nodes$D == "Y" ] = "Duplication"
+		all_nodes$Event[ all_nodes$D == "N" ] = "Speciation"
+		
+		# Create a subset that corresponds to nodes with contrasts. This excludes tips.
+		# Also take the absolute value of the contrast, since we only consider magnitude.
+		nodes_contrast = 
+			all_nodes %>%
+			filter( ! is.na( pic ) ) %>%
+			mutate( pic = abs( pic ) ) %>%
+			filter( ! is.na( D ) )
+		
+		return( nodes_contrast )
+	}
+
+
+	#' Calibrate a list of gene trees given a set of speciation node dates
+	#' 
+	#' @param gene_trees_sub A list of phylogenetic trees as treeio::treedata objects 
+	#' with associated character data
+	#' @param calibration_times A dataframe with two columns: age.min is the age 
+	#' of a clade, and clade is the name of the clade
+	#' @param ... Any additional arguments to pass to ape::chronos()
+	#' @return A list of calibrated phylogenetic trees as treeio::treedata objects. May be 
+	#' shorter than gene_trees_sub if some calibrations fail.
+	#' @export
+	calibrate_trees = function( gene_trees_sub, calibration_times, ... ) {
+		# Make the trees ultrametric and calibrate the speciation nodes to 
+		# specified times
+		gene_trees_calibrated = 
+			mclapply( 
+				gene_trees_sub,
+				calibrate_tree, 
+				calibration_times=calibration_times,
+				...,
+				mc.cores=cores
+			)
+		
+		# Remove trees that could not be successfully calibrated
+		gene_trees_calibrated = gene_trees_calibrated[ ! is.na( gene_trees_calibrated ) ]
+		
+		# Parse the calibrated node ages from the internal @phylo object and store them with the 
+		# corresponding rows in the @data object
+		gene_trees_calibrated = 
+			mclapply( 
+				gene_trees_calibrated, 
+				store_node_age, 
+				mc.cores=cores 
+			)
+		
+		return( gene_trees_calibrated )
+	}
+
+
+	#' Wilcoxon test of the ortholog conjecture, specifically that contrasts
+	#' associated with duplication nodes are greater than those for 
+	#' speciation nodes. A significant result indicates rejection of the null
+	#' hypothesis that they are not greater.
+	#' 
+	#' @param nodes_contrast A tibble of independent contrasts
+	#' @return Wilcoxon test p value
+	#' @export
+	wilcox_oc = function( nodes_contrast ) {
+ 
+		p = wilcox.test( 
+			nodes_contrast %>% filter( D=="Y" ) %>% .$pic, 
+			nodes_contrast %>% filter( D=="N" ) %>% .$pic, 
+			alternative="greater" 
+		)$p.value
+		
+		return( p )
+	}
 
 ```
 
@@ -305,10 +421,6 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 		mc.cores=cores
 	)
 
-```
-
-```{r prep_trees, echo=FALSE, cache=TRUE, message=F, warning=F}
-
 	# Remove tips from the trees that do not have expression data
 	gene_trees_sub = mclapply( 
 		gene_trees_annotated, 
@@ -319,69 +431,31 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 
 	# Remove trees with less than min_genes_with_expression tips with expression data
 	gene_trees_sub = gene_trees_sub[ ! is.na( gene_trees_sub ) ]
-	
-	# Make the trees ultrametric and calibrate the speciation nodes to 
-	# specified times
-	gene_trees_calibrated = 
-		mclapply( 
-			gene_trees_sub,
-			calibrate_tree, 
-			calibration_times=calibration_times,
-			mc.cores=cores
-		)
-	
-	# Remove trees that could not be successfully calibrated
-	gene_trees_calibrated = gene_trees_calibrated[ ! is.na( gene_trees_calibrated ) ]
-	
-	# Parse the node ages from the internal @phylo object and store them with the 
-	# corresponding rows in the @data object
-	gene_trees_calibrated = 
-		mclapply( 
-			gene_trees_calibrated, 
-			store_node_age, 
-			mc.cores=cores 
-		)
-	
-```
-
-```{r contrasts, cache=TRUE, echo=FALSE, message=F, warning=F}
-
-	# Calculate independent contrasts for Tau on each tree, storing the results 
-	# back into the @data slot of the tree objects
-	gene_trees_pic = mclapply( gene_trees_calibrated, pic.nhx, mc.cores=cores )
-	
-	# Combine the @data slots across all trees. These have labels, node annotations,
-	# expression data, contrast results, etc...
-	all_nodes = 
-		lapply( 
-			gene_trees_pic, 
-			function( nhx ){
-				tags = nhx@data
-				tags$gene = digest( nhx ) # Creates a  hash that is unique to each gene tree
-				tags %<>% select( -( B ) ) # B has inconsistent types, remove it
-				return( tags )
-			}
-		) %>%
-		bind_rows()
-	
-	# Make a new human readable column for plots that records speciation/ duplication
-	all_nodes$Event = NA
-	all_nodes$Event[ all_nodes$D == "Y" ] = "Duplication"
-	all_nodes$Event[ all_nodes$D == "N" ] = "Speciation"
-	
 
 ```
 
+```{r calibrate_trees, echo=FALSE, cache=TRUE, message=F, warning=F}
 
-```{r show_result, echo=FALSE, cache=TRUE, message=F, warning=F}
+	# Time calibrate all speciation nodes to the same years
+	gene_trees_calibrated = calibrate_trees( gene_trees_sub, calibration_times, model="correlated" )
+	
+```
 
-	# Create a subset that corresponds to nodes with contrasts. This excludes tips.
-	# Also take the absolute value of the contrast, since we only consider magnitude.
-	nodes_contrast = 
-		all_nodes %>%
-		filter( ! is.na( pic ) ) %>%
-		mutate( pic = abs( pic ) ) %>%
-		filter( ! is.na( D ) )
+```{r trees_to_contrasts, cache=TRUE, echo=FALSE, message=F, warning=F}
+
+	# Calculate the contrasts from the trees and associated expression data
+	gene_trees_pic = add_pics_to_trees( gene_trees_calibrated )
+
+	# Collect all the contrasts in a single tibble
+	nodes_contrast = summarize_contrasts( gene_trees_pic )
+	
+	# Test if the mean rank of duplication pics is greater than speciation pics
+	wilcox_test_result = wilcox_oc( nodes_contrast )
+	
+```
+
+
+```{r show_contrast_result, echo=FALSE, cache=TRUE, message=F, warning=F}
 
 	# Plot the contrasts for duplication events and speciation events
 	nodes_contrast %>%
@@ -391,15 +465,6 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 		ylab( "Density" ) +
 		xlim( 0, 0.075 ) + 
 		theme_classic()
-	
-	# Check if the mean rank of duplication pics is greater than speciation pics
-	wilcox_test_result = 
-		wilcox.test( 
-			nodes_contrast %>% filter( D=="Y" ) %>% .$pic, 
-			nodes_contrast %>% filter( D=="N" ) %>% .$pic, 
-			alternative="greater" 
-		)
-
 
 ```
 
@@ -408,7 +473,7 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 
 When we reanalyze the data with phylogenetic independent contrasts (Fig. 1B), we did not find increased evolutionary change in expression following duplication events (Fig. XXKMRR). Of the `r length(gene_trees)` trees that were parsed from ENSMBL Compara [@Herrero:2016jj], `r length(gene_trees_sub)` passed taxon sampling criteria (`r min_genes_with_expression` genes) after removing tips without Tau values. Of these, `r length(gene_trees_calibrated)` were successfully time calibrated. These calibrated pruned trees were used to calculate phylogenetic independent contrasts for Tau. They contain `r nodes_contrast %>% filter(D=="Y") %>% nrow()` duplication nodes and `r nodes_contrast %>% filter(D=="N") %>% nrow()` speciation nodes.
 
-Given the ortholog conjecture, we would expect to see larger contrasts following duplication events than speciation events. Instead, we find no such distribution (Figure XXKMRR). The Wilcox rank test does not reject the null hypothesis that the rate of evolution following duplications is the same as or less than the rate following speciation (p value = `r wilcox_test_result$p.value`). Our results therefore find no evidence for the ortholog conjecture in this system.
+Given the ortholog conjecture, we would expect to see larger contrasts following duplication events than speciation events. Instead, we find no such distribution (Figure XXKMRR). The Wilcox rank test does not reject the null hypothesis that the rate of evolution following duplications is the same as or less than the rate following speciation (p value = `r wilcox_test_result`). Our results therefore find no evidence for the ortholog conjecture in this system.
 
 ```{r ascertainment, cache=TRUE, echo=FALSE, fig.cap="XX_PIC_VAR", warning=FALSE, message=FALSE}
 
@@ -435,12 +500,7 @@ Given the ortholog conjecture, we would expect to see larger contrasts following
 		nodes_contrast %>% 
 		filter( node_age <= max_speciation_age )
 	
-	wilcox_filtered_age = 
-		wilcox.test( 
-			nodes_contrast_filtered_age %>% filter( D=="Y" ) %>% .$pic, 
-			nodes_contrast_filtered_age %>% filter( D=="N" ) %>% .$pic, 
-			alternative="greater" 
-		)$p.value
+	wilcox_filtered_age = wilcox_oc( nodes_contrast_filtered_age )
 
 	# Examine by expected variance, ie branch length
 	var_exp_max = 
@@ -458,13 +518,9 @@ Given the ortholog conjecture, we would expect to see larger contrasts following
 	nodes_contrast_filtered_var = 
 		nodes_contrast %>% 
 		filter ( ( var_exp >= var_exp_min ) & ( var_exp <= var_exp_max ) )
+	
+	wilcox_filtered_var = wilcox_oc( nodes_contrast_filtered_var )
 
-	wilcox_filtered_var = 
-	wilcox.test( 
-		nodes_contrast_filtered_var %>% filter( D=="Y" ) %>% .$pic, 
-		nodes_contrast_filtered_var %>% filter( D=="N" ) %>% .$pic, 
-		alternative="greater" 
-	)$p.value
 	
 ```
 

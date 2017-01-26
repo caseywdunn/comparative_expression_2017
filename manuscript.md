@@ -63,7 +63,7 @@ We reanalyzed the the KMRR study using phylogenetic comparative methods, focusin
 
 To test the ortholog conjecture it is essential to have a null hypothesis that makes predictions distinct from the ortholog conjecture. A suitable null hypothesis is that there is no difference in evolutionary change in differential expression along branches that descend from speciation or duplication events (Figure 1b). Under this hypothesis, we would predict that contrasts across speciation nodes and duplication nodes are drawn from the same distribution (Figure XXEXPECTATIONS a). Under the alternative hypothesis specified by the ortholog conjecture, that there is a higher rate of change following duplication events than speciation events, we would expect to see the distribution of duplication contrasts shifted to higher values relative to the speciation contrasts (Figure XXEXPECTATIONS b).
 
-![](manuscript_files/figure-markdown_github/show_result-1.png)
+![](manuscript_files/figure-markdown_github/show_contrast_result-1.png)
 
 > Figure XXKMRR | Density plot of the magnitude of phylogenetic independent contrast values following duplication and speciation events. These contrasts are not larger following duplication events, as predicted by the ortholog conjecture.
 
@@ -135,7 +135,7 @@ The fact that the first two CFG studies we reanalyzed show serious problems with
 Methods
 -------
 
-All files needed to re-execute the analyses presented in this document are available at <https://github.com/caseywdunn/comparative_expression_2017>. The most recent commit at the time of the analysis presented here was 4a39f64d2935930011dd91cd388fd3698242f0b9.
+All files needed to re-execute the analyses presented in this document are available at <https://github.com/caseywdunn/comparative_expression_2017>. The most recent commit at the time of the analysis presented here was 9cad80fcbad08e7fe4ac6f4801cff5cff3eeaa9d.
 
 ### KMRR reanalysis
 

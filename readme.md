@@ -13,6 +13,14 @@ The files in this repository include:
 
 - [manuscript.rmd](./manuscript.rmd) The manuscript text and source code for our reanalysis. This is the file we edited as we wrote the manuscript.
 
-- [kmrr](./kmrr) The folder with the data and original code from Kryuchkova-Mostacci Robinson-Rechavi 2016, as well as the products of this code and gene trees that are needed to rerun our analyses.
+- [kmrr](./kmrr) The folder with the data and original code from Kryuchkova-Mostacci Robinson-Rechavi 2016, as well as the products of this code that are needed to run our reanalyses.
 
 - [levin_etal](./levin_etal) The folder with data provided by the authors of Levin et al. 2016, as well as our annotations of their analysis and the code we used to explore their results.
+
+## Rerunning our analyses
+
+To re-execute our manuscript, first download the gene tree file Compara.75.protein.nhx.emf.gz from ftp://ftp.ensembl.org/pub/release-75/emf/ensembl-compara/homologies/, place it in the `kmrr/` directory, and uncompress it as `Compara.75.protein.nhx.emf`. We left it out of this repo since it is quite large and archived elsewhere.
+
+Then run `manuscript.rmd`, the source code for our manuscript, with the R package `knitr`. You can do this in RStudio by clicking the "knit" button. This will regenerate the manuscript, with all results and plots.
+
+The `manuscript.rmd` file has all our code for running the KMRR reanalysis. The Levin analysis code, along with additional exploratory analyses not included in the manuscript, is in [reanalyses.rmd](./levin_etal/reanalyses.rmd). The results of these reanalyses can be viewed at [reanalyses.md](./levin_etal/reanalyses.md).
