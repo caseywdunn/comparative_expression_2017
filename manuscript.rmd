@@ -561,7 +561,7 @@ We next examined the possibility that ascertainment biases were differentially i
 		D = 1:ntips %>% combn( 2 ) %>% t() %>% as_tibble()
 		names( D ) = c( "tip_a", "tip_b" )
 		
-		# Add a colmn with the gene tree hash 
+		# Add a column with the gene tree hash 
 		D %<>% mutate( gene_tree = digest( nhx ) )
 		
 		# Add the tip names
@@ -573,7 +573,7 @@ We next examined the possibility that ascertainment biases were differentially i
 		D %<>% mutate ( tau_b = nhx@data$Tau[ D$tip_b ] )
 		D %<>% mutate ( difference = abs( tau_a - tau_b ) )
 		
-		# For each row, bet the most recent common ancestor of the pairwise tip combination
+		# For each row, get the most recent common ancestor of the pairwise tip combination
 		D$mrca = 
 			apply(
 				D, 
@@ -585,7 +585,7 @@ We next examined the possibility that ascertainment biases were differentially i
 			) %>%
 			as.integer()
 		
-		# Merge data on this mrca to the node
+		# Merge data of this mrca to the node
 		D %<>% left_join(
 			nhx@data %>%
 				select( D, node, node_age, pic ),
