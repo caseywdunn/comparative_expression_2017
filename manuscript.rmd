@@ -100,7 +100,7 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 	# but not included here due to its size. Put it in the kmrr/ directory
 	gene_tree_name = "Compara.75.protein.nhx.emf"
 	
-	# Files priduced by KMRR Rscript.R with Tau values and other expression statistics
+	# Files produced by KMRR Rscript.R with Tau values and other expression statistics
 	expression_file_names = c(
 		"ChickenBrawandTScomparisonTable_9_6chPC.txt", 
 		"ChimpBrawandTScomparisonTable_9_6cmPC.txt", 
