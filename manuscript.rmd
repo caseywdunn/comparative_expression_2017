@@ -43,7 +43,7 @@ One reason that CFG has not yet embraced phylogenetic approaches is that it has 
 
 Most CFG studies to date compare gene expression across species, often between distinct tissues or developmental time points. Gene expression has been a popular target of CFG studies because, with the advent of RNA-Seq and related transcriptome sequencing methods, it is the most readily collected functional genomics trait across diverse species. Here we reconsider two recent comparative analyses of gene expression data [@KryuchkovaMostacci:2016iw; @Levin:2016bp]. 
 
-The first study, Kryuchkova-Mostacci and Robinson-Rechavi (KMRR) 2016 [@KryuchkovaMostacci:2016iw], analyzed multiple vertebrate expression datasets to test the ortholog conjecture - the hypothesis that orthologs tend to have more conserved attributes (specificity of expression across organs in this case) than do paralogs [@Nehrt:2011bm]. Using pairwise comparisons (Fig. 1A), they found lower expression correlation between paralogs than between orthologs and interpreted this as strong support for the ortholog conjecture. 
+The first study, Kryuchkova-Mostacci and Robinson-Rechavi (KMRR) 2016 [@KryuchkovaMostacci:2016iw], analyzed multiple vertebrate expression datasets to test the ortholog conjecture - the hypothesis that orthologs tend to have more conserved attributes (specificity of expression across organs in this case) than do paralogs [@Nehrt:2011bm, @Koonin:2005fp]. Using pairwise comparisons (Fig. 1A), they found lower expression correlation between paralogs than between orthologs and interpreted this as strong support for the ortholog conjecture. 
 
 The second CFG study we evaluate here is Levin *et al.* [@Levin:2016bp]. This study analyzed gene expression through the course of embryonic development for ten animal species, each from a different phylum. They concluded that these animals exhibit an "inverse hourglass" model for the evolution of gene expression, where there is more evolutionary variance in gene expression at a mid phase of development than there is at early and late phases (Fig. 2). This contrasts with the "hourglass" model previously proposed for closely related species [@Kalinka:2010dw]. Levin *et al.* conclude that this provides biological justification for the concept of phyla and may provide a definition of phyla. We previously described concerns with their interpretations of these results [@Hejnol:2016hw]. Here we directly address the analyses themselves by examining the structure of the pairwise comparisons. 
 
@@ -74,7 +74,7 @@ We reanalyzed the the KMRR study using phylogenetic comparative methods, focusin
 
 > Figure XXExpectations | (a) Under the null hypothesis that there is no difference in the rate of evolution after duplication or speciation events, the distribution of PICs would be the same across both types of nodes. (b) Under the ortholog conjecture, contrasts across duplication nodes would tend to be larger than contrasts across speciation nodes.
 
-To test the ortholog conjecture it is essential to have a null hypothesis that makes predictions distinct from the ortholog conjecture. A suitable null hypothesis is that there is no difference in evolutionary change in differential expression along branches that descend from speciation or duplication events (Figure 1b). Under this hypothesis, we would predict that contrasts across speciation nodes and duplication nodes are drawn from the same distribution (Figure XXEXPECTATIONS a). Under the alternative hypothesis specified by the ortholog conjecture, that there is a higher rate of change following duplication events than speciation events, we would expect to see the distribution of duplication contrasts shifted to higher values relative to the speciation contrasts (Figure XXEXPECTATIONS b).
+To test the ortholog conjecture it is essential to have a null hypothesis that makes predictions distinct from the ortholog conjecture. A suitable null hypothesis is that there is no difference in evolutionary change in differential expression along branches that descend from speciation or duplication events [@Studer:2009bm] (Figure 1b). Under this hypothesis, we would predict that contrasts across speciation nodes and duplication nodes are drawn from the same distribution (Figure XXEXPECTATIONS a). Under the alternative hypothesis specified by the ortholog conjecture, that there is a higher rate of change following duplication events than speciation events, we would expect to see the distribution of duplication contrasts shifted to higher values relative to the speciation contrasts (Figure XXEXPECTATIONS b).
 
 ```{r preliminaries, echo=FALSE, message=F, warning=F}
 	library( treeio )
@@ -85,7 +85,7 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 	library( ggtree )
 	library( ape )
 	library( digest )
-	library( hutan )
+	library( hutan )  # From https://github.com/caseywdunn/hutan
 	library( gridExtra )
 
 	# Set system computational parameters
@@ -151,7 +151,7 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 				}
 			)
 			
-			if( ! is.unsorted( x ) ){
+			if( ( ! is.unsorted( x ) ) & all( x > 0 ) ){
 				new_age = x
 			}
 			
@@ -197,15 +197,24 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 		return( nhx )
 	}
 	
+	#' Get the number of speciation events in an nhx tree
+	#' 
+	#' @param nhx A phylogenetic tree as a treeio::treedata object, with a 
+	#' column @data$D that has value N for speciation events
+	#' @return An integer indicating the number of speciation events
+	#' @export
+	get_n_speciation = function( nhx ){
+		sum( nhx@data$D[ ! is.tip.nhx( nhx ) ] == "N", na.rm = TRUE )
+	}
 	
-	#' Drop tips without expression data from a tree 
+	#' Drop tips without expression data from a tree. 
 	#' 
 	#' @param nhx A phylogenetic tree as a treeio::treedata object, with a 
 	#' column @data$Tau containing expression data
 	#' @param min_genes_with_expression The minimum number of tips with 
 	#' expression data for a tree to be retained
 	#' @return A treeio::treedata object, or NA if less than 
-	#' min_genes_with_expression tips would have been retained
+	#' min_genes_with_expression
 	#' @export
 	drop_empty_tips = function( nhx, min_genes_with_expression ) {
 		
@@ -456,6 +465,13 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 
 	# Remove trees with less than min_genes_with_expression tips with expression data
 	gene_trees_pruned = gene_trees_pruned[ ! is.na( gene_trees_pruned ) ]
+	
+	n_removed_for_no_speciation = length( gene_trees_pruned )
+	
+	# Remove trees with no speciation events
+	gene_trees_pruned = gene_trees_pruned[  unlist( lapply( gene_trees_pruned, get_n_speciation ) ) > 0 ]
+	
+	n_removed_for_no_speciation = n_removed_for_no_speciation - length( gene_trees_pruned )
 
 ```
 
@@ -496,7 +512,7 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 > Figure XXKMRR | Density plot of the magnitude of phylogenetic independent contrast values following duplication and speciation events. These contrasts are not larger following duplication events, as predicted by the ortholog conjecture.
 
 
-When we reanalyze the data with phylogenetic independent contrasts (Fig. 1B), we did not find increased evolutionary change in expression following duplication events (Fig. XXKMRR). Of the `r length(gene_trees)` trees that were parsed from ENSMBL Compara [@Herrero:2016jj], `r length(gene_trees_pruned)` passed taxon sampling criteria (`r min_genes_with_expression` genes) after removing tips without Tau values. Of these, `r length(gene_trees_calibrated)` were successfully time calibrated. These calibrated pruned trees were used to calculate phylogenetic independent contrasts for Tau. They contain `r nodes_contrast %>% filter(D=="Y") %>% nrow()` duplication nodes and `r nodes_contrast %>% filter(D=="N") %>% nrow()` speciation nodes.
+When we reanalyze the data with phylogenetic independent contrasts (Fig. 1B), we did not find increased evolutionary change in expression following duplication events (Fig. XXKMRR). Of the `r length(gene_trees)` trees that were parsed from ENSMBL Compara [@Herrero:2016jj], `r length(gene_trees_pruned)` passed taxon sampling criteria (`r min_genes_with_expression` genes) after removing tips without Tau values and had at least one speciation event. Of these, `r length(gene_trees_calibrated)` were successfully time calibrated. These calibrated pruned trees were used to calculate phylogenetic independent contrasts for Tau. They contain `r nodes_contrast %>% filter(D=="Y") %>% nrow()` duplication nodes and `r nodes_contrast %>% filter(D=="N") %>% nrow()` speciation nodes.
 
 Given the ortholog conjecture, we would expect to see larger contrasts following duplication events than speciation events. Instead, we find no such distribution (Figure XXKMRR). The Wilcox rank test does not reject the null hypothesis that the rate of evolution following duplications is the same as or less than the rate following speciation (p value = `r wilcox_test_result`). Our results therefore find no evidence for the ortholog conjecture in this system.
 
@@ -649,13 +665,14 @@ Why is it that pairwise methods and phylogenetic methods lead to opposite conclu
 
 To test the hypothesis that distantly related paralogs arising from these older duplication events are the reason for the lower correlation of Tau between paralogs than between orthologs, we removed them. When we consider only the paralogs that arise from duplication events the same age or younger than the oldest speciation event, the observed pattern is very different. The correlation of Tau between these shallower paralog pairs, R=`r round( paralog_subset_r, 3)`, is much stronger than for the correlation between all paralog pairs, R=`r round( paralog_r, 3)`. This is much closer to the ortholog correlation, which has R=`r round( ortholog_r, 3) `.
 
-The reason that paralog pairs have Tau values that are more different than ortholog pairs is that they tend to be more distantly related, not because there are different rates of Tau evolution following duplication and speciation events. This means that having information on whether two genes are orthologs or paralogs provides little added information about expression beyond knowing how distantly related the two genes are. This has several implications. It is an example of the limitations of the concepts of orthology and paralogy [@Dunn:2016er]. These terms can have straightforward meaning in small gene trees with simple duplication/speciation histories, but the utility of the terms breaks down on larger more complex gene trees. Orthology and paralogy are annotations on the tips of the tree that are derived from the inferred structure of the tree and annotations of duplication and speciation at internal tree nodes. In this sense, orthology and paralogy are statements about the internals of the tree that are distilled into statements at the tips of the tree. Much is lost in the process, though. In this case, KMRR [@KryuchkovaMostacci:2016iw] relied on orthology and paralogy annotations that are derived from the inferred duplication and speciation history on gene phylogenies [@Herrero:2016jj]. These are the same pre-computed trees we use in our phylogenetic re-analyses of their study. For most questions it is much more direct to focus on the structure of the tree and the inferred processes within the tree, such as which internal nodes are duplication or speciation events and how much change occurs along the branches.
+The reason that paralog pairs have Tau values that are more different than ortholog pairs is that they tend to be more distantly related, not because there are different rates of Tau evolution following duplication and speciation events. This means that having information on whether two genes are orthologs or paralogs provides little added information about expression beyond knowing how distantly related the two genes are. Closely related paralogs, for example, are expected to be more similar than distantly related orthologs [@Studer:2009bm]. This has several implications. It is an example of the limitations of the concepts of orthology and paralogy [@Dunn:2016er]. These terms can have straightforward meaning in small gene trees with simple duplication/speciation histories, but the utility of the terms breaks down on larger more complex gene trees. Orthology and paralogy are annotations on the tips of the tree that are derived from the inferred structure of the tree and annotations of duplication and speciation at internal tree nodes. In this sense, orthology and paralogy are statements about the internals of the tree that are distilled into statements at the tips of the tree. Much is lost in the process, though. In this case, KMRR [@KryuchkovaMostacci:2016iw] relied on orthology and paralogy annotations that are derived from the inferred duplication and speciation history on gene phylogenies [@Herrero:2016jj]. These are the same pre-computed trees we use in our phylogenetic re-analyses of their study. For most questions it is much more direct to focus on the structure of the tree and the inferred processes within the tree, such as which internal nodes are duplication or speciation events and how much change occurs along the branches.
 
 #### Implications for the ortholog conjecture
 
 Our reanalysis of KMRR using phylogenetic methods suggests that the ortholog conjectures is not a dominant pattern that is central to explaining the evolution of phenotypic diversity in gene families. This has important biological implications. It suggests that the mechanism of gene divergence (speciation versus duplication) may not have as strong an impact on phenotypic divergence as thought. It also has technical implications. Rather than focus on whether genes are orthologs or paralogs when attempting to predict function, it may be more effective to simply focus on how closely related or distantly related they are. Closely related paralogs, for example, may tend to have more similar phenotypes than more distantly related orthologs. 
+There has been considerable recent intrest in, and controversy about, the ortholog conjecture [@Koonin:2005fp; @Studer:2009bm; @Nehrt:2011bm; @Gabaldon:2013fi]. Our reanalysys is consistent with multiple studies that have not found support for the ortholog conjecture in comparative analyses of gene ontology [@Studer:2009bm; @Nehrt:2011bm] or gene expression [@Yanai:2004hk]. A previous study of expression concluded that there was strong support for the ortholog conjecture , though like KMRR it used pairwise comparisons. 
 
-The widespread invocation of the ortholog conjecture follows from the expectation that it is strong, widely distributed phenomenon. Our failure to detect a signature consistent with the ortholog conjecture suggests that it may not be, and that it should not be assumed in systems where it has not been explicitly tested. 
+; @Altenhoff:2012ea
 
 ### Levin *et al.* reanalysis
 
@@ -697,26 +714,30 @@ Addressing the statistical non-independence of pairwise comparisons is not the o
 
 ## Conclusions
 
-The fact that the first two CFG studies we reanalyzed show serious problems with pairwise comparisons indicates that there likely to be similar problems in other CFG studies, and that future CFG studies will be compromised if they continue to use pairwise methods. Studies of evolutionary functional genomics should not be focused on the tips of the tree, they should explicitly delve into the tree itself.
+The fact that the first two comparative functional genomics studies we reanalyzed show serious problems with pairwise comparisons indicates that there likely to be similar problems in other studies that use these methods, and that future comparative studies will be compromised if they continue to use pairwise methods. Studies of evolutionary functional genomics should not be focused on the tips of the tree, they should explicitly delve into the tree itself.
 
-These analyses also illustrate the importance of not conflating evolutionary processes with the patterns they generate. Stating that there is a pattern wherein paralogs tend to be more different than orthologs does not mean that there is a difference in the process by which orthologs and paralogs evolve. When paralogs tend to be more distantly related than orthologs, they can be more different from wach other when both evolve under the same processes. Noting that there are multiple pairwise comparisons between distantly related animals that show lower similarity in comparison at the midpoint of development does not mean that there is a general process by which this phase of development evolved deep in the animal tree. Changes restricted to a single branch will be included in multiple pairwise comparisons, and can give the false impression of a general pattern. In both cases, there is no way to interpret the impications of patterns between living organisms for understanding evolutionary processes that happened in the past without taking the relationships between the organisms - the phylogenetic tree - into account.
+These analyses illustrate how important it is to not conflate evolutionary patterns with the processes that generated them. Finding a pattern wherein paralogs tend to be more different than orthologs is not evidence that there are different processes by which orthologs and paralogs evolve. This is also the expected pattern when they evolve under the same process but paralogs tend to be more distantly related to each other than orthologs are. The fact that multiple pairwise comparisons of developmental gene expression across diverse species share a particular pattern is not evidence of a general process that explains the differences between all species in the analysis. It is also the expected pattern when there are unique changes specific to a single species, as these changes will impact all pairwise comparisons to that species and therefore be counted multiple times. To use patterns across living species to test hypotheses about evolutionary processes, it is also necessary to incorporate information about evolutionary relationships, *i.e.* phylogenies. There have been decades of work on building comparative phylogenetic methods that do exactly that, and they are just as relevant to comparing functional genomics traits across species as they are to comparing morphology or any of the other traits they are already routinely applied to.
 
 ## Methods
 
-All files needed to re-execute the analyses presented in this document are available at https://github.com/caseywdunn/comparative_expression_2017. The most recent commit at the time of the analysis presented here was `r system("git log | head -n 1", intern=TRUE) %>% str_replace("commit ", "")`.
+All files needed to re-execute the analyses presented in this document are available at https://github.com/caseywdunn/comparative_expression_2017. The most recent commit at the time of the analysis presented here was `r system("git log | head -n 1", intern=TRUE) %>% str_replace("commit ", "")`. See the `readme.md` file in this repository for more information on the contents of the source file and how to re-execute them.
 
 
 ### KMRR reanalysis
 
-The KMRR study [@KryuchkovaMostacci:2016iw] followed excellent practices in reproducibility. They posted all data and code needed to re-execute their analyses at figshare: https://figshare.com/articles/Tissue-specificity_of_gene_expression_diverges_slowly_between_orthologs_and_rapidly_between_paralogs/3493010/2 . We slightly altered their `Rscript.R` to simplify file paths. This modified script and their data files are available in the github repository for this paper, as are the intermediate files that were generated by their analysis script that we used in our own analyses. We also obtained the `Compara.75.protein.nh.emf` gene trees [@Herrero:2016jj] from ftp://ftp.ensembl.org/pub/release-75/emf/ensembl-compara/homologies/ and place them in the same directory as this file.
+The KMRR study [@KryuchkovaMostacci:2016iw] followed excellent practices in reproducibility. They posted all data and code needed to re-execute their analyses at figshare: https://figshare.com/articles/Tissue-specificity_of_gene_expression_diverges_slowly_between_orthologs_and_rapidly_between_paralogs/3493010/2 . We slightly altered their `Rscript.R` to simplify file paths and specify one missing variable. This modified script and their data files are available in the github repository for this paper, as are the intermediate files that were generated by their analysis script that we used in our own analyses. We also obtained the `Compara.75.protein.nh.emf` gene trees [@Herrero:2016jj] from ftp://ftp.ensembl.org/pub/release-75/emf/ensembl-compara/homologies/ and place them in the same directory as this file. These gene trees include branch lengths and annotate each internal node as being a duplication or speciation event.
 
-We considered only the data from Brawand *et al.* 2011 [@Brawand:2011du] for the eight taxa included in KMRR. We left in sex chromosome genes and testes expression data, as this corresponded to the analyses that provided the strongest support for the ortholog conjecture and therefore the most conservative reconsideration of it.
+We considered only the data from Brawand *et al.* 2011 [@Brawand:2011du] for the eight taxa included in KMRR. We left in sex chromosome genes and testes expression data, which KMRR removed in some of their sensitivity analyses. This corresponded to the analyses that provided the strongest support for the ortholog conjecture and therefore the most conservative reconsideration of it.
 
-Each of these gene trees includes includes homologous sequences derived from a common ancestral sequence. The tip nodes of a gene tree can include both orthologs and paralogs, and each internal node is an inferred speciation or duplication event. Prior to phylogenetic analyses of gene expression, each tree was first pruned to include only tips for which expression data were available. The speciation nodes in the tree were then time calibrated so that branch lengths were consistent across trees. We then calculated the magnitude of the independent contrast for differential expression at each internal node in each of these trees.
+After parsing the trees from the Compara file with treeio, which was recently split from ggtree [@Yu:2016fo], we added Tau estimates generated by the KMRR `Rscript.R` to the tree data objects. We then pruned away tips without expression data, retaining only the trees with `r min_genes_with_expression` or more tips. We also only retained trees with one or more speciation events, as speciation events are required for calibration steps. This removes trees that have multiple genes from only one species after pruning away tips without expression data.
+
+The speciation nodes in the gene tree were then calibrated to the dates specified in the KMRR code. This was necessary to scale the branch lengths so that they are equivalent across the trees, and in turn to scale the phylogenetic independent contrasts (which take branch length into account) so they are equivalent across trees. We used the `chronos()` function from the R package ape [@Paradis:2004dv] for this scaling, with the `correlated` model. See supplementary Materials for additional sensitivity analyses to time calibration. Some trees could not be calibrated with these hard node constraints, and were discarded.
+
+For each node in the remaining calibrated trees, we calculated the phylogenetic independent contrast for Tau across its daughter branches with the `pic()` function in ape [@Paradis:2004dv]. We then collected the contrasts from all trees into a single table, along with otherr annotations including whether the node is a speciation or duplication event. This table, `nodes_contrast`, was then analyzed as described in the main text for the presented plots and tests. 
 
 ### Levin et al. reanalysis
 
-Levin *et al.* helpfully provided data and clarification on methods. We obtained the matrix of pairwise scores that underlies their [Figure 4d](http://www.nature.com/nature/journal/v531/n7596/fig_tab/nature16994_F4.html) and confirmed we could reproduce their published results. We then removed duplicate rows, identified ctenophores as overrepresented among the low outliers in the mid-developmental transition column, and applied the Wilcoxon test in place of the Kolmogorov-Smirnov test. These data, our analysis code, and additional information are available in a git repository at [https://github.com/caseywdunn/levin2016](https://github.com/caseywdunn/levin2016). This repository includes our analysis notebook at [https://rawgit.com/caseywdunn/levin2016/master/reanalyses.html](https://rawgit.com/caseywdunn/levin2016/master/reanalyses.html).
+Levin *et al.* helpfully provided data and clarification on methods. We obtained the matrix of pairwise scores that underlies their [Figure 4d](http://www.nature.com/nature/journal/v531/n7596/fig_tab/nature16994_F4.html) and confirmed we could reproduce their published results. We then removed duplicate rows, applied the Wilcoxon test in place of the Kolmogorov-Smirnov test, and identified ctenophores as overrepresented among the low outliers in the mid-developmental transition column. An annotated explanation of these analyses is included in the git repository at 
 
 ## Acknowledgments
 
