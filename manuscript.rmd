@@ -549,7 +549,7 @@ Given the ortholog conjecture, we would expect to see larger contrasts following
 	
 ```
 
-We next examined the possibility that ascertainment biases were differentially impacting the inference of evolution following duplication and speciation events. We focused on two possible sources of bias - node depth and branch length. We found no evidence that either affected our results (Supplementary materials).
+We next examined the possibility that ascertainment biases were differentially impacting the inference of evolution following duplication and speciation events. We focused on two possible sources of bias - node depth and branch length. We found no evidence that either affected our results (Supplementary Materials). We also examined the sensitivity of the results to the calibration times used for speciation events on the gene tree. This is important because it is expected that the most recent common ancestor of two genes that diverge due to speciation is older than the speciation event itself due to incomplete lineage sorting. There is also uncertainty associated with the timing of these speciation events. In replicate analyses we added random noise to the calibration times and found that it does not impact our inability to reject the null hypothesis (Supplementary Materials).
 
 #### Understanding the incongruence between pairwise and phylogenetic methods
 
@@ -785,6 +785,38 @@ The independent contrast across a node is the amount of change observed between 
 ```
 
 > Supplementary Figure XXAscertainment | Investigation of possible ascertainment biases. (a) Magnitude of independent contrasts plotted against node age. Speciation nodes are calibrated to particular times, whereas duplication nodes have a wider range. (b) Density plot of contrasts for only the nodes that have an age less than or equal to the maximum age of speciation nodes. (c) Magnitude of independent contrasts plotted against expected variance, which is largely determined by branch lengths. Contrasts for speciation nodes have a narrower range of expected variance than do contrasts for duplication nodes. (d) Density plot of contrasts for only the nodes that have expected variance within the range of contrasts across speciation nodes.
+
+
+#### Investigation of sensitivity to calibration times
+
+```{r calibration_sensitivity, cache=TRUE, echo=FALSE, fig.cap="XX_PIC_VAR", warning=FALSE, message=FALSE}
+
+	noised_replicate_n = 10
+	sd_fraction = 0.2
+
+	noised_dates = 
+		replicate( 
+			noised_replicate_n, 
+			add_noise_calibration_times( calibration_times, sd_fraction ),
+			simplify = FALSE
+		)
+
+	nodes_contrast_noised_list = lapply(
+		noised_dates,
+		function( x ){
+			gene_trees_pruned %>% 
+				calibrate_trees( x, model="correlated" ) %>% 
+				add_pics_to_trees() %>% 
+				summarize_contrasts()
+		}
+	)
+	
+	p_noised = lapply( nodes_contrast_noised_list, wilcox_oc )
+
+
+```
+
+We examined the ensitivity of our results to the specification of calibration dates for the speciation nodes. In `r noised_replicate_n` reanalyses, we drew a new date for each calibration from a normal distribution with the mean of the original date and a standard deviation `r sd_fraction` times the original date. If any daugter nodes became older than their parent, we repeated the sampling until the dates were congruent with the topology. The minimum Wilcoxon p in these reanalyses was `r min( as.numeric( unlist( p_noised ) ) )`, *i.e.* none of them reject the null hypothesis that the rate of evolution of Tau is greater following duplication events than speciation events. This is consistent with the analysis that uses the calibration dates as specified, indicating that our results are robust to the selection of calibration times for speciation nodes.
 
 
 ## References
