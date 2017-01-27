@@ -549,7 +549,7 @@ Given the ortholog conjecture, we would expect to see larger contrasts following
 	
 ```
 
-We next examined the possibility that ascertainment biases were differentially impacting the inference of evolution following duplication and speciation events. We focused on two possible sources of bias - node depth and branch length. We found no evidence that either affacted our results (Supplementary materials).
+We next examined the possibility that ascertainment biases were differentially impacting the inference of evolution following duplication and speciation events. We focused on two possible sources of bias - node depth and branch length. We found no evidence that either affected our results (Supplementary materials).
 
 #### Understanding the incongruence between pairwise and phylogenetic methods
 
@@ -606,7 +606,7 @@ We next examined the possibility that ascertainment biases were differentially i
 		mclapply( gene_trees_pic, get_pairwise_summary, mc.cores=cores ) %>% 
 		bind_rows()
 	
-	# Calcualte some summary statistics 
+	# Calculate some summary statistics 
 	ortholog_r = 
 		pairwise_summary %>% 
 		filter( D=="N" ) %>% 
