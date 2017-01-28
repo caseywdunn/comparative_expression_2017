@@ -143,6 +143,9 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 		age = calibration_times$age.min
 		new_age = NA
 		
+		# Keep trying until dates are coherent with tree structure
+		# This is a ladder tree, so that means checking that they 
+		# are still in ascending order
 		while( NA %in% new_age ) {
 			x = sapply( 
 				age,
@@ -317,6 +320,7 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 	summarize_contrasts = function( gene_trees_pic ) {
 		# Combine the @data slots across all trees. These have labels, node annotations,
 		# expression data, contrast results, etc...
+		# Also take the absolute value of the contrast, since we only consider magnitude.
 		all_nodes = 
 			lapply( 
 				gene_trees_pic, 
@@ -327,7 +331,8 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 					return( tags )
 				}
 			) %>%
-			bind_rows()
+			bind_rows() %>%
+			mutate( pic = abs( pic ) )
 		
 		# Make a new human readable column for plots that records speciation/ duplication
 		all_nodes$Event = NA
@@ -335,11 +340,9 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 		all_nodes$Event[ all_nodes$D == "N" ] = "Speciation"
 		
 		# Create a subset that corresponds to nodes with contrasts. This excludes tips.
-		# Also take the absolute value of the contrast, since we only consider magnitude.
 		nodes_contrast = 
 			all_nodes %>%
 			filter( ! is.na( pic ) ) %>%
-			mutate( pic = abs( pic ) ) %>%
 			filter( ! is.na( D ) )
 		
 		return( nodes_contrast )
@@ -405,32 +408,20 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 
 ```
 
-```{r load_expression, echo=FALSE, message=F, warning=F}
-
-	# Read the expression data for each species and combine into a single tibble
-	expression = 
-	lapply(
-		expression_file_names, 
-		read.table, 
-		stringsAsFactors=FALSE, 
-		header=TRUE
-	) %>%
-	bind_rows()
-
-```
 
 ```{r load_trees, echo=FALSE, cache=TRUE, message=F, warning=F}
 
 	# Read in the tree file as a vector of strings, one per line
 	lines = readLines( gene_tree_name )
 
-	# Only retain strings that are trees
-	lines = lines[ grepl( "^\\(", lines, perl = TRUE ) ]
+	# Isolate strings that are trees
+	# These start with (
+	tree_lines = lines[ grepl( "^\\(", lines, perl = TRUE ) ]
 
 	# Parse each string to a treeio::treedata object, adding a label column 
 	# for node names
 	gene_trees = mclapply(
-		lines,
+		tree_lines,
 		function( x ){
 			tree_tc = textConnection( x )
 			tree = treeio::read.nhx( tree_tc )
@@ -439,6 +430,33 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 			return( tree )
 		}, mc.cores=cores
 	)
+	
+	# Parse the tree annotations, these are lines that start with SEQ
+	# These have the species names, which are not in the trees themselves
+	tip_annotations = 
+		lines[ grepl( "^SEQ", lines, perl = TRUE ) ] %>%	# Get lines that start with SEQ
+		str_c( collapse="\n" ) %>%												# Combine them into one string
+		read_delim( delim=" ", col_names = FALSE ) %>% 		# Read string as tibble
+		select( 2, 8 ) %>%																# Select the columns with species and gene ID
+		rename(  Ensembl.Gene.ID = X8 ) %>%
+		rename(  species = X2 )
+	
+```
+
+```{r load_expression, echo=FALSE, message=F, warning=F}
+
+	# Read the expression data for each species and combine into a single tibble,
+	# adding the species names from tip_annotations
+	expression = 
+		lapply(
+			expression_file_names, 
+			read.table, 
+			stringsAsFactors=FALSE, 
+			header=TRUE
+		) %>%
+		bind_rows() %>%
+		left_join( tip_annotations, by="Ensembl.Gene.ID" )
+
 ```
 
 

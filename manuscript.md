@@ -135,7 +135,7 @@ These analyses illustrate how important it is to not conflate evolutionary patte
 Methods
 -------
 
-All files needed to re-execute the analyses presented in this document are available at <https://github.com/caseywdunn/comparative_expression_2017>. The most recent commit at the time of the analysis presented here was 07d778ef5012c6601355f8a098a265102fb2dcc3. See the `readme.md` file in this repository for more information on the contents of the source file and how to re-execute them.
+All files needed to re-execute the analyses presented in this document are available at <https://github.com/caseywdunn/comparative_expression_2017>. The most recent commit at the time of the analysis presented here was a36c824180ff007a8e6f65d305834f7ce9bc6b42. See the `readme.md` file in this repository for more information on the contents of the source file and how to re-execute them.
 
 ### KMRR reanalysis
 
