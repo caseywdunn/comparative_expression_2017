@@ -122,9 +122,9 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 	# These clade dates are from the KMRR code, they got them from http://timetree.org/
 	calibration_times = data.frame(
 		age.min =
-			c(  8, 29, 92, 162, 167, 296 ), 
+			c(  7, 9, 29, 92, 162, 167, 296 ), 
 		clade = 
-			c( "Homininae", "Catarrhini", "Euarchontoglires", "Theria", "Mammalia", "Amniota" ),
+			c( "Hominini", "Homininae", "Catarrhini", "Euarchontoglires", "Theria", "Mammalia", "Amniota" ),
 		stringsAsFactors=FALSE
 	)
 ```
@@ -177,6 +177,38 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 		is.tip
 	}
 	
+
+	#' Fix ensembl clade names.
+	#' Homininae is pan + homo + gorilla
+	#' Hominini is pan + homo
+	#' ENSEMBL Compara trees lislabel Hominini as Homininae
+	#' 
+	#' @param nhx A phylogenetic tree as a treeio::treedata object
+	#' @return A phylogenetic tree as a treeio::treedata object
+	#' @export
+	fix_hominini = function( nhx ) {
+		# Get the numbers for all nodes labeled as homininae
+		homininae_nodes = nhx@data$node[ nhx@data$label == "Homininae" ]
+		
+		# Check which have no gorilla as a descendent
+		no_gorilla = sapply(
+			homininae_nodes,
+			function( x ){
+				tips = hutan::tip_descendants( nhx@phylo, x )
+				tip_species = nhx@data$species[ tips ]
+				return( ! "gorilla_gorilla" %in% tip_species )
+			}
+		)
+		
+		if( any( no_gorilla ) ){
+			hominini_nodes = homininae_nodes[ no_gorilla ]
+			nhx@data$label[ hominini_nodes ] = "Hominini"
+		}
+		
+		return( nhx )
+	}
+
+
 	#' Record the distance from a tip for each node in a tree in 
 	#' the data slot
 	#' 
@@ -490,6 +522,9 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 	gene_trees_pruned = gene_trees_pruned[  unlist( lapply( gene_trees_pruned, get_n_speciation ) ) > 0 ]
 	
 	n_removed_for_no_speciation = n_removed_for_no_speciation - length( gene_trees_pruned )
+	
+	# fix clade names
+	gene_trees_pruned = lapply( gene_trees_pruned, fix_hominini )
 
 ```
 
