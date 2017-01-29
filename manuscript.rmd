@@ -637,6 +637,10 @@ We next examined the possibility that ascertainment biases were differentially i
 		D %<>% mutate ( name_a = nhx@data$G[ D$tip_a ] )
 		D %<>% mutate ( name_b = nhx@data$G[ D$tip_b ] )
 		
+		# Add the species
+		D %<>% mutate ( species_a = nhx@data$species[ D$tip_a ] )
+		D %<>% mutate ( species_b = nhx@data$species[ D$tip_b ] )
+		
 		# Add the values at the tips
 		D %<>% mutate ( tau_a = nhx@data$Tau[ D$tip_a ] )
 		D %<>% mutate ( tau_b = nhx@data$Tau[ D$tip_b ] )
@@ -657,7 +661,7 @@ We next examined the possibility that ascertainment biases were differentially i
 		# Merge data of this mrca to the node
 		D %<>% left_join(
 			nhx@data %>%
-				select( D, node, node_age, pic ),
+				select( D, node, node_age, label, pic ),
 			by = c( "mrca" = "node")
 				
 		)
@@ -674,6 +678,10 @@ We next examined the possibility that ascertainment biases were differentially i
 	pairwise_summary = 
 		mclapply( gene_trees_pic, get_pairwise_summary, mc.cores=cores ) %>% 
 		bind_rows()
+	
+	pairwise_summary$Event = NA
+	pairwise_summary$Event[ pairwise_summary$D == "N" ] = "Speciation"
+	pairwise_summary$Event[ pairwise_summary$D == "Y" ] = "Duplication"
 	
 	# Calculate some summary statistics 
 	ortholog_r = 
@@ -710,7 +718,39 @@ We next examined the possibility that ascertainment biases were differentially i
 		.[["distance"]] %>% 
 		mean()
 	
+	
+	
+	calibration_times_all = data.frame(
+        age =
+            c( 20, 92, 167, 9, 42, 74, 296, 535, 104, 937, 29, 722, 441, 65, 15, 1215, 
+                414, 371, 162, 25, 74, 77, 86, 7 ), 
+        clade = 
+            c("Hominoidea", "Euarchontoglires", "Mammalia", "Homininae", 
+                    "Simiiformes", "Primates", "Amniota", "Vertebrata", "Eutheria", 
+                    "Bilateria", "Catarrhini", "Chordata", "Euteleostomi", 
+                    "Haplorrhini", "Hominidae", "Opisthokonta", "Sarcopterygii", 
+                    "Tetrapoda", "Theria", "Murinae", "Sciurognathi", "Rodentia", "Glires", "Hominini"
+            ),
+        stringsAsFactors=FALSE
+    )
+	
+	
+	
+	pairwise_summary %>% 
+		filter( species_a == "homo_sapiens" | species_b == "homo_sapiens" ) %>% 
+		filter( ! is.na( D ) ) %>%
+		group_by( Event, label ) %>% 
+		summarise( cor.test(  tau_a, tau_b )$estimate, n=n() ) %>% 
+		rename( rho=`cor.test(tau_a, tau_b)$estimate` ) %>%
+		rename( clade = label ) %>% 
+		left_join( calibration_times_all, clade=clade ) %>%
+		ggplot() + 
+			geom_point( aes( x=age, y=rho, col=Event, size=n ) ) +
+			theme_classic()
+	
 ```
+
+> Figure XX_KMRR_Pairwise | This figures demonstrates that the pairwise analyses presented in Figure 2a of KMRR can be reproduced with the subset of data we consider here and our own independent code base. Each circle indicates the Tau Pearson correlation (rho) for a set of pairwise comparisons annotated with a specific node name of a given age and event type (*i.e.*, whether the divergence at that nodes was due to speciation or duplication). Following KMRR Figure 2a, this figure shows only the comparisons that include a human sequence.
 
 In order to better understand why our phylogenetic analysis seems to support a different conclusion (*i.e.*, no support for the ortholog conjecture) than the published analysis of KMRR [@KryuchkovaMostacci:2016iw] (*i.e.*, strong support for the ortholog conjecture), we first checked to make sure we could reproduce their result based on pairwise analyses. This is important since we are only looking at at a subset of the data they considered, the Brawand *et al.* 2011 [@Brawand:2011du] dataset for gene trees that could be successfully time calibrated. We can replicate their result - we find a higher Tau correlation between orthologs (R=`r round( ortholog_r, 3) `) then between paralogs (R=`r round( paralog_r, 3)`).
 
