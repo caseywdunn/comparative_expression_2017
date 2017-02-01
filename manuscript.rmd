@@ -2,9 +2,9 @@
 bibliography: manuscript.bib
 csl: nature.csl
 output:
-  github_document: default
   pdf_document:
     dev: png
+  github_document: default
 ---
 
 ```{r setup, cache=TRUE, message=F, echo=FALSE, warning=F}
