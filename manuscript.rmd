@@ -2,9 +2,9 @@
 bibliography: manuscript.bib
 csl: nature.csl
 output:
+  github_document: default
   pdf_document:
     dev: png
-  github_document: default
 ---
 
 ```{r setup, cache=TRUE, message=F, echo=FALSE, warning=F}
@@ -87,6 +87,8 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 	library( digest )
 	library( hutan )  # From https://github.com/caseywdunn/hutan
 	library( gridExtra )
+	library( geiger )
+	library( phytools )
 
 	# Set system computational parameters
 	cores = detectCores() - 1
@@ -311,9 +313,15 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 	#' @return A treeio::treedata object, with new @data columns pic and var_exp
 	#' @export
 	pic.nhx = function( nhx ) {
-
+		
+		tau = nhx@data$Tau[ is.tip.nhx( nhx ) ]
+		
+		if( any( is.na(tau) ) ){
+			stop( "A trait value is NA." )
+		}
+		
 		# Calculate the contrasts
-		p = pic( nhx@data$Tau[ is.tip.nhx( nhx ) ], nhx@phylo, var.contrasts=TRUE )
+		p = pic( tau, nhx@phylo, var.contrasts=TRUE )
 	
 		# Add the results back to the @data slot, padding the rows that correspond to 
 		# tips with NA
@@ -365,11 +373,6 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 			) %>%
 			bind_rows() %>%
 			mutate( pic = abs( pic ) )
-		
-		# Make a new human readable column for plots that records speciation/ duplication
-		nodes_all$Event = NA
-		nodes_all$Event[ nodes_all$D == "Y" ] = "Duplication"
-		nodes_all$Event[ nodes_all$D == "N" ] = "Speciation"
 		
 		# Create a subset that corresponds to nodes with contrasts. This excludes tips.
 		nodes_contrast = 
@@ -500,6 +503,11 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 		gene_trees,
 		function( tree ){
 			tree@data %<>% left_join( expression, by = c( "G" = "Ensembl.Gene.ID" ) )
+			
+			tree@data$Event = NA
+			tree@data$Event[ tree@data$D == "N" ] = "Speciation"
+			tree@data$Event[ tree@data$D == "Y" ] = "Duplication"
+			
 			return( tree )
 		}, 
 		mc.cores=cores
@@ -661,7 +669,7 @@ We next examined the possibility that ascertainment biases were differentially i
 		# Merge data of this mrca to the node
 		D %<>% left_join(
 			nhx@data %>%
-				select( D, node, node_age, label, pic ),
+				select( D, Event, node, node_age, label, pic ),
 			by = c( "mrca" = "node")
 				
 		)
@@ -678,10 +686,6 @@ We next examined the possibility that ascertainment biases were differentially i
 	pairwise_summary = 
 		mclapply( gene_trees_pic, get_pairwise_summary, mc.cores=cores ) %>% 
 		bind_rows()
-	
-	pairwise_summary$Event = NA
-	pairwise_summary$Event[ pairwise_summary$D == "N" ] = "Speciation"
-	pairwise_summary$Event[ pairwise_summary$D == "Y" ] = "Duplication"
 	
 	# Calculate some summary statistics 
 	ortholog_r = 
@@ -916,10 +920,6 @@ knitr::kable(
 				nhx@data %<>% mutate( clade_name=label )
 				nhx@data$clade_name[ is.tip.nhx(nhx) | nhx@data$D !="N" ] = NA
 				
-				nhx@data$Event = NA
-				nhx@data$Event[ nhx@data$D == "Y" ] = "Duplication"
-				nhx@data$Event[ nhx@data$D == "N" ] = "Speciation"
-				
 				nhx %>% 
 					ggtree() + 
 					geom_tiplab( aes( label=species ), hjust=-0.1 ) + 
@@ -1031,6 +1031,99 @@ The independent contrast across a node is the amount of change observed between 
 ```
 
 We examined the ensitivity of our results to the specification of calibration dates for the speciation nodes. In `r noised_replicate_n` reanalyses, we drew a new date for each calibration from a normal distribution with the mean of the original date and a standard deviation `r sd_fraction` times the original date. If any daugter nodes became older than their parent, we repeated the sampling until the dates were congruent with the topology. The minimum Wilcoxon p in these reanalyses was `r min( as.numeric( unlist( p_noised ) ) )`, *i.e.* none of them reject the null hypothesis that the rate of evolution of Tau is greater following duplication events than speciation events. This is consistent with the analysis that uses the calibration dates as specified, indicating that our results are robust to the selection of calibration times for speciation nodes.
+
+
+#### Simulations
+
+```{r simulations_null, cache=TRUE, echo=FALSE, fig.cap="XX_PIC_VAR", warning=FALSE, message=FALSE}
+
+	sim_tau = function( nhx ) {
+		tau_original = nhx@data$Tau [ 1:length(nhx@phylo$tip.label) ]
+		names( tau_original ) = nhx@phylo$tip.label
+		brownian_model = fitContinuous( nhx@phylo, tau_original )
+		x = fastBM( 
+				nhx@phylo, 
+				a=brownian_model$opt$z0, 
+				sig2=brownian_model$opt$sigsq, 
+				bounds=c(-Inf,Inf) 
+			) %>% abs()
+		x[ x > 1 ] = 1
+		x[ is.nan( x ) ] = 1
+		names( x ) = NULL
+		nhx@data$Tau = c( x, rep( NA, nrow( nhx@data ) - length (x ) ) )
+		return( nhx )
+	}
+	
+	# Replace the actual Tau values with simulated Tau values, using parameters 
+	# fitted from each tree
+	gene_trees_sim_null = lapply( gene_trees_calibrated[1:1000], sim_tau )
+	
+	# Perform contrasts 
+	gene_trees_sim_null %<>% add_pics_to_trees()
+	
+	# Summarize results
+	nodes_sim_null_contrasts = gene_trees_sim_null %>% summarize_contrasts()
+	
+	# Plot
+	g_phylo_null = 
+		nodes_sim_null_contrasts %>% 
+		ggplot( aes( x=pic, y=..density.., col=Event ) ) + 
+			geom_freqpoly( binwidth=.001, position="identity" ) +
+			xlab( "Phylogenetic independent \ncontrasts (PIC)" ) +
+			ylab( "Density" ) +
+			xlim( 0, 0.075 ) + 
+			theme_classic() + 
+			ggtitle( "(b) Phylogenetic result under null simulation" )
+	
+	pairwise_sim_null_summary = 
+		mclapply( gene_trees_sim_null, get_pairwise_summary, mc.cores=cores ) %>% 
+		bind_rows()
+	
+	# Calculate some summary statistics 
+	ortholog_r_sim_null = 
+		pairwise_sim_null_summary %>% 
+		filter( D=="N" ) %>% 
+		select( tau_a, tau_b ) %>% 
+		cor( ) %>% 
+		.[ 1, 2 ]
+	
+	paralog_r_sim_null = 
+		pairwise_sim_null_summary %>% 
+		filter( D=="Y" ) %>% 
+		select( tau_a, tau_b ) %>% 
+		cor( ) %>% 
+		.[ 1, 2 ]
+	
+	g_pair_null = 
+		pairwise_sim_null_summary %>% 
+		filter( species_a == "homo_sapiens" | species_b == "homo_sapiens" ) %>% 
+		filter( ! is.na( D ) ) %>%
+		group_by( Event, label ) %>% 
+		summarise( cor.test(  tau_a, tau_b )$estimate, n=n() ) %>% 
+		rename( rho=`cor.test(tau_a, tau_b)$estimate` ) %>%
+		rename( clade = label ) %>% 
+		left_join( calibration_times_all, clade=clade ) %>%
+		ggplot() + 
+			geom_point( aes( x=age, y=rho, col=Event, size=n ) ) +
+			theme_classic() +
+			ggtitle( "(a) Pairwise result under null simulation" )
+
+```
+
+```{r simulations_plot, cache=TRUE, echo=FALSE, fig.cap="XX_PIC_VAR", warning=FALSE, message=FALSE}
+
+	grid.arrange(
+		g_pair_null,
+		g_phylo_null,
+		ncol = 2
+	)
+
+
+```
+
+> Figure XXSim
+
+We first simulated an analysis under the null model that tau evolves at the same rate following duplication and speciation events. Under the null model, pairwise approaches are very similar as for the observed data (Figure XXSim a), with higher rho for orthologs (`r ortholog_r_sim_null`) than paralogs (`r paralog_r_sim_null`).  Phylogenetic approaches do show similar divergence following speciation and duplication (Figure XXSim b) and does not reject the null hypothesis that the rates differ (Wilcoxon p=`r wilcox_oc( nodes_sim_null_contrasts )`).
 
 
 ## References

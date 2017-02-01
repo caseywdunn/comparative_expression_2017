@@ -141,7 +141,7 @@ These analyses illustrate how important it is to not conflate evolutionary patte
 Methods
 -------
 
-All files needed to re-execute the analyses presented in this document are available at <https://github.com/caseywdunn/comparative_expression_2017>. The most recent commit at the time of the analysis presented here was e1b76c5ca10446765df7c9a1da4b971c9fea6ef3. See the `readme.md` file in this repository for more information on the contents of the source file and how to re-execute them.
+All files needed to re-execute the analyses presented in this document are available at <https://github.com/caseywdunn/comparative_expression_2017>. The most recent commit at the time of the analysis presented here was 42c79da22b63d3a8e33d56e9e0d6f613a098cea9. See the `readme.md` file in this repository for more information on the contents of the source file and how to re-execute them.
 
 ### KMRR reanalysis
 
@@ -246,6 +246,14 @@ The independent contrast across a node is the amount of change observed between 
 #### Investigation of sensitivity to calibration times
 
 We examined the ensitivity of our results to the specification of calibration dates for the speciation nodes. In 10 reanalyses, we drew a new date for each calibration from a normal distribution with the mean of the original date and a standard deviation 0.2 times the original date. If any daugter nodes became older than their parent, we repeated the sampling until the dates were congruent with the topology. The minimum Wilcoxon p in these reanalyses was 1, *i.e.* none of them reject the null hypothesis that the rate of evolution of Tau is greater following duplication events than speciation events. This is consistent with the analysis that uses the calibration dates as specified, indicating that our results are robust to the selection of calibration times for speciation nodes.
+
+#### Simulations
+
+![XX\_PIC\_VAR](manuscript_files/figure-markdown_github/simulations_plot-1.png)
+
+> Figure XXSim
+
+We first simulated an analysis under the null model that tau evolves at the same rate following duplication and speciation events. Under the null model, pairwise approaches are very similar as for the observed data (Figure XXSim a), with higher rho for orthologs (0.752092) than paralogs (0.2698659). Phylogenetic approaches do show similar divergence following speciation and duplication (Figure XXSim b) and does not reject the null hypothesis that the rates differ (Wilcoxon p=0.7750778).
 
 References
 ----------
