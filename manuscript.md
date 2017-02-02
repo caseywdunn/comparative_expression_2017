@@ -87,6 +87,14 @@ To test the hypothesis that distantly related paralogs arising from these older 
 
 The reason that paralog pairs have Tau values that are more different than ortholog pairs is that they tend to be more distantly related, not because there are different rates of Tau evolution following duplication and speciation events. This means that having information on whether two genes are orthologs or paralogs provides little added information about expression beyond knowing how distantly related the two genes are. This has several implications. It is an example of the limitations of the concepts of orthology and paralogy<sup>27</sup>. These terms can have straightforward meaning in small gene trees with simple duplication/speciation histories, but the utility of the terms breaks down on larger more complex gene trees. Orthology and paralogy are annotations on the tips of the tree that are derived from the inferred structure of the tree and history of duplication and speciation at internal tree nodes. In this sense, orthology and paralogy are statements about the internals of the tree that are distilled into statements at the tips of the tree. Much is lost in the process, though. These are the same pre-computed trees we use in our phylogenetic re-analyses of their study. For most questions it is much more direct to focus on the structure of the tree and the inferred processes within the tree, such as which internal nodes are duplication or speciation events and how much change occurs along the branches. In this case, KMRR<sup>11</sup> relied on orthology and paralogy annotations that are derived from the inferred duplication and speciation history on gene phylogenies<sup>24</sup>.
 
+![XX\_PIC\_VAR](manuscript_files/figure-markdown_github/simulations_plot-1.png)
+
+> Figure XXSim
+
+We simulated a data set under the null model that tau evolves at the same rate following duplication and speciation events. Under the null model, pairwise analysis results (Figure XXSim a) are very similar as for the observed data, with higher rho for orthologs (0.7395087) than paralogs (0.2497975). In the phylogenetic analysis of the null simulation, contrasts show similar divergence following speciation and duplication (Figure XXSim b) and does not reject the null hypothesis (Wilcoxon p=0.9695727).
+
+We next simulated a data set under the ortholog conjecture, where the rate of evolution of Tau following duplication was 2 fold the rate following speciation. The results of this heterogeneous model are nearly indistinguishable from the null model (Figure XXSim c), and also have a higher rho for orthologs (0.7770009) than paralogs (0.1774267). In the phylogenetic analysis of the ortholog conjecture simulation, contrasts XX (Figure XXSim c) and XX (Wilcoxon p=4.915621410^{-28}).
+
 #### Implications for the ortholog conjecture
 
 There has been considerable recent interest in, and controversy about, the ortholog conjecture<sup>13,14,23,28</sup>. Our results are consistent with multiple studies that have not found support for the ortholog conjecture<sup>13,23,29</sup>. Another study found only slightly greater similarity between orthologs than paralogs<sup>30</sup>.
@@ -139,7 +147,7 @@ These analyses illustrate how important it is to not conflate evolutionary patte
 Methods
 -------
 
-All files needed to re-execute the analyses presented in this document are available at <https://github.com/caseywdunn/comparative_expression_2017>. The most recent commit at the time of the analysis presented here was 21e2b9a040968f9ec8eace88e6aebb4edf6e2837. See the `readme.md` file in this repository for more information on the contents of the source file and how to re-execute them.
+All files needed to re-execute the analyses presented in this document are available at <https://github.com/caseywdunn/comparative_expression_2017>. The most recent commit at the time of the analysis presented here was cc606989973192aee96fe9ca0a3f357a6bacfe9a. See the `readme.md` file in this repository for more information on the contents of the source file and how to re-execute them.
 
 ### KMRR reanalysis
 
@@ -243,17 +251,7 @@ The independent contrast across a node is the amount of change observed between 
 
 #### Investigation of sensitivity to calibration times
 
-We examined the ensitivity of our results to the specification of calibration dates for the speciation nodes. In 10 reanalyses, we drew a new date for each calibration from a normal distribution with the mean of the original date and a standard deviation 0.2 times the original date. If any daugter nodes became older than their parent, we repeated the sampling until the dates were congruent with the topology. The minimum Wilcoxon p in these reanalyses was 1, *i.e.* none of them reject the null hypothesis that the rate of evolution of Tau is greater following duplication events than speciation events. This is consistent with the analysis that uses the calibration dates as specified, indicating that our results are robust to the selection of calibration times for speciation nodes.
-
-#### Simulations
-
-![XX\_PIC\_VAR](manuscript_files/figure-markdown_github/simulations_plot-1.png)
-
-> Figure XXSim
-
-We first simulated a data set under the null model that tau evolves at the same rate following duplication and speciation events. Under the null model, pairwise analysis results (Figure XXSim a) are very similar as for the observed data, with higher rho for orthologs (0.752092) than paralogs (0.2698659). In the phylogenetic analysis of the null simulation, contrasts show similar divergence following speciation and duplication (Figure XXSim b) and does not reject the null hypothesis (Wilcoxon p=0.7750778).
-
-We next simulated a data set under the ortholog conjecture, where the rate of evolution of Tau following duplication was 2 fold the rate following speciation. The results of this heterogeneous model are nearly indistinguishable from the null model (Figure XXSim c), and also have a higher rho for orthologs (0.7629479) than paralogs (0.1753878). In the phylogenetic analysis of the ortholog conjecture simulation, contrasts XX (Figure XXSim c) and XX (Wilcoxon p=1.057302310^{-11}).
+We examined the sensitivity of our results to the specification of calibration dates for the speciation nodes. In 10 reanalyses, we drew a new date for each calibration from a normal distribution with the mean of the original date and a standard deviation 0.2 times the original date. If any daugter nodes became older than their parent, we repeated the sampling until the dates were congruent with the topology. The minimum Wilcoxon p in these reanalyses was 1, *i.e.* none of them reject the null hypothesis that the rate of evolution of Tau is greater following duplication events than speciation events. This is consistent with the analysis that uses the calibration dates as specified, indicating that our results are robust to the selection of calibration times for speciation nodes.
 
 References
 ----------
