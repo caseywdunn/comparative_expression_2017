@@ -121,14 +121,28 @@ To test the ortholog conjecture it is essential to have a null hypothesis that m
 	# The minimum number of genes with expression data that a gene needs to have to be considered
 	min_genes_with_expression = 4
 	
+
 	# These clade dates are from the KMRR code, they got them from http://timetree.org/
+	# only the following are used in phylogenetic analyses - 
+	# c( "Hominini", "Homininae", "Catarrhini", "Euarchontoglires", "Theria", "Mammalia", "Amniota" )
 	calibration_times = data.frame(
-		age.min =
-			c(  7, 9, 29, 92, 162, 167, 296 ), 
-		clade = 
-			c( "Hominini", "Homininae", "Catarrhini", "Euarchontoglires", "Theria", "Mammalia", "Amniota" ),
-		stringsAsFactors=FALSE
-	)
+        age =
+            c( 20, 92, 167, 9, 42, 74, 296, 535, 104, 937, 29, 722, 441, 65, 15, 1215, 
+                414, 371, 162, 25, 74, 77, 86, 7 ), 
+        clade = 
+            c("Hominoidea", "Euarchontoglires", "Mammalia", "Homininae", 
+                    "Simiiformes", "Primates", "Amniota", "Vertebrata", "Eutheria", 
+                    "Bilateria", "Catarrhini", "Chordata", "Euteleostomi", 
+                    "Haplorrhini", "Hominidae", "Opisthokonta", "Sarcopterygii", 
+                    "Tetrapoda", "Theria", "Murinae", "Sciurognathi", "Rodentia", "Glires", "Hominini"
+            ),
+        stringsAsFactors=FALSE
+    )
+	
+	
+	# In simulation, the fold change in rate following duplication relative to speciation
+	dup_adjust = 5
+	
 ```
 
 ```{r define_functions, echo=FALSE, message=F, warning=F}
@@ -770,24 +784,6 @@ We next examined the possibility that ascertainment biases were differentially i
 		.[["distance"]] %>% 
 		mean()
 	
-	
-	
-	calibration_times_all = data.frame(
-        age =
-            c( 20, 92, 167, 9, 42, 74, 296, 535, 104, 937, 29, 722, 441, 65, 15, 1215, 
-                414, 371, 162, 25, 74, 77, 86, 7 ), 
-        clade = 
-            c("Hominoidea", "Euarchontoglires", "Mammalia", "Homininae", 
-                    "Simiiformes", "Primates", "Amniota", "Vertebrata", "Eutheria", 
-                    "Bilateria", "Catarrhini", "Chordata", "Euteleostomi", 
-                    "Haplorrhini", "Hominidae", "Opisthokonta", "Sarcopterygii", 
-                    "Tetrapoda", "Theria", "Murinae", "Sciurognathi", "Rodentia", "Glires", "Hominini"
-            ),
-        stringsAsFactors=FALSE
-    )
-	
-	
-	
 	pairwise_summary %>% 
 		filter( species_a == "homo_sapiens" | species_b == "homo_sapiens" ) %>% 
 		filter( ! is.na( D ) ) %>%
@@ -795,7 +791,7 @@ We next examined the possibility that ascertainment biases were differentially i
 		summarise( cor.test(  tau_a, tau_b )$estimate, n=n() ) %>% 
 		rename( rho=`cor.test(tau_a, tau_b)$estimate` ) %>%
 		rename( clade = label ) %>% 
-		left_join( calibration_times_all, clade=clade ) %>%
+		left_join( calibration_times, clade=clade ) %>%
 		ggplot() + 
 			geom_point( aes( x=age, y=rho, col=Event, size=n ) ) +
 			theme_classic()
@@ -804,13 +800,13 @@ We next examined the possibility that ascertainment biases were differentially i
 
 > Figure XX_KMRR_Pairwise | This figures demonstrates that the pairwise analyses presented in Figure 2a of KMRR can be reproduced with the subset of data we consider here and our own independent code base. Each circle indicates the Tau Pearson correlation (rho) for a set of pairwise comparisons annotated with a specific node name of a given age and event type, *i.e.*, whether the divergence at that nodes was due to speciation (giving rise to orthologs) or duplication (giving rise to paralogs). Following KMRR Figure 2a, this figure shows only the comparisons that include a human sequence.
 
-In order to better understand why our phylogenetic analysis supports a different conclusion (*i.e.*, no support for the ortholog conjecture) than the published analysis of KMRR [@KryuchkovaMostacci:2016iw] (*i.e.*, strong support for the ortholog conjecture), we first checked to make sure we could reproduce their result based on pairwise analyses. This is important since we are only looking at at a subset of the data they considered, the Brawand *et al.* 2011 [@Brawand:2011du] dataset for gene trees that could be successfully time calibrated. We can replicate their result - we find a higher Tau correlation between orthologs (R=`r round( ortholog_r, 3) `) than between paralogs (R=`r round( paralog_r, 3)`).
+In order to better understand why our phylogenetic analysis supports a different conclusion (*i.e.*, no support for the ortholog conjecture) than the published analysis of KMRR [@KryuchkovaMostacci:2016iw] (*i.e.*, strong support for the ortholog conjecture), we first checked to make sure we could reproduce their result based on pairwise analyses. This is important since we are only looking at at a subset of the data they considered, the Brawand *et al.* 2011 [@Brawand:2011du] dataset for gene trees that could be successfully time calibrated. In their Figure 1, they present a higher Tau correlation coefficient between ortholog pairs than paralog ortholog pairs. We find the same here, with correlation coefficients of R=`r round( ortholog_r, 3)` between ortholog pairs and `r round( paralog_r, 3)` for paralog pairs. 
 
 Why is it that pairwise methods and phylogenetic methods lead to opposite conclusions? The reason is that they describe different things. Pairwise comparisons describe contemporary patterns, while phylogenetic methods infer historical processes [@OMeara:2012gq]. There need not be a different process of evolution following speciation and duplication for paralogs to be more different than orthologs. This could be due to the structure of the gene phylogenies. If paralogs tend to be more distantly related to each other than orthologs, then there would be more time for differences to accumulate even if the rate of change is the same between the two. This is, in fact, the case for these data. While the mean distance between orthologs is `r round( ortholog_distance_mean, 1 )` My, the mean distance between paralogs is `r round( paralog_distance_mean, 1 )` My. As described above, this is because the oldest speciation event is by definition the most recent common ancestor of the species included in the study, but many gene families underwent duplication before this time.
 
 To test the hypothesis that distantly related paralogs arising from these older duplication events (Supplementary Figure XXAscertainment a) are the reason for the lower correlation of Tau between paralogs than between orthologs, we removed them. When we consider only the paralogs that arise from duplication events the same age or younger than the oldest speciation event (Supplementary Figure XXAscertainment b), the observed pattern is very different. The correlation of Tau between these shallower paralog pairs, R=`r round( paralog_subset_r, 3)`, is much stronger than for the correlation between all paralog pairs, R=`r round( paralog_r, 3)`. This is much closer to the ortholog correlation, which has R=`r round( ortholog_r, 3) `.
 
-The reason that paralog pairs have Tau values that are more different than ortholog pairs is that they tend to be more distantly related, not because there are different rates of Tau evolution following duplication and speciation events. This means that having information on whether two genes are orthologs or paralogs provides little added information about expression beyond knowing how distantly related the two genes are. This has several implications. It is an example of the limitations of the concepts of orthology and paralogy [@Dunn:2016er]. These terms can have straightforward meaning in small gene trees with simple duplication/speciation histories, but the utility of the terms breaks down on larger more complex gene trees. Orthology and paralogy are annotations on the tips of the tree that are derived from the inferred structure of the tree and history of duplication and speciation at internal tree nodes. In this sense, orthology and paralogy are statements about the internals of the tree that are distilled into statements at the tips of the tree. Much is lost in the process, though. These are the same pre-computed trees we use in our phylogenetic re-analyses of their study. For most questions it is much more direct to focus on the structure of the tree and the inferred processes within the tree, such as which internal nodes are duplication or speciation events and how much change occurs along the branches. In this case, KMRR [@KryuchkovaMostacci:2016iw] relied on orthology and paralogy annotations that are derived from the inferred duplication and speciation history on gene phylogenies [@Herrero:2016jj]. 
+
 
 ```{r simulations_null, cache=TRUE, echo=FALSE, fig.cap="XX_PIC_VAR", warning=FALSE, message=FALSE}
 	
@@ -820,7 +816,7 @@ The reason that paralog pairs have Tau values that are more different than ortho
 	
 	# Perform contrasts 
 	gene_trees_sim_null %<>% add_pics_to_trees()
-	nodes_sim_null_contrasts = gene_trees_sim_null %>% summarize_contrasts()
+	nodes_sim_null_contrast = gene_trees_sim_null %>% summarize_contrasts()
 	
 	# Calculate pairwise comparisons
 	pairwise_sim_null_summary = 
@@ -846,8 +842,6 @@ The reason that paralog pairs have Tau values that are more different than ortho
 
 
 ```{r simulations_oc, cache=TRUE, echo=FALSE, fig.cap="XX_PIC_VAR", warning=FALSE, message=FALSE}
-	
-	dup_adjust = 2
 
 	# Replace the actual Tau values with simulated Tau values, using parameters 
 	# fitted from each tree. 
@@ -855,7 +849,7 @@ The reason that paralog pairs have Tau values that are more different than ortho
 	
 	# Calculate contrasts 
 	gene_trees_sim_oc %<>% add_pics_to_trees()
-	nodes_sim_oc_contrasts = gene_trees_sim_oc %>% summarize_contrasts()
+	nodes_sim_oc_contrast = gene_trees_sim_oc %>% summarize_contrasts()
 	
 	# Calculate pairwise comparisons 
 	pairwise_sim_oc_summary = 
@@ -882,15 +876,16 @@ The reason that paralog pairs have Tau values that are more different than ortho
 ```{r simulations_plot, cache=TRUE, echo=FALSE, fig.cap="XX_PIC_VAR", warning=FALSE, message=FALSE}
 
 	g_phylo_null = 
-		nodes_sim_null_contrasts %>% 
+		nodes_sim_null_contrast %>% 
 		ggplot( aes( x=pic, y=..density.., col=Event ) ) + 
 			geom_freqpoly( binwidth=.001, position="identity" ) +
-			xlab( "Phylogenetic independent \ncontrasts (PIC)" ) +
+			xlab( "Phylogenetic Independent Contrast" ) +
 			ylab( "Density" ) +
-			xlim( 0, 0.075 ) + 
-			ylim( 0, 100 ) +
+			xlim( 0, 0.05 ) + 
+			ylim( 0, 75 ) +
 			theme_classic() + 
-			ggtitle( "(b) Phylogenetic result under null simulation" )
+			ggtitle( "(b) Null simulation, phylogenetic" ) +
+			theme(legend.justification=c(1,1), legend.position=c(1,1))
 
 	g_pair_null = 
 		pairwise_sim_null_summary %>% 
@@ -900,22 +895,26 @@ The reason that paralog pairs have Tau values that are more different than ortho
 		summarise( cor.test(  tau_a, tau_b )$estimate, n=n() ) %>% 
 		rename( rho=`cor.test(tau_a, tau_b)$estimate` ) %>%
 		rename( clade = label ) %>% 
-		left_join( calibration_times_all, clade=clade ) %>%
+		left_join( calibration_times, clade=clade ) %>%
 		ggplot() + 
 			geom_point( aes( x=age, y=rho, col=Event, size=n ) ) +
 			theme_classic() +
-			ggtitle( "(a) Pairwise result under null simulation" )
+			xlab( "Age" ) +
+			ylab( "Rho" ) +
+			ggtitle( "(a) Null simulation, pairwise" ) +
+			theme(legend.position="none")
 
 	g_phylo_oc = 
-	nodes_sim_oc_contrasts %>% 
+	nodes_sim_oc_contrast %>% 
 	ggplot( aes( x=pic, y=..density.., col=Event ) ) + 
 		geom_freqpoly( binwidth=.001, position="identity" ) +
-		xlab( "Phylogenetic independent \ncontrasts (PIC)" ) +
+		xlab( "Phylogenetic Independent Contrast" ) +
 		ylab( "Density" ) +
-		xlim( 0, 0.075 ) + 
-		ylim( 0, 100 ) +
+		xlim( 0, 0.05 ) + 
+		ylim( 0, 75 ) +
 		theme_classic() + 
-		ggtitle( "(d) Phylogenetic result under OC simulation" )
+		ggtitle( "(d) OC simulation, phylogenetic" ) +
+		theme(legend.position="none")
 
 	g_pair_oc = 
 		pairwise_sim_oc_summary %>% 
@@ -925,11 +924,14 @@ The reason that paralog pairs have Tau values that are more different than ortho
 		summarise( cor.test(  tau_a, tau_b )$estimate, n=n() ) %>% 
 		rename( rho=`cor.test(tau_a, tau_b)$estimate` ) %>%
 		rename( clade = label ) %>% 
-		left_join( calibration_times_all, clade=clade ) %>%
+		left_join( calibration_times, clade=clade ) %>%
 		ggplot() + 
 			geom_point( aes( x=age, y=rho, col=Event, size=n ) ) +
 			theme_classic() +
-			ggtitle( "(c) Pairwise result under OC simulation" )
+			xlab( "Age" ) +
+			ylab( "Rho" ) +
+			ggtitle( "(c) OC simulation, pairwise" ) +
+			theme(legend.position="none")
 
 	grid.arrange(
 		g_pair_null,
@@ -944,11 +946,13 @@ The reason that paralog pairs have Tau values that are more different than ortho
 
 > Figure XXSim
 
-We simulated a data set under the null model that tau evolves at the same rate following duplication and speciation events. Under the null model, pairwise analysis results (Figure XXSim a) are very similar as for the observed data, with higher rho for orthologs (`r ortholog_r_sim_null`) than paralogs (`r paralog_r_sim_null`). In the phylogenetic analysis of the null simulation, contrasts show similar divergence following speciation and duplication (Figure XXSim b) and does not reject the null hypothesis (Wilcoxon p=`r wilcox_oc( nodes_sim_null_contrasts )`).
+We simulated a data set under the null model that tau evolves at the same rate following duplication and speciation events. Under the null model, pairwise analysis results (Figure XXSim a) are very similar as for the observed data, with higher rho for orthologs (`r ortholog_r_sim_null`) than paralogs (`r paralog_r_sim_null`). In the phylogenetic analysis of the null simulation, contrasts show similar divergence following speciation and duplication (Figure XXSim b) and does not reject the null hypothesis (Wilcoxon p=`r wilcox_oc( nodes_sim_null_contrast )`).
 
-We next simulated a data set under the ortholog conjecture, where the rate of evolution of Tau following duplication was `r dup_adjust` fold the rate following speciation. The results of this heterogeneous model are nearly indistinguishable from the null model  (Figure XXSim c), and also have a higher rho for orthologs (`r ortholog_r_sim_oc`) than paralogs (`r paralog_r_sim_oc`). In the phylogenetic analysis of the ortholog conjecture simulation, contrasts XX (Figure XXSim c) and XX (Wilcoxon p=`r wilcox_oc( nodes_sim_oc_contrasts )`).
+We next simulated a data set under the ortholog conjecture, where the rate of evolution of Tau following duplication was `r dup_adjust` fold the rate following speciation. The results of this heterogeneous model are nearly indistinguishable from the null model  (Figure XXSim c), and also have a higher rho for orthologs (`r ortholog_r_sim_oc`) than paralogs (`r paralog_r_sim_oc`). In the phylogenetic analysis of the ortholog conjecture simulation, contrasts XX (Figure XXSim c) and XX (Wilcoxon p=`r wilcox_oc( nodes_sim_oc_contrast )`).
 
 #### Implications for the ortholog conjecture
+
+We find that having information on whether two genes are orthologs or paralogs provides little added information about expression beyond knowing how distantly related the two genes are. This has several implications. It is an example of the limitations of the concepts of orthology and paralogy [@Dunn:2016er]. These terms can have straightforward meaning in small gene trees with simple duplication/speciation histories, but the utility of the terms breaks down on larger more complex gene trees. Orthology and paralogy are annotations on the tips of the tree that are derived from the inferred structure of the tree and history of duplication and speciation at internal tree nodes. In this sense, orthology and paralogy are statements about the internals of the tree that are distilled into statements at the tips of the tree. Much is lost in the process, though. These are the same pre-computed trees we use in our phylogenetic re-analyses of their study. For most questions it is much more direct to focus on the structure of the tree and the inferred processes within the tree, such as which internal nodes are duplication or speciation events and how much change occurs along the branches. In this case, KMRR [@KryuchkovaMostacci:2016iw] relied on orthology and paralogy annotations that are derived from the inferred duplication and speciation history on gene phylogenies [@Herrero:2016jj]. 
 
 There has been considerable recent interest in, and controversy about, the ortholog conjecture [@Koonin:2005fp; @Studer:2009bm; @Nehrt:2011bm; @Gabaldon:2013fi]. Our results are consistent with multiple studies that have not found support for the ortholog conjecture [@Studer:2009bm; @Nehrt:2011bm; @Yanai:2004hk]. Another study found only slightly greater similarity between orthologs than paralogs [@Altenhoff:2012ea].
 
@@ -1213,10 +1217,6 @@ The independent contrast across a node is the amount of change observed between 
 ```
 
 We examined the sensitivity of our results to the specification of calibration dates for the speciation nodes. In `r noised_replicate_n` reanalyses, we drew a new date for each calibration from a normal distribution with the mean of the original date and a standard deviation `r sd_fraction` times the original date. If any daugter nodes became older than their parent, we repeated the sampling until the dates were congruent with the topology. The minimum Wilcoxon p in these reanalyses was `r min( as.numeric( unlist( p_noised ) ) )`, *i.e.* none of them reject the null hypothesis that the rate of evolution of Tau is greater following duplication events than speciation events. This is consistent with the analysis that uses the calibration dates as specified, indicating that our results are robust to the selection of calibration times for speciation nodes.
-
-
-
-
 
 
 ## References
