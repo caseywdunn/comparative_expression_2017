@@ -1035,18 +1035,36 @@ We examined the ensitivity of our results to the specification of calibration da
 
 ```{r simulations_null, cache=TRUE, echo=FALSE, fig.cap="XX_PIC_VAR", warning=FALSE, message=FALSE}
 
-	sim_tau = function( nhx ) {
-		tau_original = nhx@data$Tau [ 1:length(nhx@phylo$tip.label) ]
-		names( tau_original ) = nhx@phylo$tip.label
-		brownian_model = fitContinuous( nhx@phylo, tau_original )
+	sim_tau = function( nhx, dup_adjust=1 ) {
+		
+		phy = nhx@phylo
+		
+		# Estimate parameters
+		tau_original = nhx@data$Tau [ 1:length( phy$tip.label ) ]
+		names( tau_original ) = phy$tip.label
+		brownian_model = fitContinuous( phy, tau_original )
+
+		# Adjust length of branches that descend from duplication events. 
+		# This is how we implement heterogeneous rates after duplication 
+		# rather than speciation. Extending the branch lengths is equivalent 
+		# to using a higher rate along them.
+		dup_nodes = nhx@data$node[ nhx@data$D == "Y" ]
+		dup_edges = phy$edge[,1] %in% dup_nodes
+		phy$edge.length[ dup_edges ] = phy$edge.length[ dup_edges ] * dup_adjust
+
+		# Simulate trait given the tree and parameter estimates
 		x = fastBM( 
-				nhx@phylo, 
+				phy, 
 				a=brownian_model$opt$z0, 
 				sig2=brownian_model$opt$sigsq, 
 				bounds=c(-Inf,Inf) 
 			) %>% abs()
+		
+		# Adjust the results so they fall between 0 and 1
 		x[ x > 1 ] = 1
 		x[ is.nan( x ) ] = 1
+		
+		
 		names( x ) = NULL
 		nhx@data$Tau = c( x, rep( NA, nrow( nhx@data ) - length (x ) ) )
 		return( nhx )
@@ -1058,21 +1076,9 @@ We examined the ensitivity of our results to the specification of calibration da
 	
 	# Perform contrasts 
 	gene_trees_sim_null %<>% add_pics_to_trees()
-	
-	# Summarize results
 	nodes_sim_null_contrasts = gene_trees_sim_null %>% summarize_contrasts()
 	
-	# Plot
-	g_phylo_null = 
-		nodes_sim_null_contrasts %>% 
-		ggplot( aes( x=pic, y=..density.., col=Event ) ) + 
-			geom_freqpoly( binwidth=.001, position="identity" ) +
-			xlab( "Phylogenetic independent \ncontrasts (PIC)" ) +
-			ylab( "Density" ) +
-			xlim( 0, 0.075 ) + 
-			theme_classic() + 
-			ggtitle( "(b) Phylogenetic result under null simulation" )
-	
+	# Calculate pairwise comparisons
 	pairwise_sim_null_summary = 
 		mclapply( gene_trees_sim_null, get_pairwise_summary, mc.cores=cores ) %>% 
 		bind_rows()
@@ -1091,7 +1097,57 @@ We examined the ensitivity of our results to the specification of calibration da
 		select( tau_a, tau_b ) %>% 
 		cor( ) %>% 
 		.[ 1, 2 ]
+
+```
+
+
+```{r simulations_oc, cache=TRUE, echo=FALSE, fig.cap="XX_PIC_VAR", warning=FALSE, message=FALSE}
 	
+	dup_adjust = 2
+
+	# Replace the actual Tau values with simulated Tau values, using parameters 
+	# fitted from each tree. 
+	gene_trees_sim_oc = lapply( gene_trees_calibrated[1:1000], sim_tau, dup_adjust=dup_adjust )
+	
+	# Calculate contrasts 
+	gene_trees_sim_oc %<>% add_pics_to_trees()
+	nodes_sim_oc_contrasts = gene_trees_sim_oc %>% summarize_contrasts()
+	
+	# Calculate pairwise comparisons 
+	pairwise_sim_oc_summary = 
+		mclapply( gene_trees_sim_oc, get_pairwise_summary, mc.cores=cores ) %>% 
+		bind_rows()
+	
+	ortholog_r_sim_oc = 
+		pairwise_sim_oc_summary %>% 
+		filter( D=="N" ) %>% 
+		select( tau_a, tau_b ) %>% 
+		cor( ) %>% 
+		.[ 1, 2 ]
+	
+	paralog_r_sim_oc = 
+		pairwise_sim_oc_summary %>% 
+		filter( D=="Y" ) %>% 
+		select( tau_a, tau_b ) %>% 
+		cor( ) %>% 
+		.[ 1, 2 ]
+	
+```
+
+
+```{r simulations_plot, cache=TRUE, echo=FALSE, fig.cap="XX_PIC_VAR", warning=FALSE, message=FALSE}
+
+	g_phylo_null = 
+		nodes_sim_null_contrasts %>% 
+		ggplot( aes( x=pic, y=..density.., col=Event ) ) + 
+			geom_freqpoly( binwidth=.001, position="identity" ) +
+			xlab( "Phylogenetic independent \ncontrasts (PIC)" ) +
+			ylab( "Density" ) +
+			xlim( 0, 0.075 ) + 
+			ylim( 0, 100 ) +
+			theme_classic() + 
+			ggtitle( "(b) Phylogenetic result under null simulation" )
+
 	g_pair_null = 
 		pairwise_sim_null_summary %>% 
 		filter( species_a == "homo_sapiens" | species_b == "homo_sapiens" ) %>% 
@@ -1106,13 +1162,36 @@ We examined the ensitivity of our results to the specification of calibration da
 			theme_classic() +
 			ggtitle( "(a) Pairwise result under null simulation" )
 
-```
+	g_phylo_oc = 
+	nodes_sim_oc_contrasts %>% 
+	ggplot( aes( x=pic, y=..density.., col=Event ) ) + 
+		geom_freqpoly( binwidth=.001, position="identity" ) +
+		xlab( "Phylogenetic independent \ncontrasts (PIC)" ) +
+		ylab( "Density" ) +
+		xlim( 0, 0.075 ) + 
+		ylim( 0, 100 ) +
+		theme_classic() + 
+		ggtitle( "(d) Phylogenetic result under OC simulation" )
 
-```{r simulations_plot, cache=TRUE, echo=FALSE, fig.cap="XX_PIC_VAR", warning=FALSE, message=FALSE}
+	g_pair_oc = 
+		pairwise_sim_oc_summary %>% 
+		filter( species_a == "homo_sapiens" | species_b == "homo_sapiens" ) %>% 
+		filter( ! is.na( D ) ) %>%
+		group_by( Event, label ) %>% 
+		summarise( cor.test(  tau_a, tau_b )$estimate, n=n() ) %>% 
+		rename( rho=`cor.test(tau_a, tau_b)$estimate` ) %>%
+		rename( clade = label ) %>% 
+		left_join( calibration_times_all, clade=clade ) %>%
+		ggplot() + 
+			geom_point( aes( x=age, y=rho, col=Event, size=n ) ) +
+			theme_classic() +
+			ggtitle( "(c) Pairwise result under OC simulation" )
 
 	grid.arrange(
 		g_pair_null,
 		g_phylo_null,
+		g_pair_oc,
+		g_phylo_oc,
 		ncol = 2
 	)
 
@@ -1121,7 +1200,9 @@ We examined the ensitivity of our results to the specification of calibration da
 
 > Figure XXSim
 
-We first simulated an analysis under the null model that tau evolves at the same rate following duplication and speciation events. Under the null model, pairwise approaches are very similar as for the observed data (Figure XXSim a), with higher rho for orthologs (`r ortholog_r_sim_null`) than paralogs (`r paralog_r_sim_null`).  Phylogenetic approaches do show similar divergence following speciation and duplication (Figure XXSim b) and does not reject the null hypothesis that the rates differ (Wilcoxon p=`r wilcox_oc( nodes_sim_null_contrasts )`).
+We first simulated a data set under the null model that tau evolves at the same rate following duplication and speciation events. Under the null model, pairwise analysis results (Figure XXSim a) are very similar as for the observed data, with higher rho for orthologs (`r ortholog_r_sim_null`) than paralogs (`r paralog_r_sim_null`). In the phylogenetic analysis of the null simulation, contrasts show similar divergence following speciation and duplication (Figure XXSim b) and does not reject the null hypothesis (Wilcoxon p=`r wilcox_oc( nodes_sim_null_contrasts )`).
+
+We next simulated a data set under the ortholog conjecture, where the rate of evolution of Tau following duplication was `r dup_adjust` fold the rate following speciation. The results of this heterogeneous model are nearly indistinguishable from the null model  (Figure XXSim c), and also have a higher rho for orthologs (`r ortholog_r_sim_oc`) than paralogs (`r paralog_r_sim_oc`). In the phylogenetic analysis of the ortholog conjecture simulation, contrasts XX (Figure XXSim c) and XX (Wilcoxon p=`r wilcox_oc( nodes_sim_oc_contrasts )`).
 
 
 ## References

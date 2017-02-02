@@ -139,7 +139,7 @@ These analyses illustrate how important it is to not conflate evolutionary patte
 Methods
 -------
 
-All files needed to re-execute the analyses presented in this document are available at <https://github.com/caseywdunn/comparative_expression_2017>. The most recent commit at the time of the analysis presented here was e9735510c94e7d298974142c202dfe11fb6b28e9. See the `readme.md` file in this repository for more information on the contents of the source file and how to re-execute them.
+All files needed to re-execute the analyses presented in this document are available at <https://github.com/caseywdunn/comparative_expression_2017>. The most recent commit at the time of the analysis presented here was 21e2b9a040968f9ec8eace88e6aebb4edf6e2837. See the `readme.md` file in this repository for more information on the contents of the source file and how to re-execute them.
 
 ### KMRR reanalysis
 
@@ -251,7 +251,9 @@ We examined the ensitivity of our results to the specification of calibration da
 
 > Figure XXSim
 
-We first simulated an analysis under the null model that tau evolves at the same rate following duplication and speciation events. Under the null model, pairwise approaches are very similar as for the observed data (Figure XXSim a), with higher rho for orthologs (0.752092) than paralogs (0.2698659). Phylogenetic approaches do show similar divergence following speciation and duplication (Figure XXSim b) and does not reject the null hypothesis that the rates differ (Wilcoxon p=0.7750778).
+We first simulated a data set under the null model that tau evolves at the same rate following duplication and speciation events. Under the null model, pairwise analysis results (Figure XXSim a) are very similar as for the observed data, with higher rho for orthologs (0.752092) than paralogs (0.2698659). In the phylogenetic analysis of the null simulation, contrasts show similar divergence following speciation and duplication (Figure XXSim b) and does not reject the null hypothesis (Wilcoxon p=0.7750778).
+
+We next simulated a data set under the ortholog conjecture, where the rate of evolution of Tau following duplication was 2 fold the rate following speciation. The results of this heterogeneous model are nearly indistinguishable from the null model (Figure XXSim c), and also have a higher rho for orthologs (0.7629479) than paralogs (0.1753878). In the phylogenetic analysis of the ortholog conjecture simulation, contrasts XX (Figure XXSim c) and XX (Wilcoxon p=1.057302310^{-11}).
 
 References
 ----------
