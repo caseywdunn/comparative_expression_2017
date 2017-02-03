@@ -57,7 +57,7 @@ Results in KMRR are based on pairwise comparisons (Figure 1A) between Tau within
 
 We reanalyzed the the KMRR study using phylogenetic comparative methods, focusing on the dataset of Brawand *et al.* 2011<sup>20</sup>. For each internal node in each gene tree (Figure 1b), we measured the phylogenetic independent contrast (PIC)<sup>2</sup> of the expression statistic Tau. This is the difference in values of Tau for descendant nodes scaled by the expected variance (determined largely by the lengths of these branches). These contrasts were then annotated by whether they are made across a speciation or duplication event. The original description of independent contrasts<sup>2</sup> focused on assessing covariance between changes in two traits on a tree. Our use of contrasts is a bit different-- we look for differences in evolutionary changes of one trait (differential expression) between two categories of nodes (speciation and duplication) on a tree.
 
-![Figure Expectations](figure_expectations.png?raw=true)
+![](manuscript_files/figure-markdown_github/expectation_plots-1.png)
 
 > Figure XXExpectations | (a) Under the null hypothesis that there is no difference in the rate of evolution after duplication or speciation events, the distribution of PICs would be the same across both types of nodes. (b) Under the ortholog conjecture, contrasts across duplication nodes would tend to be larger than contrasts across speciation nodes.
 
@@ -89,9 +89,9 @@ To test the hypothesis that distantly related paralogs arising from these older 
 
 > Figure XXSim
 
-We simulated a data set under the null model that tau evolves at the same rate following duplication and speciation events. Under the null model, pairwise analysis results (Figure XXSim a) are very similar as for the observed data, with higher rho for orthologs (0.7395087) than paralogs (0.2497975). In the phylogenetic analysis of the null simulation, contrasts show similar divergence following speciation and duplication (Figure XXSim b) and does not reject the null hypothesis (Wilcoxon p=0.9695727).
+We simulated a data set under the null model that tau evolves at the same rate following duplication and speciation events. Under the null model, pairwise analysis results (Figure XXSim a) are very similar as for the observed data, with higher rho for orthologs (0.7399222) than paralogs (0.2957712). In the phylogenetic analysis of the null simulation, contrasts show similar divergence following speciation and duplication (Figure XXSim b) and does not reject the null hypothesis (Wilcoxon p=1).
 
-We next simulated a data set under the ortholog conjecture, where the rate of evolution of Tau following duplication was 5 fold the rate following speciation. The results of this heterogeneous model are nearly indistinguishable from the null model (Figure XXSim c), and also have a higher rho for orthologs (0.7986038) than paralogs (0.1365938). In the phylogenetic analysis of the ortholog conjecture simulation, contrasts XX (Figure XXSim c) and XX (Wilcoxon p=3.652384210^{-118}).
+We next simulated a data set under the ortholog conjecture, where the rate of evolution of Tau following duplication was 5 fold the rate following speciation. The results of this heterogeneous model are nearly indistinguishable from the null model (Figure XXSim c), and also have a higher rho for orthologs (0.7722221) than paralogs (0.1901526). In the phylogenetic analysis of the ortholog conjecture simulation, contrasts XX (Figure XXSim c) and XX (Wilcoxon p=1.420408210^{-164}).
 
 #### Implications for the ortholog conjecture
 
@@ -147,7 +147,7 @@ These analyses illustrate how important it is to not conflate evolutionary patte
 Methods
 -------
 
-All files needed to re-execute the analyses presented in this document are available at <https://github.com/caseywdunn/comparative_expression_2017>. The most recent commit at the time of the analysis presented here was 6df9645a620fe45c06ad2a56fa44c80811a853d6. See the `readme.md` file in this repository for more information on the contents of the source file and how to re-execute them.
+All files needed to re-execute the analyses presented in this document are available at <https://github.com/caseywdunn/comparative_expression_2017>. The most recent commit at the time of the analysis presented here was 5e4462fa69b6c5b37ad7e305c9e9beca6ba56ecd. See the `readme.md` file in this repository for more information on the contents of the source file and how to re-execute them.
 
 ### KMRR reanalysis
 
@@ -252,6 +252,54 @@ The independent contrast across a node is the amount of change observed between 
 #### Investigation of sensitivity to calibration times
 
 We examined the sensitivity of our results to the specification of calibration dates for the speciation nodes. In 10 reanalyses, we drew a new date for each calibration from a normal distribution with the mean of the original date and a standard deviation 0.2 times the original date. If any daugter nodes became older than their parent, we repeated the sampling until the dates were congruent with the topology. The minimum Wilcoxon p in these reanalyses was 1, *i.e.* none of them reject the null hypothesis that the rate of evolution of Tau is greater following duplication events than speciation events. This is consistent with the analysis that uses the calibration dates as specified, indicating that our results are robust to the selection of calibration times for speciation nodes.
+
+### Software versions
+
+This manuscript was computed on Fri Feb 03 09:50:56 2017 with the following R package versions.
+
+    R version 3.3.2 (2016-10-31)
+    Platform: x86_64-apple-darwin13.4.0 (64-bit)
+    Running under: macOS Sierra 10.12.3
+
+    locale:
+    [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+    attached base packages:
+    [1] parallel  stats     graphics  grDevices utils     datasets  methods  
+    [8] base     
+
+    other attached packages:
+     [1] phytools_0.5-64  maps_3.1.1       geiger_2.0.6     gridExtra_2.2.1 
+     [5] hutan_0.0.0.9000 digest_0.6.11    ape_4.0          ggtree_1.7.7    
+     [9] stringr_1.1.0    magrittr_1.5     dplyr_0.5.0      purrr_0.2.2     
+    [13] readr_1.0.0      tidyr_0.6.1      tibble_1.2       ggplot2_2.2.1   
+    [17] tidyverse_1.0.0  treeio_0.99.9    devtools_1.12.0 
+
+    loaded via a namespace (and not attached):
+     [1] phangorn_2.1.1          deSolve_1.14           
+     [3] subplex_1.2-2           splines_3.3.2          
+     [5] lattice_0.20-34         colorspace_1.3-2       
+     [7] expm_0.999-0            htmltools_0.3.5        
+     [9] yaml_2.1.14             survival_2.40-1        
+    [11] withr_1.0.2             DBI_0.5-1              
+    [13] plyr_1.8.4              combinat_0.0-8         
+    [15] munsell_0.4.3           gtable_0.2.0           
+    [17] mvtnorm_1.0-5           codetools_0.2-15       
+    [19] coda_0.19-1             memoise_1.0.0          
+    [21] evaluate_0.10           labeling_0.3           
+    [23] knitr_1.15.1            Rcpp_0.12.9.1          
+    [25] scales_0.4.1            backports_1.0.4        
+    [27] plotrix_3.6-4           clusterGeneration_1.3.4
+    [29] scatterplot3d_0.3-38    jsonlite_1.2           
+    [31] fastmatch_1.0-4         mnormt_1.5-5           
+    [33] stringi_1.1.2           msm_1.6.4              
+    [35] animation_2.4           numDeriv_2016.8-1      
+    [37] grid_3.3.2              rprojroot_1.1          
+    [39] quadprog_1.5-5          tools_3.3.2            
+    [41] lazyeval_0.2.0          MASS_7.3-45            
+    [43] Matrix_1.2-7.1          assertthat_0.1         
+    [45] rmarkdown_1.3           R6_2.2.0               
+    [47] igraph_1.0.1            nlme_3.1-128           
 
 References
 ----------

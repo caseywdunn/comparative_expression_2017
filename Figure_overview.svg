@@ -1,273 +1,380 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 21.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!-- Generator: Adobe Illustrator 18.1.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 468 132.5" style="enable-background:new 0 0 468 132.5;" xml:space="preserve">
-<style type="text/css">
-	.st0{display:none;}
-	.st1{display:inline;}
-	.st2{fill:#F6766D;stroke:#000000;stroke-width:1.07;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
-	.st3{fill:#999999;}
-	.st4{font-family:'Helvetica';}
-	.st5{font-size:8px;}
-	.st6{font-family:'Helvetica-Bold';}
-	.st7{font-size:10px;}
-	.st8{font-size:9px;}
-	.st9{fill:none;stroke:#00BEC3;stroke-width:1.07;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
-	.st10{fill:none;stroke:#F6766D;stroke-width:1.07;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
-	.st11{fill:none;stroke:#F6766D;stroke-width:0.5;stroke-miterlimit:10;}
-	.st12{fill:#F6766D;}
-	.st13{fill:none;stroke:#00BEC3;stroke-width:0.5;stroke-miterlimit:10;}
-	.st14{fill:#00BEC3;}
-	.st15{font-size:7px;}
-	.st16{font-size:7.3209px;}
-	.st17{enable-background:new    ;}
-</style>
-<g id="old_tree" class="st0">
-	<g class="st1">
-		<path class="st2" d="M193.6,315.3h82.6 M193.6,298.3h82.6 M111,332.2h165.2 M193.6,281.4h82.6 M193.6,264.4h82.6 M193.6,247.5
-			h82.6 M193.6,230.5h82.6 M28.4,287.7L28.4,287.7 M28.4,319.5H111 M111,306.8h82.6 M104.5,256h6.5 M28.4,256h76.1 M111,272.9h82.6
-			 M111,239h82.6 M193.6,306.8v8.5 M193.6,306.8v-8.5 M111,319.5v12.7 M193.6,272.9v8.5 M193.6,272.9v-8.5 M193.6,239v8.5
-			 M193.6,239v-8.5 M28.4,287.7L28.4,287.7 M28.4,287.7v31.8 M111,319.5v-12.7 M28.4,287.7V256 M111,256v16.9 M111,256v-17"/>
+	 viewBox="0 0 468 648" enable-background="new 0 0 468 648" xml:space="preserve">
+<g id="old_tree" display="none">
+	<g display="inline">
+		
+			<path fill="#F6766D" stroke="#000000" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="
+			M193.6,573h82.6 M193.6,556h82.6 M111,590h165.2 M193.6,539.2h82.6 M193.6,522.2h82.6 M193.6,505.2h82.6 M193.6,488.2h82.6
+			 M28.4,545.5L28.4,545.5 M28.4,577.2H111 M111,564.5h82.6 M104.5,513.8h6.5 M28.4,513.8h76.1 M111,530.7h82.6 M111,496.8h82.6
+			 M193.6,564.5v8.5 M193.6,564.5V556 M111,577.2V590 M193.6,530.7v8.5 M193.6,530.7v-8.5 M193.6,496.8v8.5 M193.6,496.8v-8.5
+			 M28.4,545.5L28.4,545.5 M28.4,545.5v31.8 M111,577.2v-12.7 M28.4,545.5v-31.7 M111,513.8v16.9 M111,513.8v-17"/>
 	</g>
 </g>
 <g id="Layer_1_1_">
-	<text transform="matrix(1 0 0 1 302.3726 114.3134)" class="st3 st4 st5">Species A</text>
-	<text transform="matrix(1 0 0 1 302.3726 130.0831)" class="st3 st4 st5">Species C</text>
-	<text transform="matrix(1 0 0 1 302.3726 97.3603)" class="st3 st4 st5">Species B</text>
-	<text transform="matrix(1 0 0 1 302.3726 80.417)" class="st3 st4 st5">Species A</text>
-	<text transform="matrix(1 0 0 1 302.3726 63.4541)" class="st3 st4 st5">Species B</text>
-	<text transform="matrix(1 0 0 1 302.3726 46.5166)" class="st3 st4 st5">Species C</text>
-	<text transform="matrix(1 0 0 1 302.3726 29.5634)" class="st3 st4 st5">Species C</text>
-	<text transform="matrix(1 0 0 1 235.7918 7.9262)" class="st6 st7">(b) </text>
-	<text transform="matrix(1 0 0 1 251.2918 7.9262)" class="st4 st8">Phylogenetic independent contrasts</text>
-	<line class="st9" x1="295.1" y1="93.1" x2="280.8" y2="93.1"/>
-	<line class="st9" x1="280.8" y1="93.1" x2="280.8" y2="110"/>
-	<line class="st9" x1="280.8" y1="110" x2="295.1" y2="110"/>
-	<line class="st9" x1="252.9" y1="127.3" x2="295.1" y2="127.3"/>
-	<line class="st9" x1="252.9" y1="101.9" x2="252.9" y2="127.3"/>
-	<line class="st9" x1="274.4" y1="68" x2="252.9" y2="68"/>
-	<line class="st9" x1="252.9" y1="68" x2="252.9" y2="34.1"/>
-	<line class="st9" x1="252.9" y1="34.1" x2="266.7" y2="34.1"/>
-	<line class="st10" x1="252.9" y1="51" x2="238" y2="51"/>
-	<line class="st10" x1="238" y1="51" x2="238" y2="114.6"/>
-	<line class="st10" x1="238" y1="114.6" x2="252.9" y2="114.6"/>
-	<line class="st10" x1="295.1" y1="25.6" x2="266.7" y2="25.6"/>
-	<line class="st10" x1="266.7" y1="25.6" x2="266.7" y2="42.6"/>
-	<line class="st10" x1="266.7" y1="42.6" x2="295.1" y2="42.6"/>
-	<line class="st9" x1="295.1" y1="59.5" x2="274.4" y2="59.5"/>
-	<line class="st9" x1="274.4" y1="59.5" x2="274.4" y2="76.5"/>
-	<line class="st9" x1="274.4" y1="76.5" x2="295.1" y2="76.5"/>
-	<line class="st9" x1="252.9" y1="101.9" x2="280.8" y2="101.9"/>
+	<text transform="matrix(1 0 0 1 297.9469 368.2718)" fill="#999999" font-family="'Helvetica'" font-size="8">Species A</text>
+	<text transform="matrix(1 0 0 1 297.9469 384.0415)" fill="#999999" font-family="'Helvetica'" font-size="8">Species C</text>
+	<text transform="matrix(1 0 0 1 297.9469 351.3187)" fill="#999999" font-family="'Helvetica'" font-size="8">Species B</text>
+	<text transform="matrix(1 0 0 1 297.9469 334.3754)" fill="#999999" font-family="'Helvetica'" font-size="8">Species A</text>
+	<text transform="matrix(1 0 0 1 297.9469 317.4125)" fill="#999999" font-family="'Helvetica'" font-size="8">Species B</text>
+	<text transform="matrix(1 0 0 1 297.9469 300.475)" fill="#999999" font-family="'Helvetica'" font-size="8">Species C</text>
+	<text transform="matrix(1 0 0 1 297.9469 283.5218)" fill="#999999" font-family="'Helvetica'" font-size="8">Species C</text>
+	<text transform="matrix(1 0 0 1 231.3661 265.7262)" font-family="'Helvetica-Bold'" font-size="10">(b) </text>
+	<text transform="matrix(1 0 0 1 246.8661 266.2076)" font-family="'Helvetica'" font-size="9">Phylogenetic independent contrasts</text>
+	
+		<line fill="none" stroke="#F6766D" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="290.7" y1="347.1" x2="276.4" y2="347.1"/>
+	
+		<line fill="none" stroke="#F6766D" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="276.4" y1="347.1" x2="276.4" y2="364"/>
+	
+		<line fill="none" stroke="#F6766D" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="276.4" y1="364" x2="290.7" y2="364"/>
+	
+		<line fill="none" stroke="#F6766D" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="248.5" y1="381.3" x2="290.7" y2="381.3"/>
+	
+		<line fill="none" stroke="#F6766D" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="248.5" y1="355.9" x2="248.5" y2="381.3"/>
+	
+		<line fill="none" stroke="#F6766D" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="270" y1="322" x2="248.5" y2="322"/>
+	
+		<line fill="none" stroke="#F6766D" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="248.5" y1="322" x2="248.5" y2="288.1"/>
+	
+		<line fill="none" stroke="#F6766D" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="248.5" y1="288.1" x2="262.3" y2="288.1"/>
+	
+		<line fill="none" stroke="#00BEC3" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="248.5" y1="305" x2="233.6" y2="305"/>
+	
+		<line fill="none" stroke="#00BEC3" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="233.6" y1="305" x2="233.6" y2="368.6"/>
+	
+		<line fill="none" stroke="#00BEC3" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="233.6" y1="368.6" x2="248.5" y2="368.6"/>
+	
+		<line fill="none" stroke="#00BEC3" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="290.7" y1="279.6" x2="262.3" y2="279.6"/>
+	
+		<line fill="none" stroke="#00BEC3" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="262.3" y1="279.6" x2="262.3" y2="296.6"/>
+	
+		<line fill="none" stroke="#00BEC3" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="262.3" y1="296.6" x2="290.7" y2="296.6"/>
+	
+		<line fill="none" stroke="#F6766D" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="290.7" y1="313.5" x2="270" y2="313.5"/>
+	
+		<line fill="none" stroke="#F6766D" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="270" y1="313.5" x2="270" y2="330.5"/>
+	
+		<line fill="none" stroke="#F6766D" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="270" y1="330.5" x2="290.7" y2="330.5"/>
+	
+		<line fill="none" stroke="#F6766D" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="248.5" y1="355.9" x2="276.4" y2="355.9"/>
 	<g>
 		<g>
-			<path class="st11" d="M288.5,39.4c-7-0.7-18.4-2.9-18.4-5.4s11.4-4.6,18.4-5.4"/>
+			<path fill="none" stroke="#00BEC3" stroke-width="0.5" stroke-miterlimit="10" d="M284.1,293.4c-7-0.7-18.4-2.9-18.4-5.4
+				s11.4-4.6,18.4-5.4"/>
 			<g>
-				<path class="st12" d="M287.6,39.3l-1.2,1.7h0.1l3-0.9c1-0.1,2.1-0.3,3.1-0.4c-1-0.3-2-0.6-3-0.9l-2.8-1.4h-0.1L287.6,39.3z"/>
+				<path fill="#00BEC3" d="M283.2,293.3L282,295h0.1l3-0.9c1-0.1,2.1-0.3,3.1-0.4c-1-0.3-2-0.6-3-0.9l-2.8-1.4h-0.1L283.2,293.3z"
+					/>
 			</g>
 			<g>
-				<path class="st12" d="M287.6,28.8l-1.2-1.7h0.1l3,0.9c1,0.1,2.1,0.3,3.1,0.4c-1,0.3-2,0.6-3,0.9l-2.8,1.4h-0.1L287.6,28.8z"/>
+				<path fill="#00BEC3" d="M283.2,282.8l-1.2-1.7h0.1l3,0.9c1,0.1,2.1,0.3,3.1,0.4c-1,0.3-2,0.6-3,0.9l-2.8,1.4h-0.1L283.2,282.8z"
+					/>
 			</g>
 		</g>
 	</g>
 	<g>
 		<g>
-			<path class="st11" d="M246.7,109.9c-6.1-3-5-14.1-5-27.3s-1.3-24.3,4.9-27.3"/>
+			<path fill="none" stroke="#00BEC3" stroke-width="0.5" stroke-miterlimit="10" d="M242.3,363.9c-6.1-3-5-14.1-5-27.3
+				c0-13.2-1.3-24.3,4.9-27.3"/>
 			<g>
-				<path class="st12" d="M245.8,109.5l-1.5,1.5v0.1l3.1-0.4c1,0,2.1,0.1,3.1,0.1c-0.9-0.5-1.9-1-2.8-1.4l-2.6-1.9H245L245.8,109.5z
-					"/>
+				<path fill="#00BEC3" d="M241.4,363.5l-1.5,1.5v0.1l3.1-0.4c1,0,2.1,0.1,3.1,0.1c-0.9-0.5-1.9-1-2.8-1.4l-2.6-1.9h-0.1
+					L241.4,363.5z"/>
 			</g>
 			<g>
-				<path class="st12" d="M245.8,55.7l-1.5-1.5v-0.1l3.1,0.4c1,0,2.1-0.1,3.1-0.1c-0.9,0.5-1.9,0.9-2.8,1.4l-2.6,1.9H245L245.8,55.7
+				<path fill="#00BEC3" d="M241.4,309.7l-1.5-1.5v-0.1l3.1,0.4c1,0,2.1-0.1,3.1-0.1c-0.9,0.5-1.9,0.9-2.8,1.4l-2.6,1.9h-0.1
+					L241.4,309.7z"/>
+			</g>
+		</g>
+	</g>
+	<g>
+		<g>
+			<path fill="none" stroke="#F6766D" stroke-width="0.5" stroke-miterlimit="10" d="M284,327.6c-8.5-0.5-10.7-2.8-10.7-5.5
+				c0-2.7,1.8-5,10.7-5.5"/>
+			<g>
+				<path fill="#F6766D" d="M283.2,327.5l-1.2,1.8h0.1l3-1.1c1-0.2,2.1-0.4,3.1-0.6c-1-0.3-2-0.5-3-0.8l-2.9-1.3h-0.1L283.2,327.5z"
+					/>
+			</g>
+			<g>
+				<path fill="#F6766D" d="M283.2,316.6l-1.2-1.8h0.1l3,1.1c1,0.2,2.1,0.4,3.1,0.6c-1,0.3-2,0.5-3,0.8l-2.9,1.3h-0.1L283.2,316.6z"
+					/>
+			</g>
+		</g>
+	</g>
+	<g>
+		<g>
+			<path fill="none" stroke="#F6766D" stroke-width="0.5" stroke-miterlimit="10" d="M359.9,305.3c-13.5-0.3-17-1.9-17-3.8
+				c0-2,2.8-3.6,17-3.8"/>
+			<g>
+				<path fill="#F6766D" d="M359.1,305.1l-1.1,1.8h0.1l3-1.1c1-0.2,2.1-0.4,3.1-0.6c-1-0.3-2-0.5-3-0.8l-2.9-1.3h-0.1L359.1,305.1z"
+					/>
+			</g>
+			<g>
+				<path fill="#F6766D" d="M359.1,297.7l-1.1-1.8h0.1l3,1.1c1,0.2,2.1,0.4,3.1,0.6c-1,0.3-2,0.5-3,0.8l-2.9,1.2h-0.1L359.1,297.7z"
+					/>
+			</g>
+		</g>
+	</g>
+	<g>
+		<g>
+			<path fill="none" stroke="#F6766D" stroke-width="0.5" stroke-miterlimit="10" d="M262.9,318.4c-8.2-1.3-11.5-6.9-11.5-13.6
+				c0-6,0-11.2,3.8-13.1"/>
+			<g>
+				<path fill="#F6766D" d="M262,318.2l-1.3,1.7h0.1l3-0.9c1-0.1,2.1-0.3,3.1-0.4c-1-0.3-2-0.6-3-1l-2.8-1.4H261L262,318.2z"/>
+			</g>
+			<g>
+				<path fill="#F6766D" d="M254.5,292.1l-1.5-1.5v-0.1l3.1,0.4c1,0,2.1-0.1,3.1-0.1c-0.9,0.5-1.9,1-2.8,1.4l-2.5,1.9h-0.1
+					L254.5,292.1z"/>
+			</g>
+		</g>
+	</g>
+	<g>
+		<g>
+			<path fill="none" stroke="#F6766D" stroke-width="0.5" stroke-miterlimit="10" d="M284.1,361.5c-4.4-0.7-4.3-2.9-4.3-5.4
+				s0-4.6,4.3-5.3"/>
+			<g>
+				<path fill="#F6766D" d="M283.2,361.4l-1.2,1.7h0.1l3-0.9c1-0.1,2.1-0.3,3.1-0.4c-1-0.3-2-0.6-3-0.9l-2.8-1.4h-0.1L283.2,361.4z"
+					/>
+			</g>
+			<g>
+				<path fill="#F6766D" d="M283.2,351l-1.3-1.7h0.1l3,0.9c1,0.1,2.1,0.3,3.1,0.4c-1,0.3-2,0.6-3,1l-2.8,1.4h-0.1L283.2,351z"/>
+			</g>
+		</g>
+	</g>
+	<g>
+		<g>
+			<path fill="none" stroke="#F6766D" stroke-width="0.5" stroke-miterlimit="10" d="M284.1,378.8c-17.1-0.6-31.5-4.7-31.5-9.8
+				c0-4.8,6.1-8.9,16.8-9.7"/>
+			<g>
+				<path fill="#F6766D" d="M283.2,378.7l-1.1,1.8h0.1l3-1.1c1-0.2,2.1-0.4,3.1-0.6c-1-0.3-2-0.5-3-0.8l-2.9-1.3h-0.1L283.2,378.7z"
+					/>
+			</g>
+			<g>
+				<path fill="#F6766D" d="M268.5,359.4l-1.2-1.8h0.1l3,1c1,0.2,2.1,0.4,3.1,0.5c-1,0.3-2,0.5-3,0.8l-2.9,1.3h-0.1L268.5,359.4z"/>
+			</g>
+		</g>
+	</g>
+	<path fill="none" stroke="#00BEC3" stroke-width="0.5" stroke-miterlimit="10" d="M105.2,281.6c8.6,0,17.7,3.5,17.7,7.9
+		s-9.2,7.6-17.7,7.6"/>
+	<text transform="matrix(1 0 0 1 344.1786 282.0591)" font-family="'Helvetica'" font-size="7">The same example tree has 6 </text>
+	<text transform="matrix(1 0 0 1 344.1786 290.4591)" font-family="'Helvetica'" font-size="7">independent contrasts:</text>
+	<text transform="matrix(1 0 0 1 372.8452 299.0252)" font-family="'Helvetica'" font-size="7">4 contrasts arising from </text>
+	<text transform="matrix(1 0 0 1 372.8452 307.4252)" font-family="'Helvetica'" font-size="7">speciation nodes</text>
+	<g>
+		<g>
+			<path fill="none" stroke="#00BEC3" stroke-width="0.5" stroke-miterlimit="10" d="M359.9,325.1c-13.5-0.3-17-1.9-17-3.8
+				c0-2,2.8-3.6,17-3.8"/>
+			<g>
+				<path fill="#00BEC3" d="M359.1,325l-1.1,1.8h0.1l3-1.1c1-0.2,2.1-0.4,3.1-0.6c-1-0.3-2-0.5-3-0.8l-2.9-1.3h-0.1L359.1,325z"/>
+			</g>
+			<g>
+				<path fill="#00BEC3" d="M359.1,317.6l-1.1-1.8h0.1l3,1.1c1,0.2,2.1,0.4,3.1,0.6c-1,0.3-2,0.5-3.1,0.8l-2.9,1.2h-0.1L359.1,317.6
 					z"/>
 			</g>
 		</g>
 	</g>
-	<g>
-		<g>
-			<path class="st13" d="M288.4,73.6c-8.5-0.5-10.7-2.8-10.7-5.5s1.8-5,10.7-5.5"/>
-			<g>
-				<path class="st14" d="M287.6,73.5l-1.2,1.8h0.1l3-1.1c1-0.2,2.1-0.4,3.1-0.6c-1-0.3-2-0.5-3-0.8l-2.9-1.3h-0.1L287.6,73.5z"/>
-			</g>
-			<g>
-				<path class="st14" d="M287.6,62.6l-1.2-1.8h0.1l3,1.1c1,0.2,2.1,0.4,3.1,0.6c-1,0.3-2,0.5-3,0.8l-2.9,1.3h-0.1L287.6,62.6z"/>
-			</g>
-		</g>
-	</g>
-	<g>
-		<g>
-			<path class="st13" d="M364.3,58.7c-13.5-0.3-17-1.9-17-3.8c0-2,2.8-3.6,17-3.8"/>
-			<g>
-				<path class="st14" d="M363.5,58.5l-1.1,1.8h0.1l3-1.1c1-0.2,2.1-0.4,3.1-0.6c-1-0.3-2-0.5-3-0.8l-2.9-1.3h-0.1L363.5,58.5z"/>
-			</g>
-			<g>
-				<path class="st14" d="M363.5,51.1l-1.1-1.8h0.1l3,1.1c1,0.2,2.1,0.4,3.1,0.6c-1,0.3-2,0.5-3,0.8l-2.9,1.2h-0.1L363.5,51.1z"/>
-			</g>
-		</g>
-	</g>
-	<g>
-		<g>
-			<path class="st13" d="M267.3,64.4c-8.2-1.3-11.5-6.9-11.5-13.6c0-6,0-11.2,3.8-13.1"/>
-			<g>
-				<path class="st14" d="M266.4,64.2l-1.3,1.7h0.1l3-0.9c1-0.1,2.1-0.3,3.1-0.4c-1-0.3-2-0.6-3-1l-2.8-1.4h-0.1L266.4,64.2z"/>
-			</g>
-			<g>
-				<path class="st14" d="M258.9,38.1l-1.5-1.5v-0.1l3.1,0.4c1,0,2.1-0.1,3.1-0.1c-0.9,0.5-1.9,1-2.8,1.4l-2.5,1.9h-0.1L258.9,38.1z
-					"/>
-			</g>
-		</g>
-	</g>
-	<g>
-		<g>
-			<path class="st13" d="M288.5,107.5c-4.4-0.7-4.3-2.9-4.3-5.4s0-4.6,4.3-5.3"/>
-			<g>
-				<path class="st14" d="M287.6,107.4l-1.2,1.7h0.1l3-0.9c1-0.1,2.1-0.3,3.1-0.4c-1-0.3-2-0.6-3-0.9l-2.8-1.4h-0.1L287.6,107.4z"/>
-			</g>
-			<g>
-				<path class="st14" d="M287.6,97l-1.3-1.7h0.1l3,0.9c1,0.1,2.1,0.3,3.1,0.4c-1,0.3-2,0.6-3,1l-2.8,1.4h-0.1L287.6,97z"/>
-			</g>
-		</g>
-	</g>
-	<g>
-		<g>
-			<path class="st13" d="M288.5,124.8c-17.1-0.6-31.5-4.7-31.5-9.8c0-4.8,6.1-8.9,16.8-9.7"/>
-			<g>
-				<path class="st14" d="M287.6,124.7l-1.1,1.8h0.1l3-1.1c1-0.2,2.1-0.4,3.1-0.6c-1-0.3-2-0.5-3-0.8l-2.9-1.3h-0.1L287.6,124.7z"/>
-			</g>
-			<g>
-				<path class="st14" d="M272.9,105.4l-1.2-1.8h0.1l3,1c1,0.2,2.1,0.4,3.1,0.5c-1,0.3-2,0.5-3,0.8l-2.9,1.3h-0.1L272.9,105.4z"/>
-			</g>
-		</g>
-	</g>
-	<path class="st11" d="M101.6,23.8c8.6,0,17.7,3.5,17.7,7.9s-9.2,7.6-17.7,7.6"/>
-	<text transform="matrix(1 0 0 1 348.6043 28.1007)" class="st4 st15">The same example tree has 6 </text>
-	<text transform="matrix(1 0 0 1 348.6043 36.5007)" class="st4 st15">independent contrasts:</text>
-	<text transform="matrix(1 0 0 1 377.2709 52.4441)" class="st4 st15">4 contrasts arising from </text>
-	<text transform="matrix(1 0 0 1 377.2709 60.8441)" class="st4 st15">speciation nodes</text>
-	<g>
-		<g>
-			<path class="st11" d="M364.3,78.5c-13.5-0.3-17-1.9-17-3.8c0-2,2.8-3.6,17-3.8"/>
-			<g>
-				<path class="st12" d="M363.5,78.4l-1.1,1.8h0.1l3-1.1c1-0.2,2.1-0.4,3.1-0.6c-1-0.3-2-0.5-3-0.8l-2.9-1.3h-0.1L363.5,78.4z"/>
-			</g>
-			<g>
-				<path class="st12" d="M363.5,71l-1.1-1.8h0.1l3,1.1c1,0.2,2.1,0.4,3.1,0.6c-1,0.3-2,0.5-3.1,0.8l-2.9,1.2h-0.1L363.5,71z"/>
-			</g>
-		</g>
-	</g>
-	<text transform="matrix(0.9562 0 0 1 377.2715 72.6086)" class="st4 st16">2 contrasts arising from </text>
-	<text transform="matrix(0.9562 0 0 1 377.2715 81.4084)" class="st4 st16">duplication nodes</text>
-	<path class="st13" d="M101.6,23.8c8.6,0,17.7,7.3,17.7,16.4s-9.2,16.4-17.7,16.4"/>
-	<path class="st13" d="M101.6,23.8c8.6,0,17.7,11.1,17.7,24.8s-9.2,25-17.7,25"/>
-	<path class="st11" d="M101.6,23.8c8.6,0,17.7,14.9,17.7,33.2s-9.2,33.5-17.7,33.5"/>
-	<path class="st11" d="M101.6,23.8c8.6,0,17.7,18.6,17.7,41.5s-9.2,41.3-17.7,41.3"/>
-	<path class="st11" d="M101.6,23.8c8.6,0,17.7,22.3,17.7,49.8s-9.2,49.6-17.7,49.6"/>
-	<path class="st13" d="M101.6,39.3c6.1,0,14.5,3.6,14.5,8.4s-8.4,8.8-14.5,8.8"/>
-	<path class="st13" d="M101.6,56.5c4.7,0,11.8,3.9,11.8,8.7s-7.2,8.4-11.8,8.4"/>
-	<path class="st13" d="M101.6,39.3c6.1,0,14.5,7.5,14.5,17.1s-8.4,17.2-14.5,17.2"/>
-	<path class="st11" d="M101.6,39.3c6.1,0,14.5,11.3,14.5,25.4s-8.4,25.8-14.5,25.8"/>
-	<path class="st11" d="M101.6,39.3c6.1,0,14.5,15.3,14.5,33.8s-8.4,33.5-14.5,33.5"/>
-	<path class="st11" d="M101.6,39.3c6.1,0,14.5,19.1,14.5,42.2s-8.4,41.7-14.5,41.7"/>
-	<path class="st11" d="M101.6,56.5c4.7,0,11.8,7.9,11.8,17.1s-7.2,16.8-11.8,16.8"/>
-	<path class="st11" d="M101.6,56.5c4.7,0,11.8,11.1,11.8,25s-7.2,25-11.8,25"/>
-	<path class="st11" d="M101.6,56.5c4.7,0,11.8,14.8,11.8,33.2s-7.2,33.4-11.8,33.4"/>
-	<path class="st11" d="M101.6,73.6c3.1,0,8.5,3.9,8.5,8.5s-5.4,8.4-8.5,8.4"/>
-	<path class="st11" d="M101.6,73.6c3.1,0,8.5,7.6,8.5,16.7s-5.4,16.3-8.5,16.3"/>
-	<path class="st11" d="M101.6,73.6c3.1,0,8.5,11.6,8.5,25.3s-5.4,24.4-8.5,24.4"/>
-	<path class="st13" d="M101.6,90.5c2,0,5.9,3.9,5.9,8.3s-3.9,7.8-5.9,7.8"/>
-	<path class="st13" d="M101.6,90.5c2,0,5.9,7.7,5.9,16.8s-3.9,15.9-5.9,15.9"/>
-	<path class="st13" d="M101.6,106.6c1,0,3.3,3.1,3.3,7.5s-2.3,9.1-3.3,9.1"/>
-	<text transform="matrix(1 0 0 1 130.2196 26.9344)" class="st4 st15">This example tree has 21 </text>
-	<text transform="matrix(1 0 0 1 130.2196 35.3344)" class="st4 st15">nonindependent pairwise </text>
-	<text transform="matrix(1 0 0 1 130.2196 43.7344)" class="st4 st15">comparisons:</text>
-	<text transform="matrix(1 0 0 1 144.3411 54.1351)" class="st4 st15">8 pairwise comparisons </text>
-	<text transform="matrix(1 0 0 1 144.3411 62.5351)" class="st4 st15">between </text>
-	<text transform="matrix(1 0 0 1 172.7411 62.5351)" class="st14 st4 st15">orthologs</text>
-	<text transform="matrix(1 0 0 1 201.5411 62.5351)" class="st4 st15"> </text>
-	<text transform="matrix(0.9562 0 0 1 144.3413 78.0666)" class="st4 st16">13 pairwise comparisons </text>
-	<text transform="matrix(0.9562 0 0 1 144.3413 86.8664)" class="st4 st16">between </text>
-	<text transform="matrix(0.9562 0 0 1 172.7402 86.8664)" class="st12 st4 st16">paralogs</text>
-	<path class="st13" d="M132,50.7c2.8,0,8.1,2.3,8.1,4.8c0,2.6-5.3,4.5-8.1,4.5"/>
-	<path class="st11" d="M132,71.6c2.8,0,8.1,2.3,8.1,4.8c0,2.6-5.3,4.5-8.1,4.5"/>
-	<text transform="matrix(1 0 0 1 146.6972 101.8267)" class="st4 st15">Speciation event</text>
-	<text transform="matrix(1 0 0 1 146.6124 114.3267)" class="st4 st15">Duplication event</text>
-	<text transform="matrix(1 0 0 1 6.1444 7.9262)" class="st6 st7">(a)</text>
-	<text transform="matrix(1 0 0 1 18.3444 7.9262)" class="st4 st7"> Pairwise comparisons</text>
+	<text transform="matrix(0.9562 0 0 1 372.8458 319.1895)" font-family="'Helvetica'" font-size="7.3209">2 contrasts arising from </text>
+	<text transform="matrix(0.9562 0 0 1 372.8458 327.9893)" font-family="'Helvetica'" font-size="7.3209">duplication nodes</text>
+	<path fill="none" stroke="#F6766D" stroke-width="0.5" stroke-miterlimit="10" d="M105.2,281.6c8.6,0,17.7,7.3,17.7,16.4
+		s-9.2,16.4-17.7,16.4"/>
+	<path fill="none" stroke="#F6766D" stroke-width="0.5" stroke-miterlimit="10" d="M105.2,281.6c8.6,0,17.7,11.1,17.7,24.8
+		c0,13.7-9.2,25-17.7,25"/>
+	<path fill="none" stroke="#00BEC3" stroke-width="0.5" stroke-miterlimit="10" d="M105.2,281.6c8.6,0,17.7,14.9,17.7,33.2
+		c0,18.3-9.2,33.5-17.7,33.5"/>
+	<path fill="none" stroke="#00BEC3" stroke-width="0.5" stroke-miterlimit="10" d="M105.2,281.6c8.6,0,17.7,18.6,17.7,41.5
+		s-9.2,41.3-17.7,41.3"/>
+	<path fill="none" stroke="#00BEC3" stroke-width="0.5" stroke-miterlimit="10" d="M105.2,281.6c8.6,0,17.7,22.3,17.7,49.8
+		s-9.2,49.6-17.7,49.6"/>
+	<path fill="none" stroke="#F6766D" stroke-width="0.5" stroke-miterlimit="10" d="M105.2,297.1c6.1,0,14.5,3.6,14.5,8.4
+		s-8.4,8.8-14.5,8.8"/>
+	<path fill="none" stroke="#F6766D" stroke-width="0.5" stroke-miterlimit="10" d="M105.2,314.3c4.7,0,11.8,3.9,11.8,8.7
+		s-7.2,8.4-11.8,8.4"/>
+	<path fill="none" stroke="#F6766D" stroke-width="0.5" stroke-miterlimit="10" d="M105.2,297.1c6.1,0,14.5,7.5,14.5,17.1
+		c0,9.6-8.4,17.2-14.5,17.2"/>
+	<path fill="none" stroke="#00BEC3" stroke-width="0.5" stroke-miterlimit="10" d="M105.2,297.1c6.1,0,14.5,11.3,14.5,25.4
+		s-8.4,25.8-14.5,25.8"/>
+	<path fill="none" stroke="#00BEC3" stroke-width="0.5" stroke-miterlimit="10" d="M105.2,297.1c6.1,0,14.5,15.3,14.5,33.8
+		s-8.4,33.5-14.5,33.5"/>
+	<path fill="none" stroke="#00BEC3" stroke-width="0.5" stroke-miterlimit="10" d="M105.2,297.1c6.1,0,14.5,19.1,14.5,42.2
+		c0,23.1-8.4,41.7-14.5,41.7"/>
+	<path fill="none" stroke="#00BEC3" stroke-width="0.5" stroke-miterlimit="10" d="M105.2,314.3c4.7,0,11.8,7.9,11.8,17.1
+		c0,9.2-7.2,16.8-11.8,16.8"/>
+	<path fill="none" stroke="#00BEC3" stroke-width="0.5" stroke-miterlimit="10" d="M105.2,314.3c4.7,0,11.8,11.1,11.8,25
+		c0,13.9-7.2,25-11.8,25"/>
+	<path fill="none" stroke="#00BEC3" stroke-width="0.5" stroke-miterlimit="10" d="M105.2,314.3c4.7,0,11.8,14.8,11.8,33.2
+		s-7.2,33.4-11.8,33.4"/>
+	<path fill="none" stroke="#00BEC3" stroke-width="0.5" stroke-miterlimit="10" d="M105.2,331.4c3.1,0,8.5,3.9,8.5,8.5
+		s-5.4,8.4-8.5,8.4"/>
+	<path fill="none" stroke="#00BEC3" stroke-width="0.5" stroke-miterlimit="10" d="M105.2,331.4c3.1,0,8.5,7.6,8.5,16.7
+		s-5.4,16.3-8.5,16.3"/>
+	<path fill="none" stroke="#00BEC3" stroke-width="0.5" stroke-miterlimit="10" d="M105.2,331.4c3.1,0,8.5,11.6,8.5,25.3
+		c0,13.7-5.4,24.4-8.5,24.4"/>
+	<path fill="none" stroke="#F6766D" stroke-width="0.5" stroke-miterlimit="10" d="M105.2,348.3c2,0,5.9,3.9,5.9,8.3
+		s-3.9,7.8-5.9,7.8"/>
+	<path fill="none" stroke="#F6766D" stroke-width="0.5" stroke-miterlimit="10" d="M105.2,348.3c2,0,5.9,7.7,5.9,16.8
+		s-3.9,15.9-5.9,15.9"/>
+	<path fill="none" stroke="#F6766D" stroke-width="0.5" stroke-miterlimit="10" d="M105.2,364.4c1,0,3.3,3.1,3.3,7.5
+		s-2.3,9.1-3.3,9.1"/>
+	<text transform="matrix(1 0 0 1 128.9356 284.7344)" font-family="'Helvetica'" font-size="7">This example tree has 21 </text>
+	<text transform="matrix(1 0 0 1 128.9356 293.1344)" font-family="'Helvetica'" font-size="7">nonindependent pairwise </text>
+	<text transform="matrix(1 0 0 1 128.9356 301.5344)" font-family="'Helvetica'" font-size="7">comparisons:</text>
+	<text transform="matrix(1 0 0 1 143.0571 311.9351)" font-family="'Helvetica'" font-size="7">8 pairwise comparisons </text>
+	<text transform="matrix(1 0 0 1 143.0571 320.3351)" font-family="'Helvetica'" font-size="7">between </text>
+	<text transform="matrix(1 0 0 1 171.4571 320.3351)" fill="#F6766D" font-family="'Helvetica'" font-size="7">orthologs</text>
+	<text transform="matrix(1 0 0 1 205.1251 320.3351)" font-family="'Helvetica'" font-size="7"> </text>
+	<text transform="matrix(0.9562 0 0 1 143.0573 335.8664)" font-family="'Helvetica'" font-size="7.3209">13 pairwise comparisons </text>
+	<text transform="matrix(0.9562 0 0 1 143.0573 344.6662)" font-family="'Helvetica'" font-size="7.3209">between </text>
+	<text transform="matrix(0.9562 0 0 1 171.4562 344.6662)" fill="#00BEC3" font-family="'Helvetica'" font-size="7.3209">paralogs</text>
+	<path fill="none" stroke="#F6766D" stroke-width="0.5" stroke-miterlimit="10" d="M130.7,308.5c2.8,0,8.1,2.3,8.1,4.8
+		c0,2.6-5.3,4.5-8.1,4.5"/>
+	<path fill="none" stroke="#00BEC3" stroke-width="0.5" stroke-miterlimit="10" d="M130.7,329.4c2.8,0,8.1,2.3,8.1,4.8
+		c0,2.6-5.3,4.5-8.1,4.5"/>
+	<text transform="matrix(1 0 0 1 145.4132 359.6267)" font-family="'Helvetica'" font-size="7">Speciation event</text>
+	<text transform="matrix(1 0 0 1 145.3284 372.1267)" font-family="'Helvetica'" font-size="7">Duplication event</text>
+	<text transform="matrix(1 0 0 1 9.7284 265.7262)" font-family="'Helvetica-Bold'" font-size="10">(a)</text>
+	<text transform="matrix(1 0 0 1 21.9284 265.7262)" font-family="'Helvetica'" font-size="10"> Pairwise comparisons</text>
 </g>
-<g id="Layer_6" class="st0">
-	<text transform="matrix(1 0 0 1 7.4422 257.4243)" class="st1 st15" style="font-family:'Helvetica-Oblique';">KMRR found lower covariance between paralog expression than </text>
-	<text transform="matrix(1 0 0 1 7.4422 265.8243)" class="st1 st15" style="font-family:'Helvetica-Oblique';">orthologs expression. This was interpretted to indicate more change </text>
-	<text transform="matrix(1 0 0 1 7.4422 274.2243)" class="st1 st15" style="font-family:'Helvetica-Oblique';">in expression following duplication than speciation, and as support </text>
-	<text transform="matrix(1 0 0 1 7.4422 282.6243)" class="st1 st15" style="font-family:'Helvetica-Oblique';">for the ortholog conjecture. </text>
-	<text transform="matrix(1 0 0 1 237.9422 251.3085)" class="st1 st15" style="font-family:'Helvetica-Oblique';">We reanalyzed the KMRR study with independent contrasts, which </text>
-	<text transform="matrix(1 0 0 1 237.9422 259.7085)" class="st1 st15" style="font-family:'Helvetica-Oblique';">isolate changes following duplication and speciation and do not </text>
-	<text transform="matrix(1 0 0 1 237.9422 268.1085)" class="st1 st15" style="font-family:'Helvetica-Oblique';">count changes along the same branches multiple times. These </text>
-	<text transform="matrix(1 0 0 1 237.9422 276.5085)" class="st1 st15" style="font-family:'Helvetica-Oblique';">reanalyses do not reject the null that the rate of change in expression </text>
-	<text transform="matrix(1 0 0 1 237.9422 284.9085)" class="st1 st15" style="font-family:'Helvetica-Oblique';">following duplication is the same as that after speciation (Wilcoxon p=1). </text>
+<g id="Layer_6" display="none">
+	<text transform="matrix(1 0 0 1 7.4422 515.1743)" display="inline" font-family="'Helvetica-Oblique'" font-size="7">KMRR found lower covariance between paralog expression than </text>
+	<text transform="matrix(1 0 0 1 7.4422 523.5743)" display="inline" font-family="'Helvetica-Oblique'" font-size="7">orthologs expression. This was interpretted to indicate more change </text>
+	<text transform="matrix(1 0 0 1 7.4422 531.9743)" display="inline" font-family="'Helvetica-Oblique'" font-size="7">in expression following duplication than speciation, and as support </text>
+	<text transform="matrix(1 0 0 1 7.4422 540.3743)" display="inline" font-family="'Helvetica-Oblique'" font-size="7">for the ortholog conjecture. </text>
+	<text transform="matrix(1 0 0 1 237.9422 509.0585)" display="inline" font-family="'Helvetica-Oblique'" font-size="7">We reanalyzed the KMRR study with independent contrasts, which </text>
+	<text transform="matrix(1 0 0 1 237.9422 517.4585)" display="inline" font-family="'Helvetica-Oblique'" font-size="7">isolate changes following duplication and speciation and do not </text>
+	<text transform="matrix(1 0 0 1 237.9422 525.8585)" display="inline" font-family="'Helvetica-Oblique'" font-size="7">count changes along the same branches multiple times. These </text>
+	<text transform="matrix(1 0 0 1 237.9422 534.2585)" display="inline" font-family="'Helvetica-Oblique'" font-size="7">reanalyses do not reject the null that the rate of change in expression </text>
+	<text transform="matrix(1 0 0 1 237.9422 542.6585)" display="inline" font-family="'Helvetica-Oblique'" font-size="7">following duplication is the same as that after speciation (Wilcoxon p=1). </text>
 </g>
 <g id="formulae">
 </g>
 <g id="nodes">
-	<path class="st12" d="M240.8,82.8c0-1.5-1.2-2.8-2.8-2.8c-1.5,0-2.8,1.3-2.8,2.8s1.2,2.8,2.8,2.8C239.5,85.5,240.8,84.3,240.8,82.8
-		"/>
-	<path class="st12" d="M269.4,33.3c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8S269.4,34.9,269.4,33.3"/>
-	<path class="st3" d="M297.9,25.6c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8S297.9,27.1,297.9,25.6"/>
-	<path class="st3" d="M297.9,42.5c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8s1.2,2.8,2.8,2.8S297.9,44.1,297.9,42.5"/>
-	<path class="st3" d="M297.9,59.5c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8s1.2,2.8,2.8,2.8S297.9,61,297.9,59.5"/>
-	<path class="st3" d="M297.9,76.5c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8S297.9,78,297.9,76.5"/>
-	<path class="st3" d="M297.9,93.1c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8S297.9,94.6,297.9,93.1"/>
-	<path class="st3" d="M297.9,110c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8S297.9,111.6,297.9,110"/>
-	<path class="st3" d="M297.9,127.3c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8S297.9,128.8,297.9,127.3"/>
-	<path class="st14" d="M255.7,114.6c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8S255.7,116.1,255.7,114.6"/>
-	<path class="st14" d="M283.6,101.9c0-1.5-1.2-2.8-2.8-2.8c-1.5,0-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8
-		C282.3,104.6,283.6,103.4,283.6,101.9"/>
-	<path class="st14" d="M255.7,51c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8S255.7,52.5,255.7,51"/>
-	<path class="st14" d="M277.1,68c0-1.5-1.2-2.8-2.8-2.8c-1.5,0-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8S277.1,69.5,277.1,68"/>
-	<text transform="matrix(1 0 0 1 63.5949 108.4693)" class="st3 st4 st5">Species A</text>
-	<text transform="matrix(1 0 0 1 63.5952 125.66)" class="st3 st4 st5">Species C</text>
-	<text transform="matrix(1 0 0 1 63.5949 91.5162)" class="st3 st4 st5">Species B</text>
-	<text transform="matrix(1 0 0 1 63.5949 74.5728)" class="st3 st4 st5">Species A</text>
-	<text transform="matrix(1 0 0 1 63.5949 57.61)" class="st3 st4 st5">Species B</text>
-	<text transform="matrix(1 0 0 1 63.5949 40.6725)" class="st3 st4 st5">Species C</text>
-	<text transform="matrix(1 0 0 1 63.5949 23.7193)" class="st3 st4 st5">Species C</text>
-	<line class="st9" x1="59.9" y1="88.7" x2="45.6" y2="88.7"/>
-	<line class="st9" x1="45.6" y1="88.7" x2="45.6" y2="105.6"/>
-	<line class="st9" x1="45.6" y1="105.6" x2="59.9" y2="105.6"/>
-	<line class="st9" x1="17.6" y1="122.9" x2="59.9" y2="122.9"/>
-	<line class="st9" x1="17.6" y1="97.5" x2="17.6" y2="122.9"/>
-	<line class="st9" x1="39.1" y1="63.6" x2="17.6" y2="63.6"/>
-	<line class="st9" x1="17.6" y1="63.6" x2="17.6" y2="29.7"/>
-	<line class="st9" x1="17.6" y1="29.7" x2="31.4" y2="29.7"/>
-	<line class="st10" x1="17.6" y1="46.6" x2="2.7" y2="46.6"/>
-	<line class="st10" x1="2.7" y1="46.6" x2="2.7" y2="110.2"/>
-	<line class="st10" x1="2.7" y1="110.2" x2="17.6" y2="110.2"/>
-	<line class="st10" x1="59.9" y1="21.2" x2="31.4" y2="21.2"/>
-	<line class="st10" x1="31.4" y1="21.2" x2="31.4" y2="38.1"/>
-	<line class="st10" x1="31.4" y1="38.1" x2="59.9" y2="38.1"/>
-	<line class="st9" x1="59.9" y1="55.1" x2="39.1" y2="55.1"/>
-	<line class="st9" x1="39.1" y1="55.1" x2="39.1" y2="72"/>
-	<line class="st9" x1="39.1" y1="72" x2="59.9" y2="72"/>
-	<line class="st9" x1="17.6" y1="97.5" x2="45.6" y2="97.5"/>
-	<path class="st12" d="M5.5,78.3c0-1.5-1.2-2.8-2.8-2.8c-1.5,0-2.8,1.3-2.8,2.8s1.2,2.8,2.8,2.8C4.3,81.1,5.5,79.9,5.5,78.3"/>
-	<path class="st12" d="M143,111.6c0-1.5-1.2-2.8-2.8-2.8c-1.5,0-2.8,1.3-2.8,2.8s1.2,2.8,2.8,2.8C141.7,114.3,143,113.1,143,111.6"
+	<path fill="#00BEC3" d="M236.4,336.8c0-1.5-1.2-2.8-2.8-2.8c-1.5,0-2.8,1.3-2.8,2.8s1.2,2.8,2.8,2.8
+		C235.1,339.5,236.4,338.3,236.4,336.8"/>
+	<path fill="#00BEC3" d="M265,287.3c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8S265,288.9,265,287.3"/>
+	<path fill="#999999" d="M293.5,279.6c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8S293.5,281.1,293.5,279.6"/>
+	<path fill="#999999" d="M293.5,296.5c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8s1.2,2.8,2.8,2.8S293.5,298.1,293.5,296.5"/>
+	<path fill="#999999" d="M293.5,313.5c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8s1.2,2.8,2.8,2.8S293.5,315,293.5,313.5"/>
+	<path fill="#999999" d="M293.5,330.5c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8S293.5,332,293.5,330.5"/>
+	<path fill="#999999" d="M293.5,347.1c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8S293.5,348.6,293.5,347.1"/>
+	<path fill="#999999" d="M293.5,364c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8S293.5,365.6,293.5,364"/>
+	<path fill="#999999" d="M293.5,381.3c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8S293.5,382.8,293.5,381.3"/>
+	<path fill="#F6766D" d="M251.3,368.6c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8S251.3,370.1,251.3,368.6"/>
+	<path fill="#F6766D" d="M279.2,355.9c0-1.5-1.2-2.8-2.8-2.8c-1.5,0-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8
+		C277.9,358.6,279.2,357.4,279.2,355.9"/>
+	<path fill="#F6766D" d="M251.3,305c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8S251.3,306.5,251.3,305"/>
+	<path fill="#F6766D" d="M272.7,322c0-1.5-1.2-2.8-2.8-2.8c-1.5,0-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8S272.7,323.5,272.7,322"/>
+	<text transform="matrix(1 0 0 1 67.1789 366.2693)" fill="#999999" font-family="'Helvetica'" font-size="8">Species A</text>
+	<text transform="matrix(1 0 0 1 67.1792 383.46)" fill="#999999" font-family="'Helvetica'" font-size="8">Species C</text>
+	<text transform="matrix(1 0 0 1 67.1789 349.3162)" fill="#999999" font-family="'Helvetica'" font-size="8">Species B</text>
+	<text transform="matrix(1 0 0 1 67.1789 332.3728)" fill="#999999" font-family="'Helvetica'" font-size="8">Species A</text>
+	<text transform="matrix(1 0 0 1 67.1789 315.41)" fill="#999999" font-family="'Helvetica'" font-size="8">Species B</text>
+	<text transform="matrix(1 0 0 1 67.1789 298.4725)" fill="#999999" font-family="'Helvetica'" font-size="8">Species C</text>
+	<text transform="matrix(1 0 0 1 67.1789 281.5193)" fill="#999999" font-family="'Helvetica'" font-size="8">Species C</text>
+	
+		<line fill="none" stroke="#F6766D" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="63.5" y1="346.5" x2="49.2" y2="346.5"/>
+	
+		<line fill="none" stroke="#F6766D" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="49.2" y1="346.5" x2="49.2" y2="363.4"/>
+	
+		<line fill="none" stroke="#F6766D" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="49.2" y1="363.4" x2="63.5" y2="363.4"/>
+	
+		<line fill="none" stroke="#F6766D" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="21.2" y1="380.7" x2="63.5" y2="380.7"/>
+	
+		<line fill="none" stroke="#F6766D" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="21.2" y1="355.3" x2="21.2" y2="380.7"/>
+	
+		<line fill="none" stroke="#F6766D" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="42.7" y1="321.4" x2="21.2" y2="321.4"/>
+	
+		<line fill="none" stroke="#F6766D" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="21.2" y1="321.4" x2="21.2" y2="287.5"/>
+	
+		<line fill="none" stroke="#F6766D" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="21.2" y1="287.5" x2="35" y2="287.5"/>
+	
+		<line fill="none" stroke="#00BEC3" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="21.2" y1="304.4" x2="6.3" y2="304.4"/>
+	
+		<line fill="none" stroke="#00BEC3" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="6.3" y1="304.4" x2="6.3" y2="368"/>
+	
+		<line fill="none" stroke="#00BEC3" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="6.3" y1="368" x2="21.2" y2="368"/>
+	
+		<line fill="none" stroke="#00BEC3" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="63.5" y1="279" x2="35" y2="279"/>
+	
+		<line fill="none" stroke="#00BEC3" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="35" y1="279" x2="35" y2="295.9"/>
+	
+		<line fill="none" stroke="#00BEC3" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="35" y1="295.9" x2="63.5" y2="295.9"/>
+	
+		<line fill="none" stroke="#F6766D" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="63.5" y1="312.9" x2="42.7" y2="312.9"/>
+	
+		<line fill="none" stroke="#F6766D" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="42.7" y1="312.9" x2="42.7" y2="329.8"/>
+	
+		<line fill="none" stroke="#F6766D" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="42.7" y1="329.8" x2="63.5" y2="329.8"/>
+	
+		<line fill="none" stroke="#F6766D" stroke-width="1.07" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="21.2" y1="355.3" x2="49.2" y2="355.3"/>
+	<path fill="#00BEC3" d="M9.1,336.1c0-1.5-1.2-2.8-2.8-2.8c-1.5,0-2.8,1.3-2.8,2.8s1.2,2.8,2.8,2.8C7.9,338.9,9.1,337.7,9.1,336.1"
 		/>
-	<path class="st12" d="M34.2,28.9c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8S34.2,30.5,34.2,28.9"/>
-	<path class="st3" d="M62.6,21.2c0-1.5-1.2-2.8-2.8-2.8c-1.5,0-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8
-		C61.4,23.9,62.6,22.7,62.6,21.2"/>
-	<path class="st3" d="M62.6,38.1c0-1.5-1.2-2.8-2.8-2.8c-1.5,0-2.8,1.2-2.8,2.8s1.2,2.8,2.8,2.8C61.4,40.9,62.6,39.6,62.6,38.1"/>
-	<path class="st3" d="M62.6,55.1c0-1.5-1.2-2.8-2.8-2.8c-1.5,0-2.8,1.2-2.8,2.8s1.2,2.8,2.8,2.8C61.4,57.9,62.6,56.6,62.6,55.1"/>
-	<path class="st3" d="M62.6,72c0-1.5-1.2-2.8-2.8-2.8c-1.5,0-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8C61.4,74.8,62.6,73.6,62.6,72"/>
-	<path class="st3" d="M62.6,88.7c0-1.5-1.2-2.8-2.8-2.8c-1.5,0-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8
-		C61.4,91.4,62.6,90.2,62.6,88.7"/>
-	<path class="st3" d="M62.6,105.6c0-1.5-1.2-2.8-2.8-2.8c-1.5,0-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8
-		C61.4,108.4,62.6,107.1,62.6,105.6"/>
-	<path class="st3" d="M62.6,122.9c0-1.5-1.2-2.8-2.8-2.8c-1.5,0-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8
-		C61.4,125.7,62.6,124.4,62.6,122.9"/>
-	<path class="st14" d="M20.4,110.1c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8S20.4,111.7,20.4,110.1"/>
-	<path class="st14" d="M143,99.1c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8S143,100.6,143,99.1"/>
-	<path class="st14" d="M48.3,97.4c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8S48.3,99,48.3,97.4"/>
-	<path class="st14" d="M20.4,46.5c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8S20.4,48.1,20.4,46.5"/>
-	<path class="st14" d="M41.9,63.6c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8c0,1.6,1.2,2.8,2.8,2.8S41.9,65.1,41.9,63.6"/>
+	<path fill="#00BEC3" d="M141.7,369.4c0-1.5-1.2-2.8-2.8-2.8c-1.5,0-2.8,1.3-2.8,2.8s1.2,2.8,2.8,2.8
+		C140.4,372.1,141.7,370.9,141.7,369.4"/>
+	<path fill="#00BEC3" d="M37.8,286.7c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8S37.8,288.3,37.8,286.7"/>
+	<path fill="#999999" d="M66.2,279c0-1.5-1.2-2.8-2.8-2.8c-1.5,0-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8
+		C65,281.7,66.2,280.5,66.2,279"/>
+	<path fill="#999999" d="M66.2,295.9c0-1.5-1.2-2.8-2.8-2.8c-1.5,0-2.8,1.2-2.8,2.8s1.2,2.8,2.8,2.8C65,298.7,66.2,297.4,66.2,295.9
+		"/>
+	<path fill="#999999" d="M66.2,312.9c0-1.5-1.2-2.8-2.8-2.8c-1.5,0-2.8,1.2-2.8,2.8s1.2,2.8,2.8,2.8C65,315.7,66.2,314.4,66.2,312.9
+		"/>
+	<path fill="#999999" d="M66.2,329.8c0-1.5-1.2-2.8-2.8-2.8c-1.5,0-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8
+		C65,332.6,66.2,331.4,66.2,329.8"/>
+	<path fill="#999999" d="M66.2,346.5c0-1.5-1.2-2.8-2.8-2.8c-1.5,0-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8
+		C65,349.2,66.2,348,66.2,346.5"/>
+	<path fill="#999999" d="M66.2,363.4c0-1.5-1.2-2.8-2.8-2.8c-1.5,0-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8
+		C65,366.2,66.2,364.9,66.2,363.4"/>
+	<path fill="#999999" d="M66.2,380.7c0-1.5-1.2-2.8-2.8-2.8c-1.5,0-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8
+		C65,383.5,66.2,382.2,66.2,380.7"/>
+	<path fill="#F6766D" d="M24,367.9c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8S24,369.5,24,367.9"/>
+	<path fill="#F6766D" d="M141.7,356.9c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8S141.7,358.4,141.7,356.9"/>
+	<path fill="#F6766D" d="M51.9,355.2c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8S51.9,356.8,51.9,355.2"/>
+	<path fill="#F6766D" d="M24,304.3c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8c0,1.5,1.2,2.8,2.8,2.8S24,305.9,24,304.3"/>
+	<path fill="#F6766D" d="M45.5,321.4c0-1.5-1.2-2.8-2.8-2.8s-2.8,1.2-2.8,2.8s1.2,2.8,2.8,2.8S45.5,322.9,45.5,321.4"/>
 </g>
 <g id="arrows">
+</g>
+<text transform="matrix(1 0 0 1 347.0114 339.5276)" font-family="'Helvetica'" font-size="7">The value of the top contrast is:</text>
+<text transform="matrix(1 0 0 1 395.6776 349.2588)"><tspan x="0" y="0" font-family="'Helvetica'" font-size="7">Observed trait change </tspan><tspan x="0" y="8.4" font-family="'Helvetica'" font-size="7">(difference between </tspan><tspan x="0" y="16.8" font-family="'Helvetica'" font-size="7">descendant values)</tspan></text>
+<text transform="matrix(1 0 0 1 396.011 377.2728)"><tspan x="0" y="0" font-family="'Helvetica'" font-size="7">Expected variance</tspan><tspan x="0" y="8.4" font-family="'Helvetica'" font-size="7">(total branch length)</tspan></text>
+<text transform="matrix(1 0 0 1 344.1788 365.4561)" font-family="'TimesNewRomanPS-ItalicMT'" font-size="6">pic</text>
+<text transform="matrix(0.583 0 0 0.583 351.5089 367.4541)" font-family="'TimesNewRomanPS-ItalicMT'" font-size="6">1</text>
+<text transform="matrix(1 0 0 1 353.2579 365.4561)" font-family="'TimesNewRomanPS-ItalicMT'" font-size="6"> = </text>
+<text transform="matrix(1 0 0 1 364.3558 357.5428)" font-family="'TimesNewRomanPS-ItalicMT'" font-size="6">X</text>
+<text transform="matrix(0.583 0 0 0.583 368.0208 359.5408)" font-family="'TimesNewRomanPS-ItalicMT'" font-size="6">1 </text>
+<text transform="matrix(1 0 0 1 370.6439 357.5428)" font-family="'TimesNewRomanPS-ItalicMT'" font-size="6">- X</text>
+<text transform="matrix(0.583 0 0 0.583 377.8069 359.5408)" font-family="'TimesNewRomanPS-ItalicMT'" font-size="6">2</text>
+<text transform="matrix(1 0 0 1 364.3558 371.5428)" font-family="'TimesNewRomanPS-ItalicMT'" font-size="6">v</text>
+<text transform="matrix(0.583 0 0 0.583 367.0189 373.5408)" font-family="'TimesNewRomanPS-ItalicMT'" font-size="6">1 </text>
+<text transform="matrix(1 0 0 1 369.6419 371.5428)" font-family="'TimesNewRomanPS-ItalicMT'" font-size="6">+ v</text>
+<text transform="matrix(0.583 0 0 0.583 377.8538 373.5408)" font-family="'TimesNewRomanPS-ItalicMT'" font-size="6">2</text>
+<line fill="none" stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" x1="362.9" y1="362.9" x2="381.2" y2="362.9"/>
+<g>
+	<g>
+		<line fill="none" stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" x1="385.3" y1="354" x2="392.4" y2="352.9"/>
+		<g>
+			<path d="M385.8,353.9l0.5-1.2l0,0l-1.6,1c-0.6,0.2-1.2,0.5-1.8,0.7c0.6,0,1.3,0.1,1.9,0.1l1.8,0.4l0,0L385.8,353.9z"/>
+		</g>
+	</g>
+</g>
+<g>
+	<g>
+		<line fill="none" stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" x1="385.1" y1="371.5" x2="392.4" y2="374.9"/>
+		<g>
+			<path d="M385.6,371.7l1.1-0.7l0,0l-1.9-0.1c-0.6-0.1-1.2-0.3-1.8-0.4c0.5,0.4,1,0.8,1.5,1.1l1.3,1.4l0,0L385.6,371.7z"/>
+		</g>
+	</g>
+</g>
+<text transform="matrix(1 0 0 1 288.6335 274.5172)" font-family="'TimesNewRomanPS-ItalicMT'" font-size="6">X</text>
+<text transform="matrix(0.583 0 0 0.583 292.2985 276.5153)" font-family="'TimesNewRomanPS-ItalicMT'" font-size="6">1</text>
+<text transform="matrix(1 0 0 1 288.6339 291.6584)" font-family="'TimesNewRomanPS-ItalicMT'" font-size="6">X</text>
+<text transform="matrix(0.583 0 0 0.583 292.2989 293.6565)" font-family="'TimesNewRomanPS-ItalicMT'" font-size="6">2</text>
+<text transform="matrix(1 0 0 1 274.0571 275.6839)" font-family="'TimesNewRomanPS-ItalicMT'" font-size="6">v</text>
+<text transform="matrix(0.583 0 0 0.583 276.7202 277.6819)" font-family="'TimesNewRomanPS-ItalicMT'" font-size="6">1</text>
+<text transform="matrix(1 0 0 1 274.0569 300.7335)" font-family="'TimesNewRomanPS-ItalicMT'" font-size="6">v</text>
+<text transform="matrix(0.583 0 0 0.583 276.72 302.7315)" font-family="'TimesNewRomanPS-ItalicMT'" font-size="6">2</text>
+<g>
+	<text transform="matrix(1 0 0 1 271.9485 288.9586)" fill="#00BEC3" font-family="'TimesNewRomanPS-ItalicMT'" font-size="6">pic</text>
+	
+		<text transform="matrix(0.583 0 0 0.583 279.2786 290.9567)" fill="#00BEC3" font-family="'TimesNewRomanPS-ItalicMT'" font-size="6">1</text>
+	<text transform="matrix(1 0 0 1 281.0276 288.9586)" fill="#00BEC3" font-family="'TimesNewRomanPS-ItalicMT'" font-size="6"> </text>
 </g>
 </svg>
