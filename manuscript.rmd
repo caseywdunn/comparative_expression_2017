@@ -60,8 +60,6 @@ output:
 	
 
 	# These clade dates are from the KMRR code, they got them from http://timetree.org/
-	# only the following are used in phylogenetic analyses - 
-	# c( "Hominini", "Homininae", "Catarrhini", "Euarchontoglires", "Theria", "Mammalia", "Amniota" )
 	calibration_times = data.frame(
         age =
             c( 20, 92, 167, 9, 42, 74, 296, 535, 104, 937, 29, 722, 441, 65, 15, 1215, 
@@ -75,6 +73,10 @@ output:
             ),
         stringsAsFactors=FALSE
     )
+	
+	# The calibration times used for speciation nodes
+	focal_calibrations_clades = 
+		c( "Hominini", "Homininae", "Catarrhini", "Euarchontoglires", "Theria", "Mammalia", "Amniota" )
 	
 	
 	# In simulation, the fold change in rate following duplication relative to speciation
@@ -93,7 +95,7 @@ output:
 	#' @return A dataframe as above, but with noise
 	#' @export
 	add_noise_calibration_times = function( calibration_times, sd_fraction ) {
-		age = calibration_times$age.min
+		age = calibration_times$age
 		new_age = NA
 		
 		# Keep trying until dates are coherent with tree structure
@@ -113,7 +115,7 @@ output:
 			
 		}
 		
-		calibration_times$age.min = new_age
+		calibration_times$age = new_age
 		return( calibration_times )
 	}	
 
@@ -226,7 +228,7 @@ output:
 	#' 
 	#' @param nhx A phylogenetic tree as a treeio::treedata object, with speciation 
 	#' nodes annotated with a value of "N" in @data$D
-	#' @param calibration_times A dataframe with two columns: age.min is the age 
+	#' @param calibration_times A dataframe with two columns: age is the age 
 	#' of a clade, and clade is the name of the clade
 	#' @param ... Any additional arguments to pass to ape::chronos()
 	#' @return A treeio::treedata object if successfully calibrated
@@ -238,8 +240,9 @@ output:
 			nhx@data[ !is.tip.nhx( nhx ), ] %>%
 			filter( D == "N" ) %>%
 			left_join( calibration_times, c( "label" = "clade" ) ) %>%
-			select( node, age.min ) %>%
-			mutate( age.max = age.min ) %>% 
+			mutate( age.min = age ) %>%
+			mutate( age.max = age ) %>% 
+			select( node, age.min, age.max ) %>%
 			mutate( soft.bounds = NA )
 		
 		tree = try( 
@@ -439,6 +442,35 @@ output:
 		return( nhx )
 	}
 
+
+	#' Simulate a set of pics from a gamma distribution
+	#' 
+	#' @param scale Gamma scale parameter
+	#' @param n Number of observations per event type	
+	#' @return A dataframe
+	#' @export
+	sim_expectation = function( scale = 1, n = 10000 ){
+		expectation = 
+			bind_rows(
+				data.frame( 
+					pic = rgamma( n, 1, scale = scale ),
+					Event = "Duplication",
+					stringsAsFactors = FALSE
+				),
+				data.frame( 
+					pic = rgamma( n, 1, scale = 1 ),
+					Event = "Speciation",
+					stringsAsFactors = FALSE
+				)
+			)
+	
+		event_levels = c( "Speciation", "Duplication" )
+		expectation$Event = 
+			factor( expectation$Event, levels=event_levels )
+	
+		return( expectation )
+	}
+
 ```
 
 # Multiple pairwise comparisons between species strongly mislead functional genomics studies
@@ -459,21 +491,20 @@ Casey W. Dunn^1^*, Felipe Zapata^1,2^, Catriona Munro^1^, Stefan Siebert^1,3^, A
 
 ## Abstract
 
-Functional genomics, the study of how genomes work, is one of the most rapidly advancing fields in biology. There is now considerable interest in comparing genome function across species to understand what is conserved, what is variable, and how the diversity of organism traits (including anatomy, physiology, and development) relates to genome diversity. Most published comparisons of genome function across species have relied on multiple pairwise comparisons between species, an approach that neglects to account for the evolutionary relationships among species. This has two potential negative impacts. First, it can lead to the wrong conclusions about the evolution of genome function. Second, it is a missed opportunity to learn about biology that can only be understood in an explicit historical context that considers these relationships. Here we examine two recently published comparative gene expression studies that used multiple pairwise comparisons rather than phylogenetic approaches to investigate evolutionary patterns of gene expression. We find problems with the pairwise comparisons used in both studies that undermine their published conclusions. The first study we examine found that expression tends to be more different between paralogs than orthologs, and interpreted this as evidence of the ortholog conjecture- the hypothesis that there are greater rates of evolutionary change following duplication. Our phylogenetic analysis finds no difference in rates following duplication and speciation. Instead, the greater difference between paralogs is because they tend to be more distantly related to each other than orthologs are to each other. The second study claimed to find more evolutionary variance in gene expression at a midpoint of embryonic development than earlier and later when comparing distantly related animals. We instead find that changes along the branch of a single taxon, the ctenophore, were over counted because they were included in each pairwise comparison with this species. These reanalyses are concrete demonstrations of the inadequacy of pairwise comparisons in comparative genomics studies, including gene expression analyses, and indicates that it will be critical to adopt phylogenetic comparative methods in future work.
+There is now considerable interest in comparing functional genomics data across species, with the hope of providing an integrated understanding of genome and phenotype evolution. Most such studies have relied on multiple pairwise comparisons between species, an approach that does not incoporate information about the evolutionary relationships among species. This has the potential to mislead conclusions about the evolution of genome function, and is a missed opportunity to learn about biology that can only be understood in an explicit phylogenetic context. Here we examine two recently published studies that compare expression across species with pairwise methods.  We find problems with both that call their conclusions into question. One study interpreted higher expression correlation between orthologs than paralogs as evidence of the ortholog conjecture, *i.e.* the hypothesis that gene function evolution is more rapid after duplication than speciation. Instead, we find that this pattern is due to the structure of the gene phylogenies, not different rates of expression evolution, and is the expected pattern when rates are the same following duplication and speciation. The second study interpreted pairwise comparisons of embryonic gene expression across distantly related animals as evidence for a distinct evolutionary process that gave rise to animal phyla. Instead, we find that the pattern they identified is due to unique feature of a single species that impact multiple pairwise comparisons that include that species. In each study, distinct patterns of pairwise similarity among species were interpreted as evidence of particular evolutionary processes, but instead reflect the structure of the phylogenetic trees themselves. These reanalyses concretely demonstrate the inadequacy of pairwise comparisons for analyzing functional genomic data across species, and indicate that it will be critical to adopt phylogenetic comparative methods in future work. Fortunately, phylogenetic comparative biology is also a rapidly advancing field with many methods that can be directly applied to functional genomic data.
+
 
 ## Introduction
 
-The focus of genomics research has quickly shifted from describing genome sequences to functional genomics, the study of how genomes "work" using tools that measure functional attributes such as expression, chromatin state, and transcription initiation. Functional genomics, in turn, is now becoming more comparative- there is great interest in understanding how functional genomic variation across species gives rise to a diversity of development, morphology, physiology, and other phenotypes [@Wray:2013gh]. Comparative Functional Genomics (CFG) analyses are also critical to transferring functional insight across species, and will grow in importance in coming years.
+The focus of genomics research has quickly shifted from describing genome sequences to functional genomics, the study of how genomes "work" using tools that measure functional attributes such as expression, chromatin state, and transcription initiation. Functional genomics, in turn, is now becoming more comparative-- there is great interest in understanding how functional genomic variation across species gives rise to a diversity of development, morphology, physiology, and other phenotypes [@Wray:2013gh]. These analyses are also critical to transferring functional insight across species, and will grow in importance in coming years.
 
-A rich theoretical and statistical methodology of phylogenetic comparative methods have been developed over the last three decades to address the challenges and opportunities of comparisons across species [@Felsenstein:1985ua; @Grafen:1989um; @Pagel:1999gc; Revell:2012jd; @FitzJohn:2012ey; @Uyeda:2014jl; @Garamszegi:2014ew]. A central challenge is the dependence of observations across species due to the evolutionary history of species -- more closely related species share many traits that evolve once in a common ancestor. This violates the fundamental assumption of independence of observations in standard statistical methods. Phylogenetic comparative methods have largely been applied to the evolution of morphological and ecological traits, but are just as relevant to CFG. Most CFG studies have abstained from phylogenetic approaches and instead heavily rely on multiple pairwise comparisons (Fig. 1A) between contemporary traits that do not account for the fact that evolutionary relationships explain much of the structure of variation across species. This leaves CFG studies susceptible to serious statistical errors and is a missed opportunity to ask questions that are only accessible in an explicit phylogenetic context.
+A rich theoretical and statistical methodology of phylogenetic comparative methods have been developed over the last three decades to address the challenges and opportunities of comparisons across species [@Felsenstein:1985ua; @Grafen:1989um; @Pagel:1999gc; Revell:2012jd; @FitzJohn:2012ey; @Uyeda:2014jl; @Garamszegi:2014ew]. A central challenge is the dependence of observations across species due to the evolutionary history of species -- more closely related species share many traits that evolve once in a common ancestor. This violates the fundamental assumption of independence of observations in standard statistical methods. Phylogenetic comparative methods have largely been applied to the evolution of morphological and ecological traits, but are just as relevant to functional genomics. Most Comparative Functional Genomics (CFG) studies have abstained from phylogenetic approaches and instead rely on multiple pairwise comparisons (Fig. 1A). These do not account for the fact that evolutionary relationships are expected to explain much of the structure of variation across species. This leaves CFG studies susceptible to statistical problems and is a missed opportunity to ask questions that are only accessible in an explicit phylogenetic context.
 
-One reason that CFG has not yet embraced phylogenetic approaches is that it has not yet been concretely demonstrated that pairwise and phylogenetic approaches can lead to different results in CFG studies. In this manuscript we examine this issue. Although the value of phylogenetic approaches has been repeatedly shown in comparative analyses of other types of character data [@Ricklefs:1996wb; @Chamberlain:2012vx; @OMeara:2012gq], this value is apparently not well known to the functional genomics community since the field has until recently largely focused on within-species analyses. Many initial CFG studies have also been focused on only two species at a time, where the differences between phylogenetic and pairwise approaches are not as pronounced. As the number of species considered in each CFG study grows, the shortcomings of pairwise approaches will become far more acute. 
-
-Most CFG studies to date compare gene expression across species, often between distinct tissues or developmental time points. Gene expression has been a popular target of CFG studies because, with the advent of RNA-Seq and related transcriptome sequencing methods, it is the most readily collected functional genomics trait across diverse species. Here we reconsider two recent comparative analyses of gene expression data [@KryuchkovaMostacci:2016iw; @Levin:2016bp]. 
+Phylogenetic comparative methods explicitly model trait change along the branches of evolutionary trees. The value of these methods relative to to pairwise comparisons has been repeatedly shown in analyses of other types of character data [@Ricklefs:1996wb; @Chamberlain:2012vx; @OMeara:2012gq]. One reason that CFG has not yet embraced phylogenetic approaches is that it has not yet been concretely demonstrated that pairwise and phylogenetic comparative methods can lead to different results when considering functional genomics data. Here we examine this issue be re-evaluating the pairwise comparisons used in two recent studies that compared gene expression across species.
 
 The first study, Kryuchkova-Mostacci and Robinson-Rechavi (KMRR) 2016 [@KryuchkovaMostacci:2016iw], analyzed multiple vertebrate expression datasets to test the ortholog conjecture - the hypothesis that orthologs tend to have more conserved attributes (specificity of expression across organs in this case) than do paralogs [@Nehrt:2011bm, @Koonin:2005fp]. Using pairwise comparisons (Fig. 1A), they found lower expression correlation between paralogs than between orthologs and interpreted this as strong support for the ortholog conjecture. 
 
-The second CFG study we evaluate here is Levin *et al.* [@Levin:2016bp]. This study analyzed gene expression through the course of embryonic development for ten animal species, each from a different phylum. Using pairwise comparisons (Figure 1A), they found there is more evolutionary variance in gene expression at a mid phase of development than there is at early and late phases for these ten animals (Fig. XX). They suggest that this supports an "inverse hourglass" model for the evolution of gene expression, in contrast with the "hourglass" model previously proposed for closely related species [@Kalinka:2010dw], and provides biological justification for the concept of phyla and may provide an operational definition of phyla. We previously described concerns with these interpretations [@Hejnol:2016hw]. Here we directly address the analyses themselves by examining the structure of the pairwise comparisons.
+The second CFG study we evaluate here is Levin *et al.* [@Levin:2016bp]. This study analyzed gene expression through the course of embryonic development for ten animal species, each from a different phylum. Using pairwise comparisons (Figure 1A), they found there is more evolutionary variance in gene expression at a mid phase of development than there is at early and late phases for these ten animals (Fig. XX). They suggest that this supports an "inverse hourglass" model for the evolution of gene expression, in contrast with the "hourglass" model previously proposed for closely related species [@Kalinka:2010dw], and provides biological justification for the concept of phyla. We previously described concerns with the interpretations of this result [@Hejnol:2016hw]. Here we directly address the analyses themselves by examining the structure of the pairwise comparisons.
 
 ![Figure Overview](Figure_overview.png?raw=true)
 
@@ -499,28 +530,6 @@ Results in KMRR are based on pairwise comparisons (Figure 1A) between Tau within
 We reanalyzed the the KMRR study using phylogenetic comparative methods, focusing on the dataset of Brawand *et al.* 2011 [@Brawand:2011du]. For each internal node in each gene tree (Figure 1b), we measured the phylogenetic independent contrast (PIC) [@Felsenstein:1985ua] of the expression statistic Tau. This is the difference in values of Tau for descendant nodes scaled by the expected variance (determined largely by the lengths of these branches). These contrasts were then annotated by whether they are made across a speciation or duplication event. The original description of independent contrasts [@Felsenstein:1985ua] focused on assessing covariance between changes in two traits on a tree. Our use of contrasts is a bit different-- we look for differences in evolutionary changes of one trait (differential expression) between two categories of nodes (speciation and duplication) on a tree.
 
 ```{r expectation_plots, echo=FALSE, cache=TRUE, message=F, warning=F}
-
-	sim_expectation = function( scale = 1, n = 10000 ){
-		expectation = 
-			bind_rows(
-				data.frame( 
-					pic = rgamma( n, 1, scale = scale ),
-					Event = "Duplication",
-					stringsAsFactors = FALSE
-				),
-				data.frame( 
-					pic = rgamma( n, 1, scale = 1 ),
-					Event = "Speciation",
-					stringsAsFactors = FALSE
-				)
-			)
-	
-		event_levels = c( "Speciation", "Duplication" )
-		expectation$Event = 
-			factor( expectation$Event, levels=event_levels )
-	
-		return( expectation )
-	}
 	
 	g_expectation_null =
 		sim_expectation() %>%
@@ -1047,8 +1056,6 @@ The next issue we found was that all five of the lowest values in the mid phase 
 
 Phylogenetic comparative methods were developed specifically to address this problem [@Felsenstein:1985ua]. While we do demonstrate this problem impacts the Levin et al. analysis, we did not perform a phylogenetic reanalysis of this study, as we did for the KMRR study. This is because the similarity metric computed in the pairwise comparisons of Levin et al. are based on different genes for different species pairs. This means that they do not generate a trait that can be evaluated across a phylogeny, as KMRR's Tau can be. A full phylogenetic reanalysis would be possible by using upstream analysis products to re-derive new expression summary statistics suitable for phylogenetic comparative methods.
 
-In addition to the problems with the pairwise comparisons discussed above, we previously described several other concerns with the experimental design, analysis, and interpretation of the results of this study [@Hejnol:2016hw]. For instance, because Levin *et al.* [@Levin:2016bp] only sampled one species per phylum, there is no way to tell if observed differences are unique to the branches that gave rise to clades designated as phyla or occurred along the many other branches in the tree. Moreover, the goodness of fit of each gene having expression peaking at three phases was not considered, and alternative patterns, such as the possibility that there are more phases of expression, were not evaluated.
-
 
 ### Phylogenetic comparative methods in functional genomics
 
@@ -1259,11 +1266,16 @@ The independent contrast across a node is the amount of change observed between 
 
 	noised_replicate_n = 10
 	sd_fraction = 0.2
-
+	
+	calibration_times_focal = 
+		calibration_times %>%
+		filter( clade %in% focal_calibrations_clades ) %>%
+		arrange( age )
+	
 	noised_dates = 
 		replicate( 
 			noised_replicate_n, 
-			add_noise_calibration_times( calibration_times, sd_fraction ),
+			add_noise_calibration_times( calibration_times_focal, sd_fraction ),
 			simplify = FALSE
 		)
 
