@@ -75,7 +75,7 @@ Their [Figure 4d](http://www.nature.com/nature/journal/v531/n7596/fig_tab/nature
 Here I order the matrix by Mid to identify these values:
 
 ``` r
-D[order(D[,4]),]
+    D[order(D[,4]),]
 ```
 
     ##          Species_A       Species_B        Early          Mid         Late
@@ -128,14 +128,14 @@ D[order(D[,4]),]
 The five lowest mid values, including the three outliers, are pairwise comparisons that include the ctenophore. Here I rerun the analyses without ctenophores:
 
 ``` r
-D_no_ct = D[ ((D$Species_A != "Ctenophores") &   (D$Species_B != "Ctenophores")), ]
-boxplot(as.matrix(D_no_ct[,3:5]))
+    D_no_ct = D[ ((D$Species_A != "Ctenophores") &   (D$Species_B != "Ctenophores")), ]
+    boxplot(as.matrix(D_no_ct[,3:5]))
 ```
 
 ![](reanalyses_files/figure-markdown_github/no_cteno-1.png)
 
 ``` r
-wilcox.test(D_no_ct$Early, D_no_ct$Mid, alternative="greater", paired=T)
+    wilcox.test(D_no_ct$Early, D_no_ct$Mid, alternative="greater", paired=T)
 ```
 
     ## 
@@ -146,7 +146,7 @@ wilcox.test(D_no_ct$Early, D_no_ct$Mid, alternative="greater", paired=T)
     ## alternative hypothesis: true location shift is greater than 0
 
 ``` r
-wilcox.test(D_no_ct$Late, D_no_ct$Mid, alternative="greater", paired=T)
+    wilcox.test(D_no_ct$Late, D_no_ct$Mid, alternative="greater", paired=T)
 ```
 
     ## 
@@ -223,16 +223,16 @@ Figure 4c data
 These data are an upstream intermediate that the 4d data are derived from. I explored these data a bit to better understand the broader analysis workflow.
 
 ``` r
-Phase = as.matrix(read.table("data_processed/Figure_4c_mode.txt", header=T))
-Ortho = as.matrix(read.table("data_processed/Figure_4c_orthology.txt", header=T))
-
-dim(Phase)
+    Phase = as.matrix(read.table("data_processed/Figure_4c_mode.txt", header=T))
+    Ortho = as.matrix(read.table("data_processed/Figure_4c_orthology.txt", header=T))
+    
+    dim(Phase)
 ```
 
     ## [1] 24717    10
 
 ``` r
-dim(Ortho)
+    dim(Ortho)
 ```
 
     ## [1] 24717    10
@@ -240,13 +240,13 @@ dim(Ortho)
 First, check to see if there are any elements that are 0 in one table but not the other.
 
 ``` r
-sum((Phase>0) != (Ortho>0))
+    sum((Phase>0) != (Ortho>0))
 ```
 
     ## [1] 0
 
 ``` r
-table(Phase)
+    table(Phase)
 ```
 
     ## Phase
@@ -254,7 +254,7 @@ table(Phase)
     ## 173779  37429  11697  24265
 
 ``` r
-nrow(Phase[rowSums(Phase)>0,]) # number of nonzero rows
+    nrow(Phase[rowSums(Phase)>0,]) # number of nonzero rows
 ```
 
     ## [1] 21463
@@ -276,18 +276,18 @@ Here I try to replicate the example described by Levin et al.:
 > Finally, we measured the extent of evolutionary change within the two conserved phases and the mid-developmental transition by determining whether orthologues annotated for a particular temporal category in one species are also annotated to the same temporal category in another species. Figure 4c shows an example of this analysis for D. melanogaster and C. elegans. For 4,395 orthologues delineated between these two species, the early phase, mid-developmental transition, and the late phase expression account for 51%, 14%, and 35% of the C. elegans orthologues, respectively. A total of 28% of the orthologues are annotated to the early phase in both C. elegans and D. melanogaster, while by chance only 22% are expected given the fraction of genes in each category across the species (Fig. 4c). In contrast, 3% were expected to be conserved at the mid-developmental transition at random, and 3% were observed. The log-odds ratios between observed and expected for the early phase and the mid-developmental transition between C. elegans and D. melanogaster are thus 0.35 and 0, respectively.
 
 ``` r
-# Sample the columns for these two species
-DC = Phase[,c(2,3)]
-colnames(DC)
+    # Sample the columns for these two species
+    DC = Phase[,c(2,3)]
+    colnames(DC)
 ```
 
     ## [1] "Nematodes"   "Arthropodes"
 
 ``` r
-# sample only rows that have phase annotations for both
-
-DC = DC[(DC[,1]>0) & (DC[,2]>0),]
-nrow(DC)
+    # sample only rows that have phase annotations for both
+    
+    DC = DC[(DC[,1]>0) & (DC[,2]>0),]
+    nrow(DC)
 ```
 
     ## [1] 4395
@@ -297,14 +297,14 @@ So the number of genes selected is consistent with the reported number.
 Now calculate the fraction of genes in each phase for each species.
 
 ``` r
-colnames(DC)[1]
+    colnames(DC)[1]
 ```
 
     ## [1] "Nematodes"
 
 ``` r
-ce = table(DC[,1])/sum(table(DC[,1]))
-ce
+    ce = table(DC[,1])/sum(table(DC[,1]))
+    ce
 ```
 
     ## 
@@ -314,14 +314,14 @@ ce
 These values do correspond to the 51%, 14%, and 35% reported in the manuscript for C. elegans.
 
 ``` r
-colnames(DC)[2]
+    colnames(DC)[2]
 ```
 
     ## [1] "Arthropodes"
 
 ``` r
-dm = table(DC[,2])/sum(table(DC[,2]))
-dm
+    dm = table(DC[,2])/sum(table(DC[,2]))
+    dm
 ```
 
     ## 
@@ -329,17 +329,17 @@ dm
     ## 0.4434585 0.2209329 0.3356086
 
 ``` r
-expected = dm * ce
-
-observed = c( sum(DC[,1] ==1 & DC[,2] ==1), sum(DC[,1] ==2 & DC[,2] ==2), sum(DC[,1] ==3 & DC[,2] ==3) )
-observed = observed / nrow(DC)
-observed
+    expected = dm * ce
+    
+    observed = c( sum(DC[,1] ==1 & DC[,2] ==1), sum(DC[,1] ==2 & DC[,2] ==2), sum(DC[,1] ==3 & DC[,2] ==3) )
+    observed = observed / nrow(DC)
+    observed
 ```
 
     ## [1] 0.28464164 0.03253697 0.15972696
 
 ``` r
-observed/expected
+    observed/expected
 ```
 
     ## 
@@ -347,23 +347,37 @@ observed/expected
     ## 1.265594 1.045647 1.352115
 
 ``` r
-log(observed/expected, 2) # have not yet verified the base
+    log(observed/expected, 2) # have not yet verified the base
 ```
 
     ## 
     ##         1         2         3 
     ## 0.3398142 0.0643957 0.4352179
 
+### Matrix occupancy
+
+``` r
+    n_species_sampled = apply( Phase, 1, function(x) sum( x > 0 ) )
+    
+    phase_sub = Phase[ n_species_sampled >= 2, ]
+    
+    hist( n_species_sampled )
+```
+
+![](reanalyses_files/figure-markdown_github/gene_phase_matrix-1.png)
+
+There were 24717 gene in the original data file. 3254 of these had no phase annotations for any species. 10592 had phase annotations for 2 or more species.
+
 Software versions
 -----------------
 
 This document can be executed to an html file in RStudio (or with the `knitr` package at the command line).
 
-This document was computed on Thu Jan 19 16:17:21 2017 with the following R package versions.
+This document was computed on Sun Feb 05 07:43:53 2017 with the following R package versions.
 
     R version 3.3.2 (2016-10-31)
     Platform: x86_64-apple-darwin13.4.0 (64-bit)
-    Running under: macOS Sierra 10.12.2
+    Running under: macOS Sierra 10.12.3
 
     locale:
     [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
@@ -373,12 +387,14 @@ This document was computed on Thu Jan 19 16:17:21 2017 with the following R pack
     [8] base     
 
     other attached packages:
-    [1] reshape2_1.4.2  ggplot2_2.2.1   devtools_1.12.0
+    [1] dplyr_0.5.0     purrr_0.2.2     readr_1.0.0     tidyr_0.6.1    
+    [5] tibble_1.2      tidyverse_1.0.0 ggplot2_2.2.1   devtools_1.12.0
 
     loaded via a namespace (and not attached):
-     [1] Rcpp_0.12.8      knitr_1.15.1     magrittr_1.5     munsell_0.4.3   
-     [5] colorspace_1.3-2 stringr_1.1.0    plyr_1.8.4       tools_3.3.2     
-     [9] gtable_0.2.0     withr_1.0.2      htmltools_0.3.5  yaml_2.1.14     
-    [13] lazyeval_0.2.0   rprojroot_1.1    digest_0.6.11    assertthat_0.1  
-    [17] tibble_1.2       memoise_1.0.0    evaluate_0.10    rmarkdown_1.3   
-    [21] labeling_0.3     stringi_1.1.2    scales_0.4.1     backports_1.0.4
+     [1] Rcpp_0.12.9.1    knitr_1.15.1     magrittr_1.5     munsell_0.4.3   
+     [5] colorspace_1.3-2 R6_2.2.0         stringr_1.1.0    plyr_1.8.4      
+     [9] tools_3.3.2      gtable_0.2.0     DBI_0.5-1        withr_1.0.2     
+    [13] htmltools_0.3.5  yaml_2.1.14      lazyeval_0.2.0   rprojroot_1.1   
+    [17] digest_0.6.11    assertthat_0.1   memoise_1.0.0    evaluate_0.10   
+    [21] rmarkdown_1.3    labeling_0.3     stringi_1.1.2    scales_0.4.1    
+    [25] backports_1.0.4

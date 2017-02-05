@@ -5,7 +5,9 @@ output:
 # Levin *et al.* reanalyses
 
 ```{r setup, echo=FALSE, warning=FALSE, message=FALSE}
-
+	library(ggplot2)
+	library(tidyverse)
+	library(grid)
 ```
 
 by [Casey W. Dunn](http://dunnlab.org/)
@@ -26,16 +28,16 @@ Here we examine support for their central finding - the inverse hourglass model.
 
 This box plot corresponds to that of Levin *et al.* [Figure 4d](http://www.nature.com/nature/journal/v531/n7596/fig_tab/nature16994_F4.html):
 ```{r preprocess, echo=FALSE}
-D = read.table("data_processed/Figure_4d_data.txt", header=T)
-
-# Replace taxon indeces with taxon names
-
-taxa = c("Porifera", "Nematodes", "Arthropods", "Platyhelminthes", "Tardigrades", "Cnidaria", "Annelides", "Echinodermata", "Chordata", "Ctenophores") # from Figure 4d data.xlsx
-D$Species_A = as.factor( sapply(D$Species_A, function(x) taxa[x]) )
-D$Species_B = as.factor( sapply(D$Species_B, function(x) taxa[x]) )
-
-
-boxplot(as.matrix(D[,3:5]))
+	D = read.table("data_processed/Figure_4d_data.txt", header=T)
+	
+	# Replace taxon indeces with taxon names
+	
+	taxa = c("Porifera", "Nematodes", "Arthropods", "Platyhelminthes", "Tardigrades", "Cnidaria", "Annelides", "Echinodermata", "Chordata", "Ctenophores") # from Figure 4d data.xlsx
+	D$Species_A = as.factor( sapply(D$Species_A, function(x) taxa[x]) )
+	D$Species_B = as.factor( sapply(D$Species_B, function(x) taxa[x]) )
+	
+	
+	boxplot(as.matrix(D[,3:5]))
 ```
 
 The KS p-value for the early-mid comparison is `r format(ks.test(D$Early, D$Mid)$p.value, digits=3)`, while the p-value for the late-mid comparison is `r format(ks.test(D$Late, D$Mid)$p.value, digits=3, scientific=TRUE)`.
@@ -87,11 +89,12 @@ Here I rerun the analyses taking the matched samples into account.
 
 ```{r matched_test, echo=FALSE}
 
-# hist(D$Early - D$Mid)
-w_early = wilcox.test(D$Early, D$Mid, alternative="greater", paired=T)$p.value
-
-# hist(D$Late - D$Mid)
-w_late = wilcox.test(D$Late, D$Mid, alternative="greater", paired=T)$p.value
+	# hist(D$Early - D$Mid)
+	w_early = wilcox.test(D$Early, D$Mid, alternative="greater", paired=T)$p.value
+	
+	# hist(D$Late - D$Mid)
+	w_late = wilcox.test(D$Late, D$Mid, alternative="greater", paired=T)$p.value
+	
 ```
 
 The p-values for the Wilcoxon test are `r format(w_early, digits=3)` for the early-mid comparison, which is barely significant, and `r format(w_late, digits=3, scientific=TRUE)` for the late-mid comparison.
@@ -106,19 +109,19 @@ Their [Figure 4d](http://www.nature.com/nature/journal/v531/n7596/fig_tab/nature
 Here I order the matrix by Mid to identify these values:
 
 ```{r sorted_mid}
-D[order(D[,4]),]
 
-
+	D[order(D[,4]),]
 
 ```
 
 The five lowest mid values, including the three outliers, are pairwise comparisons that include the ctenophore. Here I rerun the analyses without ctenophores:
 
 ```{r no_cteno}
-D_no_ct = D[ ((D$Species_A != "Ctenophores") &   (D$Species_B != "Ctenophores")), ]
-boxplot(as.matrix(D_no_ct[,3:5]))
-wilcox.test(D_no_ct$Early, D_no_ct$Mid, alternative="greater", paired=T)
-wilcox.test(D_no_ct$Late, D_no_ct$Mid, alternative="greater", paired=T)
+
+	D_no_ct = D[ ((D$Species_A != "Ctenophores") &   (D$Species_B != "Ctenophores")), ]
+	boxplot(as.matrix(D_no_ct[,3:5]))
+	wilcox.test(D_no_ct$Early, D_no_ct$Mid, alternative="greater", paired=T)
+	wilcox.test(D_no_ct$Late, D_no_ct$Mid, alternative="greater", paired=T)
 
 ```
 
@@ -129,100 +132,103 @@ There is no significant difference between the early and mid phase.
 
 ```{r echo=FALSE}
 
-# Multiple plot function
-#
-# ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
-# - cols:   Number of columns in layout
-# - layout: A matrix specifying the layout. If present, 'cols' is ignored.
-#
-# If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE),
-# then plot 1 will go in the upper left, 2 will go in the upper right, and
-# 3 will go all the way across the bottom.
-#
-multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
-  library(grid)
-
-  # Make a list from the ... arguments and plotlist
-  plots <- c(list(...), plotlist)
-
-  numPlots = length(plots)
-
-  # If layout is NULL, then use 'cols' to determine layout
-  if (is.null(layout)) {
-    # Make the panel
-    # ncol: Number of columns of plots
-    # nrow: Number of rows needed, calculated from # of cols
-    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
-                    ncol = cols, nrow = ceiling(numPlots/cols))
-  }
-
- if (numPlots==1) {
-    print(plots[[1]])
-
-  } else {
-    # Set up the page
-    grid.newpage()
-    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
-
-    # Make each plot, in the correct location
-    for (i in 1:numPlots) {
-      # Get the i,j matrix positions of the regions that contain this subplot
-      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
-
-      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
-                                      layout.pos.col = matchidx$col))
-    }
-  }
-}
+	# Multiple plot function
+	#
+	# ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
+	# - cols:   Number of columns in layout
+	# - layout: A matrix specifying the layout. If present, 'cols' is ignored.
+	#
+	# If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE),
+	# then plot 1 will go in the upper left, 2 will go in the upper right, and
+	# 3 will go all the way across the bottom.
+	#
+	multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+	
+	
+	  # Make a list from the ... arguments and plotlist
+	  plots <- c(list(...), plotlist)
+	
+	  numPlots = length(plots)
+	
+	  # If layout is NULL, then use 'cols' to determine layout
+	  if (is.null(layout)) {
+	    # Make the panel
+	    # ncol: Number of columns of plots
+	    # nrow: Number of rows needed, calculated from # of cols
+	    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+	                    ncol = cols, nrow = ceiling(numPlots/cols))
+	  }
+	
+	 if (numPlots==1) {
+	    print(plots[[1]])
+	
+	  } else {
+	    # Set up the page
+	    grid.newpage()
+	    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+	
+	    # Make each plot, in the correct location
+	    for (i in 1:numPlots) {
+	      # Get the i,j matrix positions of the regions that contain this subplot
+	      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+	
+	      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+	                                      layout.pos.col = matchidx$col))
+	    }
+	  }
+	}
 
 ```
 
 
 ```{r summary, echo=FALSE, message=FALSE}
 
-library(ggplot2)
-library(reshape2)
-library(grid)
+	limits=c(-0.4, 0.75)
+	
+	phase_levels = c( "Early", "Mid", "Late" )
 
-limits=c(-0.4, 0.75)
-
-Dm = melt(D, id=c("Species_A", "Species_B"), variable.name = "phase", value.name = "similarity")
-Dm_no_ct = melt(D_no_ct, id=c("Species_A", "Species_B"), variable.name = "phase", value.name = "similarity")
-
-has_cteno = (Dm$Species_A == "Ctenophores") | (Dm$Species_B == "Ctenophores")
-alpha = rep(0.4, length(has_cteno))
-alpha[has_cteno] = 0.9
-color = rep("black", length(has_cteno))
-color[has_cteno] = "red"
-
-pa = ggplot(Dm, aes(phase, similarity)) +
-    geom_boxplot(outlier.shape=NA)+ # Outliers are drawn in bellow with jitter, so supress them here so they aren't duplicated
-    scale_y_continuous(limits=limits) +
-    geom_jitter(shape=16, position=position_jitter(0.2), alpha=alpha, color=color)
-
-pa = pa + coord_flip() + ggtitle("(a) Original, with ctenophore in red")
-
-
-pb = ggplot(Dm_no_ct, aes(phase, similarity)) +
-    geom_boxplot(outlier.shape=NA)+ # Outliers are drawn in bellow with jitter, so supress them here so they aren't duplicated
-    scale_y_continuous(limits=limits) +
-    geom_jitter(shape=16, position=position_jitter(0.2), alpha=0.4)
-
-pb = pb + coord_flip() + ggtitle("(b) New, without ctenophore")
-
-#pa
-#ggplotly()
-
-multiplot(pa, pb, cols=1)
-
-pdf("Figure_levin_raw.pdf", width=4, height=4)
-multiplot(pa, pb, cols=1)
-dev.off()
-
-# Plots without points
-pa = ggplot(Dm, aes(phase, similarity)) + geom_boxplot()  + ggtitle("(a) Original, with ctenophore") + scale_y_continuous(limits=limits) + coord_flip()
-pb = ggplot(Dm_no_ct, aes(phase, similarity)) + geom_boxplot() + ggtitle("(b) New, without ctenophore") +  scale_y_continuous(limits=limits) + coord_flip() 
-#multiplot(pa, pb, cols=1)
+	Dm = D %>% 
+		gather( Early, Mid, Late, key="phase", value="similarity" ) %>%
+		mutate( phase=factor( phase, levels=phase_levels ) )
+	
+	
+	Dm_no_ct =  D_no_ct %>% 
+		gather( Early, Mid, Late, key="phase", value="similarity" ) %>%
+		mutate( phase=factor( phase, levels=phase_levels ) )
+	
+	has_cteno = (Dm$Species_A == "Ctenophores") | (Dm$Species_B == "Ctenophores")
+	alpha = rep(0.4, length(has_cteno))
+	alpha[has_cteno] = 0.9
+	color = rep("black", length(has_cteno))
+	color[has_cteno] = "red"
+	
+	pa = Dm %>% 
+		ggplot( aes(x=phase, y=similarity) ) +
+	    geom_boxplot(outlier.shape=NA) + # Outliers are drawn in bellow with jitter, so supress them here so they aren't duplicated
+	    scale_y_continuous(limits=limits) +
+	    geom_jitter(shape=16, position=position_jitter(0.2), alpha=alpha, color=color) + 
+			coord_flip() + 
+			ggtitle("(a) Original, with ctenophore in red")
+	
+	
+	pb = Dm_no_ct %>% 
+		ggplot( aes(x=phase, y=similarity)) +
+	    geom_boxplot(outlier.shape=NA)+ # Outliers are drawn in bellow with jitter, so supress them here so they aren't duplicated
+	    scale_y_continuous(limits=limits) +
+	    geom_jitter(shape=16, position=position_jitter(0.2), alpha=0.4) + 
+			coord_flip() + 
+			ggtitle("(b) New, without ctenophore")
+	
+	multiplot(pa, pb, cols=1)
+	
+	pdf("Figure_levin_raw.pdf", width=4, height=4)
+	multiplot(pa, pb, cols=1)
+	dev.off()
+	
+	# Plots without points
+	pa = ggplot(Dm, aes(phase, similarity)) + geom_boxplot()  + ggtitle("(a) Original, with ctenophore") + scale_y_continuous(limits=limits) + coord_flip()
+	pb = ggplot(Dm_no_ct, aes(phase, similarity)) + geom_boxplot() + ggtitle("(b) New, without ctenophore") +  scale_y_continuous(limits=limits) + coord_flip() 
+	#multiplot(pa, pb, cols=1)
 
 ```
 
@@ -236,11 +242,9 @@ When all the annotated points are shown in the interactive plot below, however, 
 
 ```{r matched, echo=FALSE}
 
-
-ggplot(data=Dm, aes(x=phase,y=similarity, group=interaction(Species_A, Species_B), text=paste(Species_A, Species_B, sep="-")))  + geom_line(size=0.5) + geom_point(color=color)
-
-inverse_hourglass = D[ (D$Mid<D$Early) & (D$Mid < D$Late),]
-
+	ggplot(data=Dm, aes(x=phase,y=similarity, group=interaction(Species_A, Species_B), text=paste(Species_A, Species_B, sep="-")))  + geom_line(size=0.5) + geom_point(color=color)
+	
+	inverse_hourglass = D[ (D$Mid<D$Early) & (D$Mid < D$Late),]
 
 ```
 
@@ -250,9 +254,9 @@ The results for the subset of comparisons that show the inverse hourglass patter
 
 ```{r matched_table, echo=FALSE}
 
-inverse_hourglass
-
-table(c(as.character(inverse_hourglass$Species_A), as.character(inverse_hourglass$Species_B)))
+	inverse_hourglass
+	
+	table(c(as.character(inverse_hourglass$Species_A), as.character(inverse_hourglass$Species_B)))
 
 ```
 
@@ -262,21 +266,21 @@ table(c(as.character(inverse_hourglass$Species_A), as.character(inverse_hourglas
 These data are an upstream intermediate that the 4d data are derived from. I explored these data a bit to better understand the broader analysis workflow.
 
 ```{r preprocess_4c}
-Phase = as.matrix(read.table("data_processed/Figure_4c_mode.txt", header=T))
-Ortho = as.matrix(read.table("data_processed/Figure_4c_orthology.txt", header=T))
-
-dim(Phase)
-dim(Ortho)
+	Phase = as.matrix(read.table("data_processed/Figure_4c_mode.txt", header=T))
+	Ortho = as.matrix(read.table("data_processed/Figure_4c_orthology.txt", header=T))
+	
+	dim(Phase)
+	dim(Ortho)
 ```
 
 First, check to see if there are any elements that are 0 in one table but not the other.
 
 ```{r comare_4c}
-sum((Phase>0) != (Ortho>0))
-
-table(Phase)
-
-nrow(Phase[rowSums(Phase)>0,]) # number of nonzero rows
+	sum((Phase>0) != (Ortho>0))
+	
+	table(Phase)
+	
+	nrow(Phase[rowSums(Phase)>0,]) # number of nonzero rows
 
 ```
 
@@ -297,14 +301,16 @@ Here I try to replicate the example described by Levin et al.:
 > Finally, we measured the extent of evolutionary change within the two conserved phases and the mid-developmental transition by determining whether orthologues annotated for a particular temporal category in one species are also annotated to the same temporal category in another species. Figure 4c shows an example of this analysis for D. melanogaster and C. elegans. For 4,395 orthologues delineated between these two species, the early phase, mid-developmental transition, and the late phase expression account for 51%, 14%, and 35% of the C. elegans orthologues, respectively. A total of 28% of the orthologues are annotated to the early phase in both C. elegans and D. melanogaster, while by chance only 22% are expected given the fraction of genes in each category across the species (Fig. 4c). In contrast, 3% were expected to be conserved at the mid-developmental transition at random, and 3% were observed. The log-odds ratios between observed and expected for the early phase and the mid-developmental transition between C. elegans and D. melanogaster are thus 0.35 and 0, respectively.
 
 ```{r DC_pre}
-# Sample the columns for these two species
-DC = Phase[,c(2,3)]
-colnames(DC)
 
-# sample only rows that have phase annotations for both
-
-DC = DC[(DC[,1]>0) & (DC[,2]>0),]
-nrow(DC)
+	# Sample the columns for these two species
+	DC = Phase[,c(2,3)]
+	colnames(DC)
+	
+	# sample only rows that have phase annotations for both
+	
+	DC = DC[(DC[,1]>0) & (DC[,2]>0),]
+	nrow(DC)
+	
 ```
 
 So the number of genes selected is consistent with the reported number.
@@ -312,33 +318,50 @@ So the number of genes selected is consistent with the reported number.
 Now calculate the fraction of genes in each phase for each species.
 
 ```{r frac_4c_ce}
-colnames(DC)[1]
-ce = table(DC[,1])/sum(table(DC[,1]))
-ce
+
+	colnames(DC)[1]
+	ce = table(DC[,1])/sum(table(DC[,1]))
+	ce
+	
 ```
 
 These values do correspond to the 51%, 14%, and 35% reported in the manuscript for C. elegans.
 
 
 ```{r frac_4c_dm}
-colnames(DC)[2]
-dm = table(DC[,2])/sum(table(DC[,2]))
-dm
+
+	colnames(DC)[2]
+	dm = table(DC[,2])/sum(table(DC[,2]))
+	dm
+	
 ```
 
 ```{r scores}
-expected = dm * ce
-
-observed = c( sum(DC[,1] ==1 & DC[,2] ==1), sum(DC[,1] ==2 & DC[,2] ==2), sum(DC[,1] ==3 & DC[,2] ==3) )
-observed = observed / nrow(DC)
-observed
-
-observed/expected
-
-log(observed/expected, 2) # have not yet verified the base
+	expected = dm * ce
+	
+	observed = c( sum(DC[,1] ==1 & DC[,2] ==1), sum(DC[,1] ==2 & DC[,2] ==2), sum(DC[,1] ==3 & DC[,2] ==3) )
+	observed = observed / nrow(DC)
+	observed
+	
+	observed/expected
+	
+	log(observed/expected, 2) # have not yet verified the base
 
 ```
 
+### Matrix occupancy
+
+```{r gene_phase_matrix}
+
+	n_species_sampled = apply( Phase, 1, function(x) sum( x > 0 ) )
+	
+	phase_sub = Phase[ n_species_sampled >= 2, ]
+	
+	hist( n_species_sampled )
+	
+```
+
+There were `r nrow(Phase)` gene in the original data file. `r sum(n_species_sampled == 0)` of these had no phase annotations for any species. `r nrow(phase_sub)` had phase annotations for 2 or more species.
 
 ## Software versions
 
