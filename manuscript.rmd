@@ -9,8 +9,7 @@ output:
     fig_height: 4
   github_document:
     fig_caption: yes
-header-includes:
-  - \setlength{\parindent}{4em}
+
 ---
 
 ```{r setup, cache=TRUE, message=F, echo=FALSE, warning=F}
