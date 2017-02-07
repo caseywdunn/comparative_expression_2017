@@ -9,7 +9,7 @@ previously published comparative gene expression studies:
 
 The files in this repository include:
 
-- [manuscript.pdf](./manuscript.pdf) The rendered manuscript. It is the simplest way to view our manuscript, including the computed results and figures.
+- [manuscript.pdf](./manuscript.pdf?raw=true) The rendered manuscript. It is the simplest way to view our manuscript, including the computed results and figures.
 
 - [manuscript.rmd](./manuscript.rmd) The manuscript text and source code for our reanalysis. This is the file we edited as we wrote the manuscript.
 
