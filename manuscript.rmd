@@ -1155,8 +1155,7 @@ Levin *et al.* helpfully provided data and clarification on methods. We obtained
 
 ## Acknowledgments
 
-Thanks to Steve Haddock, Alex Damian Serrano, August Guang, Bruno Vellutini, and Zack Lewis for feedback on the manuscript. This work was supported by the National Science Foundation (DEB-1256695 and the Waterman Award).
-
+Thanks to Steve Haddock, Alex Damian Serrano, August Guang, Bruno Vellutini, and Zack Lewis for feedback on the manuscript. CWD's contribution was supported by the National Science Foundation (DEB-1256695 and the Waterman Award). AH was supported by the European Research Council Community’s Framework Program Horizon 2020 (2014–2020) ERC grant agreement 648861.
 \pagebreak
 
 ## Supplementary Information
