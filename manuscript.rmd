@@ -494,7 +494,7 @@ output:
 
 ```
 
-# Multiple pairwise comparisons between species can strongly mislead functional genomics studies
+# Pairwise comparisons are problematic when analyzing functional genomic data across species
 
 Casey W. Dunn^1^*, Felipe Zapata^1,2^, Catriona Munro^1^, Stefan Siebert^1,3^, Andreas Hejnol^4^
 
@@ -512,7 +512,7 @@ Casey W. Dunn^1^*, Felipe Zapata^1,2^, Catriona Munro^1^, Stefan Siebert^1,3^, A
 
 ## Abstract
 
-There is now considerable interest in comparing functional genomics data across species. One goal of this work is to provide an integrated understanding of genome and phenotype evolution. Most studies of this type have relied on multiple pairwise comparisons between species, an approach that does not incorporate information about the evolutionary relationships among species. These pairwise approaches have the potential to mislead conclusions about the evolution of genome function, and are a missed opportunity to learn about biology that can only be understood in an explicit phylogenetic context. Here we examine two recently published studies that compare expression across species with pairwise methods.  We find problems with both that call their conclusions into question. One study interpreted higher expression correlation between orthologs than paralogs as evidence for the ortholog conjecture, *i.e.* the hypothesis that gene function evolution is more rapid after duplication than speciation. Instead, we find that this pattern is due to the structure of the gene phylogenies, not different rates of expression evolution, and is the expected pattern when rates are the same following duplication and speciation. The second study interpreted pairwise comparisons of embryonic gene expression across distantly related animals as evidence for a distinct evolutionary process that gave rise to animal phyla. Instead, we find that the pattern they identified is due to unique feature of a single species that impact multiple pairwise comparisons that include that species. In each study, distinct patterns of pairwise similarity among species were interpreted as evidence of particular evolutionary processes, but instead reflect the structure of phylogenies. These reanalyses concretely demonstrate the inadequacy of pairwise comparisons for analyzing functional genomic data across species, and indicate that it will be critical to adopt phylogenetic comparative methods in future functional genomics work. Fortunately, phylogenetic comparative biology is also a rapidly advancing field with many methods that can be directly applied to functional genomic data.
+There is now considerable interest in comparing functional genomics data across species. One goal of this work is to provide an integrated understanding of genome and phenotype evolution. Most studies of this type have relied on multiple pairwise comparisons between species, an approach that does not incorporate information about the evolutionary relationships among species. The statistical problems that arise from not considering these relationships can lead pairwise approaches to the wrong conclusions, and are a missed opportunity to learn about biology that can only be understood in an explicit phylogenetic context. Here we examine two recently published studies that compare gene expression across species with pairwise methods. We find problems with both that call their conclusions into question. One study interpreted higher expression correlation between orthologs than paralogs as evidence for the ortholog conjecture, *i.e.* the hypothesis that gene function evolution is more rapid after duplication than speciation. Instead, we find that this pattern is due to the structure of the gene phylogenies, not different rates of expression evolution, and is the expected pattern when rates are the same following duplication and speciation. The second study interpreted pairwise comparisons of embryonic gene expression across distantly related animals as evidence for a distinct evolutionary process that gave rise to animal phyla. Instead, we find that the pattern they identified is due to unique features of a single species that impact multiple pairwise comparisons that include that species. In each study, distinct patterns of pairwise similarity among species were interpreted as evidence of particular evolutionary processes, but instead reflect the structure of phylogenies. These reanalyses concretely demonstrate the inadequacy of pairwise comparisons for analyzing functional genomic data across species, and indicate that it will be critical to adopt phylogenetic comparative methods in future functional genomics work. Fortunately, phylogenetic comparative biology is also a rapidly advancing field with many methods that can be directly applied to functional genomic data.
 
 
 ## Introduction
@@ -535,19 +535,6 @@ The second comparative functional genomics study we evaluate here is Levin *et a
 
 ### KMRR Reanalysis
 
-#### Original pairwise test of the ortholog conjecture
-
-The KMRR study [@KryuchkovaMostacci:2016iw] sought to test the ortholog conjecture. The ortholog conjecture [@Nehrt:2011bm] is the proposition that orthologs (genes that diverged from each other due to a speciation event) have more similar attributes than do paralogs (genes that diverged from each other due to a gene duplication event). The ortholog conjecture has important biological and technical implications. It shapes our understanding of the functional diversity of gene families. It is used to relate findings from well-studied genes to related genes that have not been investigated in detail. It can be applied to any trait of genes, from gene sequence to biochemical properties to expression. While the ortholog conjecture describes a specific pattern of functional diversity across genes, it is also articulated as a hypothesis about the process of evolution-- that there is greater evolutionary change in gene attributes following a duplication event than a speciation event. 
-
-Despite its importance, there have been relatively few tests of the ortholog conjecture. Previous work has shown that ontology annotations are not sufficient to test the ortholog conjecture [@Chen:2012jz; @Thomas:2012hz]. Analyses of domain structure were consistent with the ortholog conjecture [@Forslund:2011cw]. There have been few tests of the ortholog conjecture with regards to gene expression [@Chen:2012jz], and KMRR is the most thorough such expression study to date.
-
-The KMRR study considered several publicly available datasets of gene expression across tissues and species. Their expression summary statistic is Tau [@Yanai:2005dh, @KryuchkovaMostacci:2016in], an indicator of tissue specificity of gene expression. It can range from a value of 0, which indicates no specificity (*i.e.*, uniform expression across tissues), to a value of 1, which indicates high specificity (*i.e.*, expression in only one tissue). It is convenient in that it is a single number of defined range for each gene, though of course since the original expression is multidimensional this means much information is discarded. This includes information about which tissue expression is specific to. For example, if one gene has expression specific to the brain and another expression specific to the kidney, both would have a Tau of 1. 
-
-The KMRR analyses are based on pairwise comparisons (Figure 1a) between Tau within each gene family. They found the correlation coefficient of Tau for orthologs to be significantly greater than the correlation coefficient of Tau for paralogs, *i.e.* that orthologs tend to be more similar to each other than paralogs. From this they concluded that their analyses support the ortholog conjecture. They also concluded that this pattern provides support for a particular evolutionary process, that "tissue-specificity evolves very slowly in the absence of duplication, while immediately after duplication the new gene copy differs" [@KryuchkovaMostacci:2016iw].
-
-#### Phylogenetic reanalyses
-
-We reanalyzed the KMRR study using phylogenetic comparative methods. We focused on one of the datasets included in their analyses, that of Brawand *et al.* 2011 [@Brawand:2011du]. This dataset is the best sampled in their analyses. It has gene expression data for six organs across ten species (nine mammals and one bird), eight of which were analyzed by KMRR and further considered here. 
 
 ```{r expectation_plots, echo=FALSE, cache=TRUE, message=F, warning=F, fig.height=2, fig.cap="(a) Under the null hypothesis that there is no difference in the rate of evolution after duplication or speciation events, the distribution of phylogenetic independent contrasts would be drawn from the same distribution across both types of nodes. (b) Under the ortholog conjecture, contrasts across duplication nodes would tend to be larger than contrasts across speciation nodes."}
 	
@@ -593,6 +580,20 @@ We reanalyzed the KMRR study using phylogenetic comparative methods. We focused 
 		)
 
 ```
+
+#### Original pairwise test of the ortholog conjecture
+
+The KMRR study [@KryuchkovaMostacci:2016iw] sought to test the ortholog conjecture. The ortholog conjecture [@Nehrt:2011bm] is the proposition that orthologs (genes that diverged from each other due to a speciation event) have more similar attributes than do paralogs (genes that diverged from each other due to a gene duplication event). The ortholog conjecture has important biological and technical implications. It shapes our understanding of the functional diversity of gene families. It is used to relate findings from well-studied genes to related genes that have not been investigated in detail. It can be applied to any trait of genes, from gene sequence to biochemical properties to expression. While the ortholog conjecture describes a specific pattern of functional diversity across genes, it is also articulated as a hypothesis about the process of evolution-- that there is greater evolutionary change in gene attributes following a duplication event than a speciation event. 
+
+Despite its importance, there have been relatively few tests of the ortholog conjecture. Previous work has shown that ontology annotations are not sufficient to test the ortholog conjecture [@Chen:2012jz; @Thomas:2012hz]. Analyses of domain structure were consistent with the ortholog conjecture [@Forslund:2011cw]. There have been few tests of the ortholog conjecture with regards to gene expression [@Chen:2012jz], and KMRR is the most thorough such expression study to date.
+
+The KMRR study considered several publicly available datasets of gene expression across tissues and species. Their expression summary statistic is Tau [@Yanai:2005dh, @KryuchkovaMostacci:2016in], an indicator of tissue specificity of gene expression. It can range from a value of 0, which indicates no specificity (*i.e.*, uniform expression across tissues), to a value of 1, which indicates high specificity (*i.e.*, expression in only one tissue). It is convenient in that it is a single number of defined range for each gene, though of course since the original expression is multidimensional this means much information is discarded. This includes information about which tissue expression is specific to. For example, if one gene has expression specific to the brain and another expression specific to the kidney, both would have a Tau of 1. 
+
+The KMRR analyses are based on pairwise comparisons (Figure 1a) between Tau within each gene family. They found the correlation coefficient of Tau for orthologs to be significantly greater than the correlation coefficient of Tau for paralogs, *i.e.* that orthologs tend to be more similar to each other than paralogs. From this they concluded that their analyses support the ortholog conjecture. They also concluded that this pattern provides support for a particular evolutionary process, that "tissue-specificity evolves very slowly in the absence of duplication, while immediately after duplication the new gene copy differs" [@KryuchkovaMostacci:2016iw].
+
+#### Phylogenetic reanalyses
+
+We reanalyzed the KMRR study using phylogenetic comparative methods. We focused on one of the datasets included in their analyses, that of Brawand *et al.* 2011 [@Brawand:2011du]. This dataset is the best sampled in their analyses. It has gene expression data for six organs across ten species (nine mammals and one bird), eight of which were analyzed by KMRR and further considered here. 
 
 
 For each internal node in each gene tree, we measured the phylogenetic independent contrast (PIC) of the expression statistic Tau. This is the difference in values of Tau for descendant nodes scaled by the expected variance, which is largely determined by the lengths of the two branches that connect the node to its two descendants (Figure 1b). These contrasts were then annotated by whether each is made across a speciation or duplication event. The original description of independent contrasts [@Felsenstein:1985ua] focused on assessing covariance between changes in two traits on a tree. Our use of contrasts is a bit different-- we look for differences in evolutionary changes of one trait (differential expression) between two categories of nodes (speciation and duplication) on a tree.
@@ -711,7 +712,7 @@ For each internal node in each gene tree, we measured the phylogenetic independe
 ```
 
 
-```{r show_contrast_result, echo=FALSE, cache=TRUE, message=F, warning=F, fig.height=2, fig.width=5, fig.cap="Density plot of the magnitude of phylogenetic independent contrast values following duplication and speciation events. As the contrasts for duplication events are not larger than those of speciation events, the results are not consistent with the predictions of the ortholog conjecture."}
+```{r show_contrast_result, echo=FALSE, cache=TRUE, message=F, warning=F, fig.height=2, fig.width=4, fig.cap="Phylogneetic reanalysis of the Tau values calculated by KMRR [@KryuchkovaMostacci:2016iw]. Density plot of the magnitude of phylogenetic independent contrasts for Tau following duplication and speciation events. As the contrasts for duplication events are not larger than those of speciation events, the results are not consistent with the predictions of the ortholog conjecture."}
 
 	# Plot the contrasts for duplication events and speciation events
 	nodes_contrast %>%
@@ -720,8 +721,9 @@ For each internal node in each gene tree, we measured the phylogenetic independe
 		xlab( "Phylogenetic independent contrasts" ) +
 		ylab( "Density" ) +
 		xlim( 0, 0.075 ) + 
-		theme( legend.justification=c( 1, 1 ), legend.position=c( 1, 1 ) ) +
-		theme_classic()
+		theme_classic() + 
+		theme( legend.justification=c( 1, 1 ), legend.position=c( 1, 1 ) )
+		
 
 ```
 
@@ -974,7 +976,7 @@ To test the hypothesis that distantly paralogs that arose from duplications that
 ```
 
 
-```{r simulations_plot, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="Analyses of simulated data reveal that pairwise methods produce similar results under both the null model and the ortholog conjecture, while the phylogenetic method distinguishes between the two. (a) Pairwise analysis of dataset simulated under the null model that there is no difference in the rate of expresison evolution following duplication and speciation. (b) Phylogenetic analysis of data simulated under the null model. (c) Pairwise analysis of dataset simulated under the ortholog conjecture, in which there is a higher rate of expresison evolution following duplication than speciation. This plot is very similar to the corresponding plot for the null model. (d) Phylogenetic analysis of data simulated under the ortholog conjecture. This plot is distinct from that for the null model in that phylogenetic independent contrasts for duplication events are significantly larger than after speciation events."}
+```{r simulations_plot, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="Analyses of simulated data reveal that pairwise methods produce similar results under both the null model and the ortholog conjecture (OC), while the phylogenetic method provides different results under each model. (a) Pairwise analysis of dataset simulated under the null model that there is no difference in the rate of expresison evolution following duplication and speciation. (b) Phylogenetic analysis of data simulated under the null model. (c) Pairwise analysis of dataset simulated under the ortholog conjecture, in which there is a higher rate of expresison evolution following duplication than speciation. This plot is very similar to the corresponding plot for the null model. (d) Phylogenetic analysis of data simulated under the ortholog conjecture. This plot is distinct from that for the null model in that phylogenetic independent contrasts for duplication events are significantly larger than after speciation events."}
 
 	g_phylo_null = 
 		nodes_sim_null_contrast %>% 
@@ -985,7 +987,7 @@ To test the hypothesis that distantly paralogs that arose from duplications that
 			xlim( 0, 0.05 ) + 
 			ylim( 0, 75 ) +
 			theme_classic() + 
-			ggtitle( "(b) Null simulation, phylogenetic" ) +
+			ggtitle( "(b) Null, phylogenetic" ) +
 			theme( legend.justification=c( 1, 1 ), legend.position=c( 1, 1 ) )
 
 	g_pair_null = 
@@ -1003,7 +1005,7 @@ To test the hypothesis that distantly paralogs that arose from duplications that
 			xlab( "Node Age (million years)" ) +
 			ylab( "Correlation Coefficient" ) +
 			ylim( 0, 1 ) +
-			ggtitle( "(a) Null simulation, pairwise" ) +
+			ggtitle( "(a) Null, pairwise" ) +
 			theme(legend.position="none")
 
 	g_phylo_oc = 
@@ -1015,7 +1017,7 @@ To test the hypothesis that distantly paralogs that arose from duplications that
 		xlim( 0, 0.05 ) + 
 		ylim( 0, 75 ) +
 		theme_classic() + 
-		ggtitle( "(d) OC simulation, phylogenetic" ) +
+		ggtitle( "(d) OC, phylogenetic" ) +
 		theme(legend.position="none")
 
 	g_pair_oc = 
@@ -1033,7 +1035,7 @@ To test the hypothesis that distantly paralogs that arose from duplications that
 			xlab( "Node Age (million years)" ) +
 			ylab( "Correlation Coefficient" ) +
 			ylim( 0, 1 ) +
-			ggtitle( "(c) OC simulation, pairwise" ) +
+			ggtitle( "(c) OC, pairwise" ) +
 			theme(legend.position="none")
 
 	grid.arrange(
@@ -1051,7 +1053,7 @@ To test the hypothesis that distantly paralogs that arose from duplications that
 
 The KMRR study did investigate the impact of node age on correlation, but in a different way. In their Figure 2, they grouped orthologs and paralogs according to the ENSEMBL node name of their most recent common ancestor, and plotted the correlation of Tau for each of these groups by the node age. They found that across the investigated range of node ages, ortholog pairs have higher tau correlation than paralogs. We confirmed that we can replicate this result (Figure 4). There are several difficulties with interpreting this plot, though. First, it does not just reflect the evolutionary processes that generated the data, it is also impacted by the phylogenies along which these processes acted. The expected covariance of traits that evolve under neutral processes is in fact defined by the phylogeny [@Grafen:1989um]. Second, the correlation for each group is based on multiple non-independent pairwise comparisons. 
 
-To better understand this plot (Figure 4), we performed a couple simulations of Tau on the calibrated gene trees and then regenerated the figures. First, we simulated the evolution of tau under the null model that it evolves at the same rate following duplication and speciation events. Under the null model, the plot of correlation coefficient to node age is very similar as for the observed data (Figure 5a). As in the original study, there is higher correlation coefficient across orthologs (`r ortholog_r_sim_null`) than paralogs (`r paralog_r_sim_null`) when not considering node age. Phylogenetic analysis of the data simulated under the null hypothesis (Figure 5b) do not reject the null hypothesis (Wilcoxon p = $`r wilcox_oc( nodes_sim_null_contrast )`$), as expected.
+To better understand this plot (Figure 4), we performed a couple simulations of Tau on the calibrated gene trees and then regenerated the figures. First, we simulated the evolution of Tau under the null model that it evolves at the same rate following duplication and speciation events. Under the null model, the plot of correlation coefficient to node age is very similar as for the observed data (Figure 5a). As in the original study, there is higher correlation coefficient across orthologs (`r ortholog_r_sim_null`) than paralogs (`r paralog_r_sim_null`) when not considering node age. Phylogenetic analysis of the data simulated under the null hypothesis (Figure 5b) do not reject the null hypothesis (Wilcoxon p = $`r wilcox_oc( nodes_sim_null_contrast )`$), as expected.
 
 We next simulated the evolution of Tau under the ortholog conjecture, where the rate of evolution of Tau following duplication was `r dup_adjust` fold the rate following speciation. The pairwise results of this heterogeneous model are nearly indistinguishable from the null model (Figure 5c), and also have a higher correlation coefficient for orthologs (`r ortholog_r_sim_oc`) than paralogs (`r paralog_r_sim_oc`). The phylogenetic analysis of the ortholog conjecture simulation (Figure 5d) does reject the null hypothesis (Wilcoxon p = $`r wilcox_oc( nodes_sim_oc_contrast )`$).
 
@@ -1074,7 +1076,7 @@ This is also an example of the limitations of the concepts of orthology and para
 
 #### Original pairwise analyses of developmental gene expression
 
-![Distributions of pairwise similarity scores for each phase of development. Pairwise scores for the ctenophore are red. Wilcoxon test p-values for the significance of the differences between early-mid distributions and late-mid distributions are on the right. Model of variance, which is inversely related to similarity, is on the left. (a) The distributions as published. Low similarity (*i.e.*, high variance) in the mid phase of development was interpreted as support for an inverse hourglass model for the evolution of gene expression. The five least-similar mid phase scores were all from the ctenophore. Published KS p-values, based on duplicated data, are in parentheses. The inset ctenophore image is by S. Haddock from phylopic.org. (b) The distributions after the exclusion of the ctenophore. The early and mid phase distributions are not statistically distinct.](levin_etal/Figure_levin.png?raw=true)
+![Distributions of pairwise similarity scores for each phase of development. Pairwise scores for the ctenophore are red. Wilcoxon test p-values for the significance of the differences between early-mid distributions and late-mid distributions are on the right. Model of variance, which is inversely related to similarity, is on the left. (a) The distributions as published. Low similarity (*i.e.*, high variance) in the mid phase of development was interpreted as support for an inverse hourglass model for the evolution of gene expression. The five least-similar mid phase scores were all from the ctenophore. Published KS p-values, based on duplicated data, are in parentheses. The inset ctenophore image is by S. Haddock from phylopic.org. (b) The distributions after the exclusion of the ctenophore. The early and mid phase distributions are not statistically distinct.](levin_etal/Figure_levin.pdf)
 
 
 Levin *et al.* [@Levin:2016bp] analyzed gene expression through the course of embryonic development for ten animal species, each from a different clade that has been designated as having the rank of phylum. They arrived at two major conclusions. First, animal development is characterized by a well-defined mid-developmental transition that marks the transition from an early phase of gene expression to a late stage of gene expression. Second, this transition helps explain the evolution of features observed among distantly related animals. Specifically, they concluded that animals from different phyla exhibit an "inverse hourglass" model for the evolution of gene expression, where there is more evolutionary variance in gene expression at a mid phase of development than there is at early and late phases. Closely related animals have previously been described as having an hourglass model of gene expression, where evolutionary variance in expression is greater early and late in development than at the midpoint of development [@Kalinka:2010dw; @DomazetLoso:2010cn]. Levin *et al.* conclude that this contrast between distantly and closely related animals provides biological justification for the concept of phyla and may provide a definition of phyla. 
@@ -1132,7 +1134,7 @@ Levin *et al.* helpfully provided data and clarification on methods. We obtained
 
 ## Acknowledgments
 
-Thanks to XX. This work was supported by the National Science Foundation (DEB-1256695 and the Waterman Award).
+Thanks to Steve Haddock, Alex Damian Serrano, and August Guang for feedback on the manuscript. This work was supported by the National Science Foundation (DEB-1256695 and the Waterman Award).
 
 \pagebreak
 
@@ -1332,7 +1334,10 @@ We examined the sensitivity of our results to the specification of calibration d
 
 #### Relationship between Tau and maximum expression
 
-```{r Tau_v_max, cache=TRUE, echo=FALSE, warning=FALSE, dev="png", dpi=300, message=FALSE, fig.cap="There is a negative relationship between Tau and the maximum observed expression for each gene."}
+There is a negative relationship between miximum expression and Tau for each gene (Supplementary Figure 9).
+
+
+```{r Tau_v_max, cache=TRUE, echo=FALSE, warning=FALSE, dev="png", dpi=300, message=FALSE, fig.cap="Genes with higher maximum observed expression tend to have lower Tau. The blue line is the linear model for the relationship between the two."}
 
 	nodes_tips = nodes_all %>% filter( ! is.na( species ) )
 	max_expression = nodes_tips %>% select( contains("Averaged") ) %>% apply( 1, FUN=max, na.rm=TRUE )
@@ -1340,11 +1345,14 @@ We examined the sensitivity of our results to the specification of calibration d
 	
 	ggplot( nodes_tips, aes( x=max_expression, y=Tau  ) ) + 
 		geom_point( size=0.5, alpha = 0.05 ) + 
-		geom_smooth( method="lm" ) +
+		geom_smooth( method="lm", se=FALSE ) +
 		xlab( "Maximum Expression" ) +
+		ylim( 0, 1 ) +
 		theme_classic()
 
 ```
+
+\pagebreak
 
 ### Software versions
 
