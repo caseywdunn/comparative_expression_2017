@@ -24,7 +24,7 @@ output:
 	library( ggtree )
 	library( ape )
 	library( digest )
-	library( hutan )  # From https://github.com/caseywdunn/hutan
+	library( hutan ) # From https://github.com/caseywdunn/hutan
 	library( gridExtra )
 	library( geiger )
 	library( phytools )
@@ -63,18 +63,18 @@ output:
 
 	# These clade dates are from the KMRR code, they got them from http://timetree.org/
 	calibration_times = data.frame(
-        age =
-            c( 20, 92, 167, 9, 42, 74, 296, 535, 104, 937, 29, 722, 441, 65, 15, 1215, 
-                414, 371, 162, 25, 74, 77, 86, 7 ), 
-        clade = 
-            c("Hominoidea", "Euarchontoglires", "Mammalia", "Homininae", 
-                    "Simiiformes", "Primates", "Amniota", "Vertebrata", "Eutheria", 
-                    "Bilateria", "Catarrhini", "Chordata", "Euteleostomi", 
-                    "Haplorrhini", "Hominidae", "Opisthokonta", "Sarcopterygii", 
-                    "Tetrapoda", "Theria", "Murinae", "Sciurognathi", "Rodentia", "Glires", "Hominini"
-            ),
-        stringsAsFactors=FALSE
-    )
+		age =
+			c( 20, 92, 167, 9, 42, 74, 296, 535, 104, 937, 29, 722, 441, 65, 15, 1215, 
+				414, 371, 162, 25, 74, 77, 86, 7 ), 
+		clade = 
+			c("Hominoidea", "Euarchontoglires", "Mammalia", "Homininae", 
+				"Simiiformes", "Primates", "Amniota", "Vertebrata", "Eutheria", 
+				"Bilateria", "Catarrhini", "Chordata", "Euteleostomi", 
+				"Haplorrhini", "Hominidae", "Opisthokonta", "Sarcopterygii", 
+				"Tetrapoda", "Theria", "Murinae", "Sciurognathi", "Rodentia", "Glires", "Hominini"
+		),
+		stringsAsFactors=FALSE
+	)
 	
 	# The calibration times used for speciation nodes
 	focal_calibrations_clades = 
@@ -169,7 +169,7 @@ output:
 	#' Record the distance from a tip for each node in a tree in 
 	#' the data slot
 	#' 
-	#' @param nhx A phylogenetic tree as a  treeio::treedata
+	#' @param nhx A phylogenetic tree as a treeio::treedata
 	#' @return A treeio::treedata object, with an additional node_age column
 	#' in the data slot, or the original object if it was not of class treedata
 	#' @export
@@ -322,7 +322,7 @@ output:
 				gene_trees_pic, 
 				function( nhx ){
 					tags = nhx@data
-					tags$gene = digest( nhx ) # Creates a  hash that is unique to each gene tree
+					tags$gene = digest( nhx ) # Creates a hash that is unique to each gene tree
 					tags %<>% select( -( B ) ) # B has inconsistent types, remove it
 					return( tags )
 				}
@@ -495,6 +495,63 @@ output:
 		return( expectation )
 	}
 
+	#' Summarize pairwise comparisons between tips of a tree
+	#' 
+	#' @param nhx A phylogenetic tree as a treeio::treedata object 
+	#' 	
+	#' @return A dataframe
+	#' @export
+	get_pairwise_summary = function ( nhx ) {
+		
+		# Create a tibble with one row for each pairwise combination of tip nodes
+		ntips = length( nhx@phylo$tip.label )
+		D = 1:ntips %>% combn( 2 ) %>% t() %>% as_tibble()
+		names( D ) = c( "tip_a", "tip_b" )
+		
+		# Add a column with the gene tree hash 
+		D %<>% mutate( gene_tree = digest( nhx ) )
+		
+		# Add the tip names
+		D %<>% mutate ( name_a = nhx@data$G[ D$tip_a ] )
+		D %<>% mutate ( name_b = nhx@data$G[ D$tip_b ] )
+		
+		# Add the species
+		D %<>% mutate ( species_a = nhx@data$species[ D$tip_a ] )
+		D %<>% mutate ( species_b = nhx@data$species[ D$tip_b ] )
+		
+		# Add the values at the tips
+		D %<>% mutate ( tau_a = nhx@data$Tau[ D$tip_a ] )
+		D %<>% mutate ( tau_b = nhx@data$Tau[ D$tip_b ] )
+		D %<>% mutate ( difference = abs( tau_a - tau_b ) )
+		
+		# For each row, get the most recent common ancestor of the pairwise tip combination
+		D$mrca = 
+			apply(
+				D, 
+				1, 
+				function( y ) ape::getMRCA( 
+					nhx@phylo, 
+					c( as.integer( y['tip_a'] ), as.integer( y['tip_b'] ) )
+				)
+			) %>%
+			as.integer()
+		
+		# Merge data of this mrca to the node
+		D %<>% left_join(
+			nhx@data %>%
+				select( D, Event, node, node_age, label, pic ),
+			by = c( "mrca" = "node")
+				
+		)
+		
+		# Calculate the distance between the tips, which for an ultrametric tree 
+		# is twice the age of their most recent common ancestor
+		D %<>% mutate( distance = 2 * node_age )
+		
+		return( D )
+		
+	}
+
 ```
 
 # Pairwise comparisons are problematic when analyzing functional genomic data across species
@@ -524,7 +581,7 @@ The focus of genomics research has quickly shifted from describing genome sequen
 
 A rich theoretical and statistical methodology of phylogenetic comparative methods have been developed over the last three decades to address the challenges and opportunities of trait comparisons across species [@Felsenstein:1985ua; @Grafen:1989um; @Pagel:1999gc; Revell:2012jd; @FitzJohn:2012ey; @Uyeda:2014jl; @Garamszegi:2014ew]. A central challenge is the dependence of observations across species due to the evolutionary history of species -- more closely related species share many traits that evolved once in a common ancestor. This violates the fundamental assumption of observation independence in standard statistical methods. Phylogenetic comparative methods address this dependence. They have largely been applied to morphological and ecological traits, but are just as relevant to functional genomics. Even so, most comparative functional genomics studies have abstained from phylogenetic approaches and instead rely on multiple pairwise comparisons (Figure 1a). This leaves comparative functional genomics studies susceptible to statistical problems and is a missed opportunity to ask questions that are only accessible in an explicit phylogenetic context.
 
-Phylogenetic comparative methods account for evolutionary history and explicitly model trait change along the branches of evolutionary trees (*e.g.*, Figure 1b). The value of these methods relative to to pairwise comparisons has been repeatedly shown in analyses of other types of character data [@Ricklefs:1996wb; @Chamberlain:2012vx; @OMeara:2012gq]. The application of these methods is illustrated by a study of leaf functional attributes for about 100 plant species [@Ackerly:1999iu]. If phylogenetic relationships are not considered, analyses indicate a negative correlation of leaf lifespan with leaf size. With the application of phylogenetic comparative methods, however, this correlation disappears. This is because most of the observed variance is due to differences between conifers and flowering plants. Phylogenetic comparative methods capture this shift as change along a single branch deep in the tree, revealing that there is not a tendency of correlated change between these traits across the phylogeny. One reason that comparative functional genomics has not yet embraced phylogenetic approaches is that it has not yet been concretely demonstrated that pairwise and phylogenetic comparative methods can lead to different results when considering functional genomics data. Here we examine this issue be re-evaluating the pairwise comparisons used in two recent studies that compared gene expression across species.
+Phylogenetic comparative methods account for evolutionary history and explicitly model trait change along the branches of evolutionary trees (*e.g.*, Figure 1b). The value of these methods relative to to pairwise comparisons has been repeatedly shown in analyses of other types of character data [@Ricklefs:1996wb; @Chamberlain:2012vx; @OMeara:2012gq]. The application of these methods is illustrated by a study of leaf functional attributes for about 100 plant species [@Ackerly:1999iu]. If phylogenetic relationships are not considered, analyses indicate a negative correlation of leaf lifespan with leaf size. With the application of phylogenetic comparative methods, however, this correlation disappears. This is because most of the observed variance is due to differences between conifers and flowering plants. Phylogenetic comparative methods capture this shift as change along a single branch deep in the tree, revealing that there is not a tendency of correlated change between these traits across the phylogeny. One reason that comparative functional genomics has not yet embraced phylogenetic approaches is that it has not yet been concretely demonstrated that pairwise and phylogenetic comparative methods can lead to different results when considering functional genomics data. Here we examine this issue by re-evaluating the pairwise comparisons used in two recent studies that compared gene expression across species.
 
 The first study, Kryuchkova-Mostacci and Robinson-Rechavi (KMRR) 2016 [@KryuchkovaMostacci:2016iw], analyzed multiple vertebrate expression datasets to test the ortholog conjecture - the hypothesis that orthologs tend to have more conserved attributes (specificity of expression across organs in this case) than do paralogs [@Nehrt:2011bm, @Koonin:2005fp]. Using pairwise comparisons (Figure 1a), they found lower expression correlation between paralogs than between orthologs and interpreted this as strong support for the ortholog conjecture. 
 
@@ -544,7 +601,7 @@ The second comparative functional genomics study we evaluate here is Levin *et a
 	g_expectation_null =
 		sim_expectation() %>%
 		ggplot( aes( x=pic, y=..density.., col=Event ) ) + 
-			geom_freqpoly(  binwidth=0.2, position="identity" ) +
+			geom_freqpoly( binwidth=0.2, position="identity" ) +
 			xlab( "Phylogenetic independent contrasts" ) +
 			ylab( "Density" ) +
 			xlim( 0, 6 ) + 
@@ -562,7 +619,7 @@ The second comparative functional genomics study we evaluate here is Levin *et a
 	g_expectation_oc =
 		sim_expectation( scale=2 ) %>%
 		ggplot( aes( x=pic, y=..density.., col=Event ) ) + 
-			geom_freqpoly(  binwidth=0.2, position="identity" ) +
+			geom_freqpoly( binwidth=0.2, position="identity" ) +
 			xlab( "Phylogenetic independent contrasts" ) +
 			ylab( "Density" ) +
 			xlim( 0, 6 ) + 
@@ -630,8 +687,12 @@ For each internal node in each gene tree, we measured the phylogenetic independe
 		str_c( collapse="\n" ) %>%												# Combine them into one string
 		read_delim( delim=" ", col_names = FALSE ) %>% 		# Read string as tibble
 		select( 2, 8 ) %>%																# Select the columns with species and gene ID
-		rename(  Ensembl.Gene.ID = X8 ) %>%
-		rename(  species = X2 )
+		rename( Ensembl.Gene.ID = X8 ) %>%
+		rename( species = X2 )
+	
+	# Remove the large string objects to free up memory
+	rm( lines )
+	rm( tree_lines )
 	
 ```
 
@@ -685,7 +746,7 @@ For each internal node in each gene tree, we measured the phylogenetic independe
 	n_removed_for_no_speciation = length( gene_trees_pruned )
 	
 	# Remove trees with no speciation events
-	gene_trees_pruned = gene_trees_pruned[  unlist( lapply( gene_trees_pruned, get_n_speciation ) ) > 0 ]
+	gene_trees_pruned = gene_trees_pruned[ unlist( lapply( gene_trees_pruned, get_n_speciation ) ) > 0 ]
 	
 	n_removed_for_no_speciation = n_removed_for_no_speciation - length( gene_trees_pruned )
 	
@@ -715,7 +776,7 @@ For each internal node in each gene tree, we measured the phylogenetic independe
 ```
 
 
-```{r show_contrast_result, echo=FALSE, cache=TRUE, message=F, warning=F, fig.height=2, fig.width=4, fig.cap="Phylogneetic reanalysis of the Tau values calculated by KMRR [@KryuchkovaMostacci:2016iw]. Density plot of the magnitude of phylogenetic independent contrasts for Tau following duplication and speciation events. As the contrasts for duplication events are not larger than those of speciation events, the results are not consistent with the predictions of the ortholog conjecture."}
+```{r show_contrast_result, echo=FALSE, cache=TRUE, message=F, warning=F, fig.height=2, fig.width=4, fig.cap="Phylogenetic reanalysis of the Tau values calculated by KMRR [@KryuchkovaMostacci:2016iw]. Density plot of the magnitude of phylogenetic independent contrasts for Tau following duplication and speciation events. As the contrasts for duplication events are not larger than those of speciation events, the results are not consistent with the predictions of the ortholog conjecture."}
 
 	# Plot the contrasts for duplication events and speciation events
 	nodes_contrast %>%
@@ -731,11 +792,11 @@ For each internal node in each gene tree, we measured the phylogenetic independe
 ```
 
 
-We mapped the Tau values calculated by KMRR [@KryuchkovaMostacci:2016iw] for the Brawand *et al.* 2011 [@Brawand:2011du] datset onto `r length(gene_trees)` gene trees parsed from ENSMBL Compara [@Herrero:2016jj]. These are the same pre-computed trees that the orthology/ paralogy annotations KMRR used are based on. `r length(gene_trees_pruned)` passed taxon sampling criteria (`r min_genes_with_expression` genes) after removing tips without Tau values and had at least one speciation event. Of these, `r length(gene_trees_calibrated)` were successfully time calibrated. These calibrated trees were used to calculate phylogenetic independent contrasts for  `r nodes_contrast %>% filter(D=="Y") %>% nrow()` duplication nodes and `r nodes_contrast %>% filter(D=="N") %>% nrow()` speciation nodes. One of these trees is shown in Supplementary Figure 7 to demonstrate the analysis.
+We mapped the Tau values calculated by KMRR [@KryuchkovaMostacci:2016iw] for the Brawand *et al.* 2011 [@Brawand:2011du] datset onto `r length(gene_trees)` gene trees parsed from ENSMBL Compara [@Herrero:2016jj]. These are the same pre-computed trees that the orthology/ paralogy annotations KMRR used are based on. `r length(gene_trees_pruned)` passed taxon sampling criteria (`r min_genes_with_expression` genes) after removing tips without Tau values and had at least one speciation event. Of these, `r length(gene_trees_calibrated)` were successfully time calibrated. These calibrated trees were used to calculate phylogenetic independent contrasts for `r nodes_contrast %>% filter(D=="Y") %>% nrow()` duplication nodes and `r nodes_contrast %>% filter(D=="N") %>% nrow()` speciation nodes. One of these trees is shown in Supplementary Figure 7 to demonstrate the analysis.
 
-It is essential to have a null hypothesis that makes a distinct prediction from the prediction of the hypothesis under consideration. A suitable null hypothesis in this case  is that there is no difference in the evolution of expression following speciation or duplication events [@Studer:2009bm]. Under this hypothesis, we would predict that contrasts across speciation nodes and duplication nodes are drawn from the same distribution (Figure 2a). Under the alternative hypothesis specified by the ortholog conjecture, that there is a higher rate of change following duplication events than speciation events, we would expect to see the distribution of duplication contrasts shifted to higher values relative to the speciation contrasts (Figure 2b).
+It is essential to have a null hypothesis that makes a distinct prediction from the prediction of the hypothesis under consideration. A suitable null hypothesis in this case is that there is no difference in the evolution of expression following speciation or duplication events [@Studer:2009bm]. Under this hypothesis, we would predict that contrasts across speciation nodes and duplication nodes are drawn from the same distribution (Figure 2a). Under the alternative hypothesis specified by the ortholog conjecture, that there is a higher rate of change following duplication events than speciation events, we would expect to see the distribution of duplication contrasts shifted to higher values relative to the speciation contrasts (Figure 2b).
 
-We did not find increased evolutionary change in expression following duplication events (Figure 3). The Wilcoxon rank test does not reject the null hypothesis that the rate of evolution following duplications is the same as or less than the rate following speciation (p value = `r wilcox_test_result`). Our phylogenetic comparative analysis, unlike the previously published pairwise comparative analysis [@KryuchkovaMostacci:2016iw], therefore find no evidence for the ortholog conjecture in this system.
+We did not find increased evolutionary change in expression following duplication events (Figure 3). The Wilcoxon rank test does not reject the null hypothesis that the rate of evolution following duplications is the same as or less than the rate following speciation (p value = `r wilcox_test_result`). Our phylogenetic comparative analysis, unlike the previously published pairwise comparative analysis [@KryuchkovaMostacci:2016iw], therefore finds no evidence for the ortholog conjecture in this system.
 
 ```{r ascertainment, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
 
@@ -792,56 +853,6 @@ We next examined the possibility that ascertainment biases were differentially i
 #### Understanding the incongruence between pairwise and phylogenetic methods
 
 ```{r pairwise, echo=FALSE, cache=TRUE, message=F, warning=F, fig.height=2, fig.width=5, fig.cap="The pairwise analyses presented in Figure 2a of KMRR [@KryuchkovaMostacci:2016iw] can be reproduced with the subset of data we consider here. Each circle indicates the Tau Pearson correlation coefficient for a set of pairwise comparisons annotated with a specific node name of a given age and event type, *i.e.*, whether the divergence at that nodes was due to speciation (giving rise to orthologs) or duplication (giving rise to paralogs). Following KMRR Figure 2a, this figure shows only the comparisons that include a human sequence."}
-	get_pairwise_summary = function ( nhx ) {
-		
-		# Create a tibble with one row for each pairwise combination of tip nodes
-		ntips = length( nhx@phylo$tip.label )
-		D = 1:ntips %>% combn( 2 ) %>% t() %>% as_tibble()
-		names( D ) = c( "tip_a", "tip_b" )
-		
-		# Add a column with the gene tree hash 
-		D %<>% mutate( gene_tree = digest( nhx ) )
-		
-		# Add the tip names
-		D %<>% mutate ( name_a = nhx@data$G[ D$tip_a ] )
-		D %<>% mutate ( name_b = nhx@data$G[ D$tip_b ] )
-		
-		# Add the species
-		D %<>% mutate ( species_a = nhx@data$species[ D$tip_a ] )
-		D %<>% mutate ( species_b = nhx@data$species[ D$tip_b ] )
-		
-		# Add the values at the tips
-		D %<>% mutate ( tau_a = nhx@data$Tau[ D$tip_a ] )
-		D %<>% mutate ( tau_b = nhx@data$Tau[ D$tip_b ] )
-		D %<>% mutate ( difference = abs( tau_a - tau_b ) )
-		
-		# For each row, get the most recent common ancestor of the pairwise tip combination
-		D$mrca = 
-			apply(
-				D, 
-				1, 
-				function( y ) ape::getMRCA( 
-					nhx@phylo, 
-					c( as.integer( y['tip_a'] ), as.integer( y['tip_b'] ) )
-				)
-			) %>%
-			as.integer()
-		
-		# Merge data of this mrca to the node
-		D %<>% left_join(
-			nhx@data %>%
-				select( D, Event, node, node_age, label, pic ),
-			by = c( "mrca" = "node")
-				
-		)
-		
-		# Calculate the distance between the tips, which for an ultrametric tree 
-		# is twice the age of their most recent common ancestor
-		D %<>% mutate( distance = 2 * node_age )
-		
-		return( D )
-		
-	}
 
 	# Build a tibble of all pairwise comparisons between tips
 	pairwise_summary = 
@@ -887,7 +898,7 @@ We next examined the possibility that ascertainment biases were differentially i
 		filter( species_a == "homo_sapiens" | species_b == "homo_sapiens" ) %>% 
 		filter( ! is.na( D ) ) %>%
 		group_by( Event, label ) %>% 
-		summarise( cor.test(  tau_a, tau_b )$estimate, n=n() ) %>% 
+		summarise( cor.test( tau_a, tau_b )$estimate, n=n() ) %>% 
 		rename( rho=`cor.test(tau_a, tau_b)$estimate` ) %>%
 		rename( clade = label ) %>% 
 		left_join( calibration_times, clade=clade ) %>%
@@ -900,12 +911,11 @@ We next examined the possibility that ascertainment biases were differentially i
 ```
 
 
+In order to better understand why our phylogenetic analysis supports a different conclusion (*i.e.*, no support for the ortholog conjecture) than the published analysis of KMRR [@KryuchkovaMostacci:2016iw] (*i.e.*, strong support for the ortholog conjecture), we first checked to make sure we could reproduce their result based on pairwise analyses. This is important since we are only looking at at a subset of the data they considered, the Brawand *et al.* 2011 [@Brawand:2011du] dataset for gene trees that could be successfully time calibrated. In their Figure 1, they present a higher Tau correlation coefficient between ortholog pairs than paralog ortholog pairs. We find the same here, with correlation coefficients of `r round( ortholog_r, 2)` for orthologs and `r round( paralog_r, 2)` for paralogs. 
 
-In order to better understand why our phylogenetic analysis supports a different conclusion (*i.e.*, no support for the ortholog conjecture) than the published analysis of KMRR [@KryuchkovaMostacci:2016iw] (*i.e.*, strong support for the ortholog conjecture), we first checked to make sure we could reproduce their result based on pairwise analyses. This is important since we are only looking at at a subset of the data they considered, the Brawand *et al.* 2011 [@Brawand:2011du] dataset for gene trees that could be successfully time calibrated. In their Figure 1, they present a higher Tau correlation coefficient between ortholog pairs than paralog ortholog pairs. We find the same here, with correlation coefficients of `r round( ortholog_r, 3)` for orthologs and `r round( paralog_r, 3)` for paralogs. 
+Why is it that pairwise methods and phylogenetic methods lead to opposite conclusions? One reason is that multiple pairwise comparisons repeatedly sample the same evolutionary changes and in so doing violate statistical assumptions of independence, whereas phylogenetic comparative methods make multiple independent comparisons across non-overlapping branches of the tree. The other reason for the different conclusions is that pairwise comparisons between the tips and phylogenetic comparative methods describe different things. Pairwise comparisons describe contemporary patterns, while phylogenetic methods infer historical processes [@OMeara:2012gq]. There need not be a different process of evolution following speciation and duplication for paralogs to be more different than orthologs. This could be due to the structure of the gene phylogenies. If paralogs tend to be more distantly related to each other than orthologs, then there would be more time for differences to accumulate even if the rate of change is the same between the two. This is, in fact, the case for these data. While the mean distance (*i.e.*, total branch length) between orthologs is `r round( ortholog_distance_mean, 1 )` million years, the mean distance between paralogs is `r round( paralog_distance_mean, 1 )` million years. This is because the oldest speciation event is by definition the most recent common ancestor of the species included in the study, but many gene families underwent duplication before this time.
 
-Why is it that pairwise methods and phylogenetic methods lead to opposite conclusions? One reason is that multiple pairwise comparisons repeatedly sample the same evolutionary changes and in so doing violate statistical assumptions of independence, whereas phylogenetic comparative methods make multiple independent comparisons across non-overlapping branches of the tree.  The other reason for the different conclusions is that pairwise comparisons between the tips and phylogenetic comparative methods describe different things. Pairwise comparisons describe contemporary patterns, while phylogenetic methods infer historical processes [@OMeara:2012gq]. There need not be a different process of evolution following speciation and duplication for paralogs to be more different than orthologs. This could be due to the structure of the gene phylogenies. If paralogs tend to be more distantly related to each other than orthologs, then there would be more time for differences to accumulate even if the rate of change is the same between the two. This is, in fact, the case for these data. While the mean distance between orthologs is `r round( ortholog_distance_mean, 1 )` million years, the mean distance between paralogs is `r round( paralog_distance_mean, 1 )` million years. This is because the oldest speciation event is by definition the most recent common ancestor of the species included in the study, but many gene families underwent duplication before this time.
-
-To test the hypothesis that distantly paralogs that arose from duplications that precede the oldest speciation event (Supplementary Figure 8a) impact the lower correlation of Tau between paralogs than between orthologs, we removed them. When we consider only the duplication events the same age or younger than the oldest speciation event (Supplementary Figure 8b), the paralog correlation coefficient increases from `r round( paralog_r, 3)` to  `r round( paralog_subset_r, 3)`. This is much closer to the ortholog correlation of `r round( ortholog_r, 3) `. 
+To test the hypothesis that ancient duplications that precede the oldest speciation event (Supplementary Figure 8a) impact the lower correlation of Tau between paralogs than between orthologs, we removed them. When we consider only the duplication events the same age or younger than the oldest speciation event (Supplementary Figure 8b), the paralog correlation coefficient increases from `r round( paralog_r, 2)` to `r round( paralog_subset_r, 2)`. This is much closer to the ortholog correlation of `r round( ortholog_r, 2) `. 
 
 
 ```{r estimate_tau_model, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
@@ -979,7 +989,7 @@ To test the hypothesis that distantly paralogs that arose from duplications that
 ```
 
 
-```{r simulations_plot, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="Analyses of simulated data reveal that pairwise methods produce similar results under both the null model and the ortholog conjecture (OC), while the phylogenetic method provides different results under each model. (a) Pairwise analysis of dataset simulated under the null model that there is no difference in the rate of expresison evolution following duplication and speciation. (b) Phylogenetic analysis of data simulated under the null model. (c) Pairwise analysis of dataset simulated under the ortholog conjecture, in which there is a higher rate of expresison evolution following duplication than speciation. This plot is very similar to the corresponding plot for the null model. (d) Phylogenetic analysis of data simulated under the ortholog conjecture. This plot is distinct from that for the null model in that phylogenetic independent contrasts for duplication events are significantly larger than after speciation events."}
+```{r simulations_plot, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="Analyses of simulated data reveal that pairwise methods produce similar results under both the null model and the ortholog conjecture (OC), while the phylogenetic method provides different results under each model. (a) Pairwise analysis of dataset simulated under the null model that there is no difference in the rate of expression evolution following duplication and speciation. (b) Phylogenetic analysis of data simulated under the null model. (c) Pairwise analysis of dataset simulated under the ortholog conjecture, in which there is a higher rate of expression evolution following duplication than speciation. This plot is very similar to the corresponding plot for the null model. (d) Phylogenetic analysis of data simulated under the ortholog conjecture. This plot is distinct from that for the null model in that phylogenetic independent contrasts for duplication events are significantly larger than after speciation events."}
 
 	g_phylo_null = 
 		nodes_sim_null_contrast %>% 
@@ -998,7 +1008,7 @@ To test the hypothesis that distantly paralogs that arose from duplications that
 		filter( species_a == "homo_sapiens" | species_b == "homo_sapiens" ) %>% 
 		filter( ! is.na( D ) ) %>%
 		group_by( Event, label ) %>% 
-		summarise( cor.test(  tau_a, tau_b )$estimate, n=n() ) %>% 
+		summarise( cor.test( tau_a, tau_b )$estimate, n=n() ) %>% 
 		rename( rho=`cor.test(tau_a, tau_b)$estimate` ) %>%
 		rename( clade = label ) %>% 
 		left_join( calibration_times, clade=clade ) %>%
@@ -1028,7 +1038,7 @@ To test the hypothesis that distantly paralogs that arose from duplications that
 		filter( species_a == "homo_sapiens" | species_b == "homo_sapiens" ) %>% 
 		filter( ! is.na( D ) ) %>%
 		group_by( Event, label ) %>% 
-		summarise( cor.test(  tau_a, tau_b )$estimate, n=n() ) %>% 
+		summarise( cor.test( tau_a, tau_b )$estimate, n=n() ) %>% 
 		rename( rho=`cor.test(tau_a, tau_b)$estimate` ) %>%
 		rename( clade = label ) %>% 
 		left_join( calibration_times, clade=clade ) %>%
@@ -1068,7 +1078,7 @@ Their Figure 3 differs from their other analyses in that it presents independent
 
 There has been considerable recent interest in, and controversy about, the ortholog conjecture [@Koonin:2005fp; @Studer:2009bm; @Nehrt:2011bm; @Gabaldon:2013fi; @Altenhoff:2012ea]. While some studies have presented support for the ortholog conjecture, our results are consistent with multiple studies that have not [@Studer:2009bm; @Nehrt:2011bm; @Yanai:2004hk].
 
-Our results suggest, at a minimum, that the ortholog conjecture is not a dominant pattern that is central to explaining the evolution of phenotypic diversity in gene families. The ortholog conjecture does not have to be an all or nothing question, though. It may be the case that the rates of phenotypic evolution following duplication may be greater than that following duplication in some organisms, gene families, and evolutionary processes [@Gabaldon:2013fi]. We just don't find evidence for it when summarizing gene expression across tissues with Tau in these organisms. This calls into question the general predictive power of the ortholog conjecture, and until these processes are better understood it will be necessary to test for it in each situation. These tests should be articulated in terms of clear alternative hypotheses [@Studer:2009bm] that make distinct phylogenetic comparative predictions.
+Our results suggest, at a minimum, that the ortholog conjecture is not a dominant pattern that is central to explaining the evolution of phenotypic diversity in gene families. The ortholog conjecture does not have to be an all or nothing question, though. It may be the case that the rates of phenotypic evolution following duplication may be greater than that following duplication in some organisms, gene families, and evolutionary processes [@Gabaldon:2013fi]. We just don't find evidence for it when summarizing gene expression across tissues with Tau in these organisms. This calls into question the general predictive power of the ortholog conjecture with respect to gene expression, and until these processes are better understood it will be necessary to test for it in each situation. These tests should be articulated in terms of clear alternative hypotheses [@Studer:2009bm] that make distinct phylogenetic comparative predictions.
 
 Lack of support for the ortholog conjecture has important biological implications. It indicates that the mechanism of gene divergence (speciation versus duplication) may not have as strong an impact on phenotypic divergence as sometimes proposed. It also has technical implications. Having information on whether two genes are orthologs or paralogs provides little added information about expression beyond knowing how distantly related the two genes are. Rather than focus on whether genes are orthologs or paralogs when attempting to predict function, it may be more effective to simply focus on how closely related or distantly related they are. Closely related paralogs, for example, may tend to have more similar phenotypes than more distantly related orthologs [@Studer:2009bm]. 
 
@@ -1129,7 +1139,7 @@ After parsing the trees from the Compara file with treeio, which was recently sp
 
 The gene trees were then time calibrated. The goal is not necessarily to have precise dates for each node, but to scale branch lengths so that they are equivalent across the trees. This in turn scales the phylogenetic independent contrasts (which take branch length into account) so they can be compared appropriately. We found a problem with the clade names on the ENSEMBL Compara trees, which others have also identified [@Daub:2016gd], that first had to be fixed. Hominini is the name for the clade that includes humans and chimps, while Homininae is the clade that includes humans, chimps, and gorillas. Both clades are labeled as Homininae in the Compara trees, though, which would interfere with calibration of these nodes. To fix the problem, we identified all clades labeled Homininae that have no gorilla sequence and renamed them Hominini. We then calibrated the trees by fixing the speciation nodes to the dates specified in the KMRR code, with the exception of Hominini and Homininae. These we set to 7 million years and 9 million years, drawing on the same TimeTree source [@Hedges:2006jv] that KMRR used. We used the `chronos()` function from the R package ape [@Paradis:2004dv] for this calibration, with the `correlated` model. See Supplementary Information for additional sensitivity analyses to time calibration. Some trees could not be calibrated with these hard node constraints, and were discarded.
 
-For each node in the remaining calibrated trees, we calculated the phylogenetic independent contrast for Tau across its daughter branches with the `pic()` function in ape [@Paradis:2004dv]. We then collected the contrasts from all trees into a single table, along with otherr annotations including whether the node is a speciation or duplication event. This table, `nodes_contrast`, was then analyzed as described in the main text for the presented plots and tests. 
+For each node in the remaining calibrated trees, we calculated the phylogenetic independent contrast for Tau across its daughter branches with the `pic()` function in ape [@Paradis:2004dv]. We then collected the contrasts from all trees into a single table, along with other annotations including whether the node is a speciation or duplication event. This table, `nodes_contrast`, was then analyzed as described in the main text for the presented plots and tests. 
 
 ### Levin et al. reanalysis
 
@@ -1137,7 +1147,7 @@ Levin *et al.* helpfully provided data and clarification on methods. We obtained
 
 ## Acknowledgments
 
-Thanks to Steve Haddock, Alex Damian Serrano, and August Guang for feedback on the manuscript. This work was supported by the National Science Foundation (DEB-1256695 and the Waterman Award).
+Thanks to Steve Haddock, Alex Damian Serrano, August Guang, and Zack Lewis for feedback on the manuscript. This work was supported by the National Science Foundation (DEB-1256695 and the Waterman Award).
 
 \pagebreak
 
@@ -1150,21 +1160,21 @@ Thanks to Steve Haddock, Alex Damian Serrano, and August Guang for feedback on t
 
 ```{r contrast_table, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
 
-clades_table = 
-	nodes_contrast %>% 
-	filter(D=="N") %>% 
-	.$label %>% 
-	table() %>% 
-	as.data.frame()
+	clades_table = 
+		nodes_contrast %>% 
+		filter(D=="N") %>% 
+		.$label %>% 
+		table() %>% 
+		as.data.frame()
 
-names( clades_table ) = c( "Clade", "N" )
+	names( clades_table ) = c( "Clade", "N" )
 
-clades_table %<>%  slice( match( calibration_times$clade, Clade) )
+	clades_table %<>% slice( match( calibration_times$clade, Clade) )
 
-knitr::kable(
-  clades_table,
-  caption = "Number of speciation nodes N with contrasts by clade name."
-)
+	knitr::kable(
+		clades_table,
+		caption = "Number of speciation nodes N with contrasts by clade name."
+	)
 ```
 
 ```{r species_table, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
@@ -1174,7 +1184,7 @@ knitr::kable(
 				gene_trees_pic, 
 				function( nhx ){
 					tags = nhx@data
-					tags$gene = digest( nhx ) # Creates a  hash that is unique to each gene tree
+					tags$gene = digest( nhx ) # Creates a hash that is unique to each gene tree
 					tags %<>% select( -( B ) ) # B has inconsistent types, remove it
 					return( tags )
 				}
@@ -1199,8 +1209,8 @@ knitr::kable(
 		mutate( Species = str_replace( Species, "q", " ") )
 	
 	knitr::kable(
-	  species_table,
-	  caption = "Number of tips for each species in trees that were used to calculate the independent contrasts."
+		species_table,
+		caption = "Number of tips for each species in trees that were used to calculate the independent contrasts."
 	)
 
 
@@ -1346,7 +1356,7 @@ There is a negative relationship between miximum expression and Tau for each gen
 	max_expression = nodes_tips %>% select( contains("Averaged") ) %>% apply( 1, FUN=max, na.rm=TRUE )
 	nodes_tips$max_expression = max_expression
 	
-	ggplot( nodes_tips, aes( x=max_expression, y=Tau  ) ) + 
+	ggplot( nodes_tips, aes( x=max_expression, y=Tau ) ) + 
 		geom_point( size=0.5, alpha = 0.05 ) + 
 		geom_smooth( method="lm", se=FALSE ) +
 		xlab( "Maximum Expression" ) +
