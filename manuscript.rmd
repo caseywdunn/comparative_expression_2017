@@ -412,7 +412,10 @@ output:
 		phy = nhx@phylo
 		tau_original = nhx@data$Tau [ 1:length( phy$tip.label ) ]
 		names( tau_original ) = phy$tip.label
-		nhx@phylo$model = fitContinuous( phy, tau_original, ... )
+		brownian_model = fitContinuous( phy, tau_original, ... )
+		
+		nhx@phylo$model$opt$z0 = brownian_model$opt$z0
+		nhx@phylo$model$opt$sigsq = brownian_model$opt$sigsq
 		
 		return( nhx )
 	}
