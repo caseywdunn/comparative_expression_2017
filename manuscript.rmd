@@ -679,6 +679,8 @@ For each internal node in each gene tree, we calculated the phylogenetic indepen
 		}, mc.cores=cores
 	)
 	
+	n_gene_trees = length( gene_trees )
+	
 	# Parse the tree annotations, these are lines that start with SEQ
 	# These have the species names, which are not in the trees themselves
 	tip_annotations = 
@@ -709,6 +711,9 @@ For each internal node in each gene tree, we calculated the phylogenetic indepen
 		bind_rows() %>%
 		left_join( tip_annotations, by="Ensembl.Gene.ID" )
 
+	# Free up memory
+	rm( tip_annotations )
+
 ```
 
 
@@ -731,6 +736,9 @@ For each internal node in each gene tree, we calculated the phylogenetic indepen
 		mc.cores=cores
 	)
 
+	# Free up memory
+	rm( gene_trees )
+
 	# Remove tips from the trees that do not have expression data
 	gene_trees_pruned = mclapply( 
 		gene_trees_annotated, 
@@ -738,6 +746,9 @@ For each internal node in each gene tree, we calculated the phylogenetic indepen
 		min_genes_with_expression=min_genes_with_expression,
 		mc.cores=cores 
 	)
+	
+	# Free up memory
+	rm( gene_trees_annotated )
 
 	# Remove trees with less than min_genes_with_expression tips with expression data
 	gene_trees_pruned = gene_trees_pruned[ ! is.na( gene_trees_pruned ) ]
@@ -794,7 +805,7 @@ For each internal node in each gene tree, we calculated the phylogenetic indepen
 ```
 
 
-We mapped the Tau values calculated by KMRR [@KryuchkovaMostacci:2016iw] for the Brawand *et al.* 2011 [@Brawand:2011du] datset onto `r length(gene_trees)` gene trees parsed from ENSMBL Compara [@Herrero:2016jj]. These are the same pre-computed trees that the orthology/ paralogy annotations KMRR used are based on. `r length(gene_trees_pruned)` gene trees passed taxon sampling criteria (`r min_genes_with_expression` genes) after removing tips without Tau values and had at least one speciation event. Of these, `r length(gene_trees_calibrated)` were successfully time calibrated. These calibrated trees were used to calculate phylogenetic independent contrasts for `r nodes_contrast %>% filter(D=="Y") %>% nrow()` duplication nodes and `r nodes_contrast %>% filter(D=="N") %>% nrow()` speciation nodes. One of these trees is shown in Supplementary Figure 7 to demonstrate the analysis.
+We mapped the Tau values calculated by KMRR [@KryuchkovaMostacci:2016iw] for the Brawand *et al.* 2011 [@Brawand:2011du] datset onto `r n_gene_trees` gene trees parsed from ENSMBL Compara [@Herrero:2016jj]. These are the same pre-computed trees that the orthology/ paralogy annotations KMRR used are based on. `r length(gene_trees_pruned)` gene trees passed taxon sampling criteria (`r min_genes_with_expression` genes) after removing tips without Tau values and had at least one speciation event. Of these, `r length(gene_trees_calibrated)` were successfully time calibrated. These calibrated trees were used to calculate phylogenetic independent contrasts for `r nodes_contrast %>% filter(D=="Y") %>% nrow()` duplication nodes and `r nodes_contrast %>% filter(D=="N") %>% nrow()` speciation nodes. One of these trees is shown in Supplementary Figure 7 to demonstrate the analysis.
 
 It is essential to have a null hypothesis that makes a distinct prediction from the prediction of the hypothesis under consideration. A suitable null hypothesis in this case is that there is no difference in the evolution of expression following speciation or duplication events [@Studer:2009bm]. Under this hypothesis, we would predict that contrasts across speciation nodes and duplication nodes are drawn from the same distribution (Figure 2a). Under the alternative hypothesis specified by the ortholog conjecture, that there is a higher rate of change following duplication events than speciation events, we would expect to see the distribution of duplication contrasts shifted to higher values relative to the speciation contrasts (Figure 2b).
 
@@ -1097,7 +1108,7 @@ This is also an example of the limitations of the concepts of orthology and para
 
 #### Original pairwise analyses of developmental gene expression
 
-![Distributions of pairwise similarity scores for each phase of development. Pairwise scores for the ctenophore are red. Wilcoxon test p-values for the significance of the differences between early-mid distributions and late-mid distributions are on the right. Model of variance, which is inversely related to similarity, is on the left. (a) The distributions as published. Low similarity (*i.e.*, high variance) in the mid phase of development was interpreted as support for an inverse hourglass model for the evolution of gene expression. The five least-similar mid phase scores were all from the ctenophore. Published KS p-values, based on duplicated data, are in parentheses. The inset ctenophore image is by S. Haddock from phylopic.org. (b) The distributions after the exclusion of the ctenophore. The early and mid phase distributions are not statistically distinct.](levin_etal/Figure_levin.pdf)
+![Distributions of pairwise similarity scores for each phase of development. Pairwise scores for the ctenophore are red. Wilcoxon test p-values for the significance of the differences between early-mid distributions and late-mid distributions are on the right. Model of variance, which is inversely related to similarity, is on the left. (a) The distributions as published by Levin *et al.* [@Levin:2016bp]. Low similarity (*i.e.*, high variance) in the mid phase of development was interpreted as support for an inverse hourglass model for the evolution of gene expression. The five least-similar mid phase scores were all from the ctenophore. Published KS p-values, based on duplicated data, are in parentheses. The inset ctenophore image is by S. Haddock from phylopic.org. (b) The distributions after the exclusion of the ctenophore. The early and mid phase distributions are not statistically distinct.](levin_etal/Figure_levin.pdf)
 
 
 Levin *et al.* [@Levin:2016bp] analyzed gene expression through the course of embryonic development for ten animal species, each from a different clade that has been designated as having the rank of phylum. They arrived at two major conclusions. First, animal development is characterized by a well-defined mid-developmental transition that marks the transition from an early phase of gene expression to a late stage of gene expression. Second, this transition helps explain the evolution of features observed among distantly related animals. Specifically, they concluded that animals from different phyla exhibit an "inverse hourglass" model for the evolution of gene expression, where there is more evolutionary variance in gene expression at a mid phase of development than there is at early and late phases. Closely related animals have previously been described as having an hourglass model of gene expression, where evolutionary variance in expression is greater early and late in development than at the midpoint of development [@Kalinka:2010dw; @DomazetLoso:2010cn]. Levin *et al.* conclude that this contrast between distantly and closely related animals provides biological justification for the concept of phyla and may provide a definition of phyla. 
