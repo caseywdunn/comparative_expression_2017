@@ -339,18 +339,6 @@ We did not find increased evolutionary change in expression following duplicatio
 
 	# Examine by node age
 
-	g_age =
-		nodes_contrast %>%
-		ggplot( aes( x=node_age, y=pic, col=Event ) ) + 
-			geom_point( alpha=0.2 ) + 
-			xlab( "Node age (millions of years)" ) + 
-			ylab( "Phylogenetic independent \ncontrast" ) +
-			ylim( 0, 0.3 ) +
-			xlim( 0, 1000 ) +
-			ggtitle( "(a)" ) +
-			theme_classic()	+
-			theme( legend.justification=c( 1, 1 ), legend.position=c( 1, 1 ) )
-
 	max_speciation_age = 
 		nodes_contrast %>% 
 		filter( D=="N" ) %>%
@@ -795,9 +783,20 @@ The independent contrast across a node is the amount of change observed between 
 
 ```{r ascertainment_plot, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE, dev="png", dpi=600, fig.cap="Investigation of possible ascertainment biases. (a) Magnitude of independent contrasts plotted against node age. Speciation nodes are calibrated to particular times, whereas duplication nodes have a wider range. (b) Density plot of contrasts for only the nodes that have an age less than or equal to the maximum age of speciation nodes. (c) Magnitude of independent contrasts plotted against expected variance, which is largely determined by branch lengths. Contrasts for speciation nodes have a narrower range of expected variance than do contrasts for duplication nodes. (d) Density plot of contrasts for only the nodes that have expected variance within the range of contrasts across speciation nodes."}
 
-	# Plot results of the ascertainment bias analyses
+	g_age =
+		nodes_contrast %>%
+		ggplot( aes( x=node_age, y=pic, col=Event ) ) + 
+			geom_point( alpha=0.2, size = 0.5 ) + 
+			xlab( "Node age (millions of years)" ) + 
+			ylab( "Phylogenetic independent \ncontrast" ) +
+			ylim( 0, 0.3 ) +
+			xlim( 0, 1000 ) +
+			ggtitle( "(a)" ) +
+			theme_classic()	+
+			guides( colour = guide_legend( override.aes = list( alpha = 1, size = 2 ) ) ) +
+			theme( legend.justification=c( 1, 1 ), legend.position=c( 1, 1 ) )
 
-	label_age = str_c( "Wilcoxon p=", wilcox_filtered_age )
+	label_age = str_c( "Wilcoxon p=", signif( wilcox_filtered_age, 2 ) )
 	
 	g_density_filtered_age =
 		nodes_contrast_filtered_age %>%
@@ -816,7 +815,7 @@ The independent contrast across a node is the amount of change observed between 
 	g_var_exp =
 		nodes_contrast %>%
 		ggplot( aes( x=var_exp, y=pic, col=Event ) ) + 
-		geom_point( alpha=0.2 ) + 
+		geom_point( alpha=0.2, size = 0.5 ) + 
 		xlab( "Expected variance, \n depends mostly on branch length" ) + 
 		ylab( "Phylogenetic independent \ncontrast" ) +
 		ylim( 0, 0.3 ) +
@@ -825,7 +824,7 @@ The independent contrast across a node is the amount of change observed between 
 		theme_classic()	+
 		theme(legend.position="none")
 
-	label_var = str_c( "Wilcoxon p=", wilcox_filtered_var )
+	label_var = str_c( "Wilcoxon p=", signif ( wilcox_filtered_var, 2 ) )
 	
 	g_density_filtered_var =
 		nodes_contrast_filtered_var %>% 
