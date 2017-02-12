@@ -740,7 +740,7 @@ Thanks to Steve Haddock, Alex Damian Serrano, August Guang, Bruno Vellutini, and
 	
 	knitr::kable(
 		species_table,
-		caption = "Number of tips for each species in trees that were used to calculate the independent contrasts."
+		caption = "Number of tips N for each species in trees that were used to calculate the independent contrasts."
 	)
 
 
@@ -761,7 +761,7 @@ Thanks to Steve Haddock, Alex Damian Serrano, August Guang, Bruno Vellutini, and
 				nhx %>% 
 					ggtree() + 
 					geom_tiplab( aes( label=species ), hjust=-0.1 ) + 
-					xlim( NA, 1400 ) + 
+					xlim( 0, 400 ) + 
 					geom_tippoint( aes( size=Tau ) ) +
 					geom_nodepoint( aes( color=Event ), shape=15, size = 2 ) +
 					geom_tippoint( aes( size=Tau ) ) +
