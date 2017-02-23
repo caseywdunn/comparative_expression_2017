@@ -315,21 +315,23 @@ For each internal node in each gene tree, we calculated the phylogenetic indepen
 	label_p = str_c( "Wilcoxon p=", signif( wilcox_test_result, 2 ) )
 
 	# Plot the contrasts for duplication events and speciation events
-	nodes_contrast %>%
-		ggplot( aes( x=pic, y=..density.., col=Event ) ) + 
-		geom_freqpoly( binwidth=.001, position="identity" ) +
-		xlab( "Phylogenetic independent contrasts" ) +
-		ylab( "Density" ) +
-		xlim( 0, 0.075 ) + 
-		theme_classic() + 
-		annotate( "text", x = Inf, y = 50, hjust="right", vjust="top", label=label_p ) +
-		theme( legend.justification=c( 1, 1 ), legend.position=c( 1, 1 ) )
-		
+	g_pic_empirical = 
+		nodes_contrast %>%
+			ggplot( aes( x=pic, y=..density.., col=Event ) ) + 
+			geom_freqpoly( binwidth=.001, position="identity" ) +
+			xlab( "Phylogenetic independent contrasts" ) +
+			ylab( "Density" ) +
+			xlim( 0, 0.075 ) + 
+			theme_classic() + 
+			annotate( "text", x = Inf, y = 50, hjust="right", vjust="top", label=label_p ) +
+			theme( legend.justification=c( 1, 1 ), legend.position=c( 1, 1 ) )
+	
+	print( g_pic_empirical )
 
 ```
 
 
-We mapped the Tau values calculated by KMRR [@KryuchkovaMostacci:2016iw] for the Brawand *et al.* 2011 [@Brawand:2011du] datset onto `r n_gene_trees` gene trees parsed from ENSMBL Compara [@Herrero:2016jj]. These are the same pre-computed trees that the orthology/ paralogy annotations KMRR used are based on. `r length(gene_trees_pruned)` gene trees passed taxon sampling criteria (`r min_genes_with_expression` genes) after removing tips without Tau values and had at least one speciation event. Of these, `r length(gene_trees_calibrated)` were successfully time calibrated. These calibrated trees were used to calculate phylogenetic independent contrasts for `r nodes_contrast %>% filter(D=="Y") %>% nrow()` duplication nodes and `r nodes_contrast %>% filter(D=="N") %>% nrow()` speciation nodes. One of these trees is shown in Supplementary Figure 7 to demonstrate the analysis.
+We mapped the Tau values calculated by KMRR [@KryuchkovaMostacci:2016iw] for the Brawand *et al.* 2011 [@Brawand:2011du] datset onto `r n_gene_trees` gene trees parsed from ENSEMBL Compara [@Herrero:2016jj]. These are the same pre-computed trees that the orthology/ paralogy annotations KMRR used are based on. `r length(gene_trees_pruned)` gene trees passed taxon sampling criteria (`r min_genes_with_expression` genes) after removing tips without Tau values and had at least one speciation event. Of these, `r length(gene_trees_calibrated)` were successfully time calibrated. These calibrated trees were used to calculate phylogenetic independent contrasts for `r nodes_contrast %>% filter(D=="Y") %>% nrow()` duplication nodes and `r nodes_contrast %>% filter(D=="N") %>% nrow()` speciation nodes. One of these trees is shown in Supplementary Figure 7 to demonstrate the analysis.
 
 It is essential to have a null hypothesis that makes a distinct prediction from the prediction of the hypothesis under consideration. A suitable null hypothesis in this case is that there is no difference in the evolution of expression following speciation or duplication events [@Studer:2009bm]. Under this hypothesis, we would predict that contrasts across speciation nodes and duplication nodes are drawn from the same distribution (Figure 2a). Under the alternative hypothesis specified by the ortholog conjecture, that there is a higher rate of change following duplication events than speciation events, we would expect to see the distribution of duplication contrasts shifted to higher values relative to the speciation contrasts (Figure 2b).
 
@@ -419,24 +421,27 @@ We next examined the possibility that ascertainment biases were differentially i
 		.[["distance"]] %>% 
 		mean()
 	
-	pairwise_summary %>% 
-		filter( species_a == "homo_sapiens" | species_b == "homo_sapiens" ) %>% 
-		filter( ! is.na( D ) ) %>%
-		group_by( Event, label ) %>% 
-		summarise( cor.test( tau_a, tau_b )$estimate, n=n() ) %>% 
-		rename( rho=`cor.test(tau_a, tau_b)$estimate` ) %>%
-		rename( clade = label ) %>% 
-		left_join( calibration_times, clade=clade ) %>%
-		ggplot() + 
-			geom_point( aes( x=age, y=rho, col=Event ), size=3 ) +
-			theme_classic() +
-			xlab( "Node Age (million years)" ) +
-			ylab( "Correlation Coefficient" )
+	g_pairwise_empirical = 
+		pairwise_summary %>% 
+			filter( species_a == "homo_sapiens" | species_b == "homo_sapiens" ) %>% 
+			filter( ! is.na( D ) ) %>%
+			group_by( Event, label ) %>% 
+			summarise( cor.test( tau_a, tau_b )$estimate, n=n() ) %>% 
+			rename( rho=`cor.test(tau_a, tau_b)$estimate` ) %>%
+			rename( clade = label ) %>% 
+			left_join( calibration_times, clade=clade ) %>%
+			ggplot() + 
+				geom_point( aes( x=age, y=rho, col=Event ), size=3 ) +
+				theme_classic() +
+				xlab( "Node Age (million years)" ) +
+				ylab( "Correlation Coefficient" )
+	
+	print( g_pairwise_empirical )
 	
 ```
 
 
-In order to better understand why our phylogenetic analysis supports a different conclusion (*i.e.*, no support for the ortholog conjecture) than the published analysis of KMRR [@KryuchkovaMostacci:2016iw] (*i.e.*, strong support for the ortholog conjecture), we first checked to make sure we could reproduce their result based on pairwise analyses. This is important since we are only looking at at a subset of the data they considered, the Brawand *et al.* 2011 [@Brawand:2011du] dataset for gene trees that could be successfully time calibrated. In their Figure 1, they present a higher Tau correlation coefficient between ortholog pairs than paralog ortholog pairs. We find the same here, with correlation coefficients of `r signif( ortholog_r, 2)` for orthologs and `r signif( paralog_r, 2)` for paralogs. 
+In order to better understand why our phylogenetic analysis supports a different conclusion (*i.e.*, no support for the ortholog conjecture) than the published analysis of KMRR [@KryuchkovaMostacci:2016iw] (*i.e.*, strong support for the ortholog conjecture), we first checked to make sure we could reproduce their result based on pairwise analyses. This is important since we are only looking at a subset of the data they considered, the Brawand *et al.* 2011 [@Brawand:2011du] dataset for gene trees that could be successfully time calibrated. In their Figure 1, they present a higher Tau correlation coefficient between ortholog pairs than paralog ortholog pairs. We find the same here, with correlation coefficients of `r signif( ortholog_r, 2)` for orthologs and `r signif( paralog_r, 2)` for paralogs. 
 
 Why is it that pairwise methods and phylogenetic methods lead to opposite conclusions? One reason is that multiple pairwise comparisons repeatedly sample the same evolutionary changes and in so doing violate statistical assumptions of independence, whereas phylogenetic comparative methods make multiple independent comparisons across non-overlapping branches of the tree. The other reason for the different conclusions is that pairwise comparisons and phylogenetic comparative methods describe different things. Pairwise comparisons describe contemporary patterns, while phylogenetic methods infer historical processes [@OMeara:2012gq]. There need not be a different process of evolution following speciation and duplication for paralogs to be more different than orthologs. Any difference could be due to the structure of the gene phylogenies alone. If paralogs tend to be more distantly related to each other than orthologs, then there would be more time for differences to accumulate even if the rate of change is the same between the two. This is, in fact, the case for these data. While the mean distance (*i.e.*, total branch length) between orthologs is `r round( ortholog_distance_mean, 1 )` million years, the mean distance between paralogs is `r round( paralog_distance_mean, 1 )` million years. This is because the oldest speciation event is by definition the most recent common ancestor of the species included in the study, but many gene families underwent duplication before this time.
 

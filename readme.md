@@ -36,3 +36,7 @@ repository and run:
 
     library( testthat )
     test_dir( "tests/testthat/" )
+
+## Distribution
+
+You can access this repository with the shortened url https://git.io/vDj9j
