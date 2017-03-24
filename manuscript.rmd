@@ -16,15 +16,17 @@ output:
 ```
 
 ```{r preliminaries, echo=FALSE, message=F, warning=F}
-	library( treeio )
+	library( treeio ) # https://bioconductor.org/packages/devel/bioc/html/treeio.html
+	library( ggtree ) # https://bioconductor.org/packages/release/bioc/html/ggtree.html
+	library( hutan ) # https://github.com/caseywdunn/hutan
+
+	# The rest can be installed from CRAN
 	library( tidyverse )
 	library( magrittr )
 	library( stringr )
 	library( parallel )
-	library( ggtree )
 	library( ape )
 	library( digest )
-	library( hutan ) # From https://github.com/caseywdunn/hutan
 	library( gridExtra )
 	library( geiger )
 	library( phytools )

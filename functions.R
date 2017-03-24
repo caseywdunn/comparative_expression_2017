@@ -514,3 +514,58 @@ get_pairwise_summary = function ( nhx ) {
 	return( D )
 	
 }
+
+#' Create a ggplot summary of independent contrast values
+#' 
+#' @param contrasts The contrasts to be displayed 
+#' @param mode The type of plot to produce 
+#' 	
+#' @return A ggplot object
+#' @export
+make_contrast_plot = function( nodes_contrast, mode="diff" ){
+	
+	wilcox_test_result = wilcox_oc( nodes_contrast )
+	label_p = str_c( "Wilcoxon p=", signif( wilcox_test_result, 2 ) )
+	
+	if( mode == "freqpoly" ){
+		ggcontrasts = nodes_contrast %>%
+			ggplot( aes( x=pic, y=..density.., col=Event ) ) + 
+				geom_freqpoly( binwidth=.001, position="identity" ) +
+				xlab( "Tau Phylogenetic Contrast" ) +
+				ylab( "Density" ) +
+				xlim( 0, 0.05 ) + 
+				ylim( 0, 75 ) +
+				theme_classic() + 
+				annotate( "text", x = Inf, y = 20, hjust="right", vjust="top", label=label_p ) +
+				theme( legend.position="none" )
+	} else if( mode == "boxplot" ) {
+		ggcontrasts = nodes_contrast %>%
+			filter( pic < 0.05 ) %>%
+			ggplot( aes(factor(Event), pic ) ) +
+			geom_boxplot( notch = TRUE ) +
+			coord_flip()
+	} else if( mode == "diff" ){
+		binwidth = 0.001
+		
+		ggcontrasts = 
+			nodes_contrast %>% 
+			group_by(Event) %>% 
+			# calculate densities for each group over same range; store in list column
+			summarise(d = list(density(pic, from = 0, to = 0.05))) %>% 
+			# make a new data.frame from two density objects
+			do(data.frame(x = .$d[[1]]$x,    # grab one set of x values (which are the same)
+										y = .$d[[1]]$y - .$d[[2]]$y)) %>%    # and subtract the y values
+			ggplot(aes(x, y)) +    # now plot
+				geom_line() +
+				xlab( "Tau Phylogenetic Contrast" ) +
+				ylab( "Density Difference" ) +
+				xlim( 0, 0.05 ) + 
+				ylim( -30, 30 ) +
+				geom_hline( yintercept = 0 ) +
+				theme_classic()
+		
+	}
+	
+	ggcontrasts
+	
+}
