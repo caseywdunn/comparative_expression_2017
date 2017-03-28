@@ -547,22 +547,31 @@ make_contrast_plot = function( nodes_contrast, mode="diff" ){
 	} else if( mode == "diff" ){
 		binwidth = 0.001
 		
-		ggcontrasts = 
+		D = 
 			nodes_contrast %>% 
 			group_by(Event) %>% 
 			# calculate densities for each group over same range; store in list column
 			summarise(d = list(density(pic, from = 0, to = 0.05))) %>% 
 			# make a new data.frame from two density objects
 			do(data.frame(x = .$d[[1]]$x,    # grab one set of x values (which are the same)
-										y = .$d[[1]]$y - .$d[[2]]$y)) %>%    # and subtract the y values
+										y = .$d[[1]]$y - .$d[[2]]$y))    # and subtract the y values
+		
+		D$Event[ D$y >= 0 ] = "Speciation"
+		D$Event[ D$y <= 0 ] = "Duplication"
+		D$Event = factor( D$Event, levels=c( "Speciation", "Duplication" ) )
+			
+		ggcontrasts = D %>%
 			ggplot(aes(x, y)) +    # now plot
 				geom_line() +
 				xlab( "Tau Phylogenetic Contrast" ) +
 				ylab( "Density Difference" ) +
 				xlim( 0, 0.05 ) + 
 				ylim( -30, 30 ) +
+				geom_area( aes( fill=Event ) ) +
 				geom_hline( yintercept = 0 ) +
-				theme_classic()
+				annotate( "text", x = Inf, y = -20, hjust="right", vjust="top", label=label_p ) +
+				theme_classic() +
+				theme(legend.position="none")
 		
 	}
 	

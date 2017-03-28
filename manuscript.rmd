@@ -16,9 +16,12 @@ output:
 ```
 
 ```{r preliminaries, echo=FALSE, message=F, warning=F}
-	library( treeio ) # https://bioconductor.org/packages/devel/bioc/html/treeio.html
-	library( ggtree ) # https://bioconductor.org/packages/release/bioc/html/ggtree.html
-	library( hutan ) # https://github.com/caseywdunn/hutan
+
+	# The following should be installed from github with the specified 
+	# devtools command. You will need to install devtools first.
+	library( treeio ) # devtools::install_github("GuangchuangYu/treeio")
+	library( ggtree ) # devtools::install_github("GuangchuangYu/ggtree")
+	library( hutan ) # devtools::install_github("caseywdunn/hutan")
 
 	# The rest can be installed from CRAN
 	library( tidyverse )
@@ -134,52 +137,6 @@ The second comparative functional genomics study we evaluate here is Levin *et a
 ## Results and Discussion
 
 ### KMRR Reanalysis
-
-
-```{r expectation_plots, echo=FALSE, cache=TRUE, message=F, warning=F, fig.height=2, fig.cap="(a) Under the null hypothesis that there is no difference in the rate of evolution after duplication or speciation events, the distribution of phylogenetic independent contrasts would be drawn from the same distribution across both types of nodes. (b) Under the ortholog conjecture, contrasts across duplication nodes would tend to be larger than contrasts across speciation nodes."}
-	
-	g_expectation_null =
-		sim_expectation() %>%
-		ggplot( aes( x=pic, y=..density.., col=Event ) ) + 
-			geom_freqpoly( binwidth=0.2, position="identity" ) +
-			xlab( "Phylogenetic independent contrasts" ) +
-			ylab( "Density" ) +
-			xlim( 0, 6 ) + 
-			theme_classic() +
-			theme( 
-				axis.text.x=element_blank(), 
-				axis.ticks.x=element_blank(), 
-				axis.text.y=element_blank(), 
-				axis.ticks.y=element_blank(),
-				legend.justification=c( 1, 1 ), 
-				legend.position=c( 1, 1 )
-			) +
-			ggtitle( "(a) Null expectation" )
-	
-	g_expectation_oc =
-		sim_expectation( scale=2 ) %>%
-		ggplot( aes( x=pic, y=..density.., col=Event ) ) + 
-			geom_freqpoly( binwidth=0.2, position="identity" ) +
-			xlab( "Phylogenetic independent contrasts" ) +
-			ylab( "Density" ) +
-			xlim( 0, 6 ) + 
-			theme_classic() +
-			theme( 
-				axis.text.x=element_blank(), 
-				axis.ticks.x=element_blank(), 
-				axis.text.y=element_blank(), 
-				axis.ticks.y=element_blank(),
-				legend.position="none"
-			) +
-			ggtitle( "(b) Ortholog Conjecture \nexpectation" )
-	
-	grid.arrange(
-			g_expectation_null,
-			g_expectation_oc,
-			ncol = 2
-		)
-
-```
 
 #### Original pairwise test of the ortholog conjecture
 
@@ -313,11 +270,11 @@ For each internal node in each gene tree, we calculated the phylogenetic indepen
 
 
 
-We mapped the Tau values calculated by KMRR [@KryuchkovaMostacci:2016iw] for the Brawand *et al.* 2011 [@Brawand:2011du] datset onto `r n_gene_trees` gene trees parsed from ENSEMBL Compara [@Herrero:2016jj]. These are the same pre-computed trees that the orthology/ paralogy annotations KMRR used are based on. `r length(gene_trees_pruned)` gene trees passed taxon sampling criteria (`r min_genes_with_expression` genes) after removing tips without Tau values and had at least one speciation event. Of these, `r length(gene_trees_calibrated)` were successfully time calibrated. These calibrated trees were used to calculate phylogenetic independent contrasts for `r nodes_contrast %>% filter(D=="Y") %>% nrow()` duplication nodes and `r nodes_contrast %>% filter(D=="N") %>% nrow()` speciation nodes. One of these trees is shown in Supplementary Figure 5 to demonstrate the analysis.
+We mapped the Tau values calculated by KMRR [@KryuchkovaMostacci:2016iw] for the Brawand *et al.* 2011 [@Brawand:2011du] datset onto `r n_gene_trees` gene trees parsed from ENSEMBL Compara [@Herrero:2016jj]. These are the same pre-computed trees that the orthology/ paralogy annotations KMRR used are based on. `r length(gene_trees_pruned)` gene trees passed taxon sampling criteria (`r min_genes_with_expression` genes) after removing tips without Tau values and had at least one speciation event. Of these, `r length(gene_trees_calibrated)` were successfully time calibrated. These calibrated trees were used to calculate phylogenetic independent contrasts for `r nodes_contrast %>% filter(D=="Y") %>% nrow()` duplication nodes and `r nodes_contrast %>% filter(D=="N") %>% nrow()` speciation nodes. One of these trees is shown in Supplementary Figure 4 to demonstrate the analysis.
 
-It is essential to have a null hypothesis that makes a distinct prediction from the prediction of the hypothesis under consideration. A suitable null hypothesis in this case is that there is no difference in the evolution of expression following speciation or duplication events [@Studer:2009bm]. Under this hypothesis, we would predict that contrasts across speciation nodes and duplication nodes are drawn from the same distribution (Figure 2a). Under the alternative hypothesis specified by the ortholog conjecture, that there is a higher rate of change following duplication events than speciation events, we would expect to see the distribution of duplication contrasts shifted to higher values relative to the speciation contrasts (Figure 2b).
+It is essential to have a null hypothesis that makes a distinct prediction from the prediction of the hypothesis under consideration. A suitable null hypothesis in this case is that there is no difference in the evolution of expression following speciation or duplication events [@Studer:2009bm]. Under this hypothesis, we would predict that contrasts across speciation nodes and duplication nodes are drawn from the same distribution. Under the alternative hypothesis specified by the ortholog conjecture, that there is a higher rate of change following duplication events than speciation events, we would expect to see the distribution of duplication contrasts shifted to higher values relative to the speciation contrasts.
 
-We did not find increased evolutionary change in expression following duplication events (Figure 3b). The Wilcoxon rank test does not reject the null hypothesis that the rate of evolution following duplications is the same as or less than the rate following speciation (p value = `r wilcox_test_result`). Our phylogenetic comparative analysis, unlike the previously published pairwise comparative analysis [@KryuchkovaMostacci:2016iw], therefore finds no evidence for the ortholog conjecture in this system.
+We did not find increased evolutionary change in expression following duplication events (Figure 2b). The Wilcoxon rank test does not reject the null hypothesis that the rate of evolution following duplications is the same as or less than the rate following speciation (p value = `r wilcox_test_result`). Our phylogenetic comparative analysis, unlike the previously published pairwise comparative analysis [@KryuchkovaMostacci:2016iw], therefore finds no evidence for the ortholog conjecture in this system.
 
 ```{r ascertainment, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
 
@@ -357,7 +314,7 @@ We did not find increased evolutionary change in expression following duplicatio
 	
 ```
 
-We next examined the possibility that ascertainment biases were differentially impacting the inference of expression evolution following duplication and speciation events. Such a bias might obscure support for the ortholog conjecture. We focused on two possible sources of bias, node depth and branch length. We found no evidence that either affected our results (Supplementary Information, Supplementary Figure 6). We also examined the sensitivity of the results to the calibration times applied to speciation events on the gene trees. This is important because it is expected that genes from separate species have a common ancestor older than the time at which the species diverged from each other [@Takahata:1989uh; @Degnan:2009hr]. There is also uncertainty associated with the timing of these speciation events. We added random noise to the calibration times in replicate analyses, and all still failed to reject the null hypothesis (Supplementary Information).
+We next examined the possibility that ascertainment biases were differentially impacting the inference of expression evolution following duplication and speciation events. Such a bias might obscure support for the ortholog conjecture. We focused on two possible sources of bias, node depth and branch length. We found no evidence that either affected our results (Supplementary Information, Supplementary Figure 4). We also examined the sensitivity of the results to the calibration times applied to speciation events on the gene trees. This is important because it is expected that genes from separate species have a common ancestor older than the time at which the species diverged from each other [@Takahata:1989uh; @Degnan:2009hr]. There is also uncertainty associated with the timing of these speciation events. We added random noise to the calibration times in replicate analyses, and all still failed to reject the null hypothesis (Supplementary Information).
 
 #### Understanding the incongruence between pairwise and phylogenetic methods
 
@@ -412,7 +369,7 @@ In order to better understand why our phylogenetic analysis supports a different
 
 Why is it that pairwise methods and phylogenetic methods lead to opposite conclusions? One reason is that multiple pairwise comparisons repeatedly sample the same evolutionary changes and in so doing violate statistical assumptions of independence, whereas phylogenetic comparative methods make multiple independent comparisons across non-overlapping branches of the tree. The other reason for the different conclusions is that pairwise comparisons and phylogenetic comparative methods describe different things. Pairwise comparisons describe contemporary patterns, while phylogenetic methods infer historical processes [@OMeara:2012gq]. There need not be a different process of evolution following speciation and duplication for paralogs to be more different than orthologs. Any difference could be due to the structure of the gene phylogenies alone. If paralogs tend to be more distantly related to each other than orthologs, then there would be more time for differences to accumulate even if the rate of change is the same between the two. This is, in fact, the case for these data. While the mean distance (*i.e.*, total branch length) between orthologs is `r round( ortholog_distance_mean, 1 )` million years, the mean distance between paralogs is `r round( paralog_distance_mean, 1 )` million years. This is because the oldest speciation event is by definition the most recent common ancestor of the species included in the study, but many gene families underwent duplication before this time.
 
-To test the hypothesis that ancient duplications that precede the oldest speciation event (Supplementary Figure 6a) impact the lower correlation of Tau between paralogs than between orthologs, we removed them. When we consider only the duplication events the same age or younger than the oldest speciation event (Supplementary Figure 6b), the paralog correlation coefficient increases from `r signif( paralog_r, 2)` to `r signif( paralog_subset_r, 2)`. This is much closer to the ortholog correlation of `r signif( ortholog_r, 2) `. 
+To test the hypothesis that ancient duplications that precede the oldest speciation event (Supplementary Figure 5a) impact the lower correlation of Tau between paralogs than between orthologs, we removed them. When we consider only the duplication events the same age or younger than the oldest speciation event (Supplementary Figure 5b), the paralog correlation coefficient increases from `r signif( paralog_r, 2)` to `r signif( paralog_subset_r, 2)`. This is much closer to the ortholog correlation of `r signif( ortholog_r, 2) `. 
 
 
 ```{r estimate_tau_model, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
@@ -486,7 +443,7 @@ To test the hypothesis that ancient duplications that precede the oldest speciat
 ```
 
 
-```{r pairwise_and_phylo_plots, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE, fig.width=6.5, fig.height=6.5, fig.cap="Pairwise (left column - a, c, e) and phylogenetic (right column - b, d, f) phylogenetic analyses of the original data (first row - a, b), data simulated under the null hypothesis (second row - c, d), and data simulated under the ortholog conjecture (third row- e, f). In the simulation under the null hypothesis, the rate of evolution following duplication and speciation is the same. In the simulation under the ortholog conjecture, the rate of evolution following duplication is greater than following speciation. In the pairwise plots, each circle indicates the correlation coefficient of Tau for a set of pairwise comparisons annotated with a specific node name and event type, *i.e.*, whether the divergence at that nodes was due to speciation (giving rise to orthologs) or duplication (giving rise to paralogs). The top left pane (a) reproduces the pattern presented in Figure 2a of KMRR [@KryuchkovaMostacci:2016iw], which they took as evidence of the ortholog conjecture. The recovery of this same pairwise pattern under both simulations (c, e) indicates that it does not make distinct predictions that can test hyptheses about the evolution of expression. The phylogenetic analysis of the original data does not reject the null (b), providing no support for the ortholog conjecture. The bottom right panes validate the phylogenetic approach by showing that it does not reject the null when data are simulated under the null (d), but does reject the null when data are simulated under the ortholog conjecture (f)."}
+```{r pairwise_and_phylo_plots, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE, fig.width=6.5, fig.height=6.5, fig.cap="Pairwise (left column - a, c, e) and phylogenetic (right column - b, d, f) analyses of the original data (first row - a, b), data simulated under the null hypothesis (second row - c, d), and data simulated under the ortholog conjecture (third row- e, f). In the pairwise plots, each circle indicates the correlation coefficient of Tau for a set of pairwise comparisons annotated with a specific node name (e.g, Primates) and event type (speciation or duplication, giving rise respectively to orthologs and paralogs). The phylogenetic plots show the difference between the density distributions for Tau phylogenetic contrasts for speciation and duplication events, where a value above 0 indicates an excess of speciation contrasts in the indicated interval. A horizontal line at 0 would indicate that the density distributions are identical. The top left pane (a) reproduces the pattern presented in Figure 2a of KMRR [@KryuchkovaMostacci:2016iw], which they took as evidence of the ortholog conjecture. The recovery of this same pairwise pattern under both simulations (c, e) indicates that it does not make distinct predictions that can test hyptheses about the evolution of expression. The phylogenetic analysis of the original data (b) does not show an excess of larger contrasts for duplication events and does not reject the null hypothesis, providing no support for the ortholog conjecture. The bottom right panes validate the phylogenetic approach by showing that it does not reject the null when data are simulated under the null (d), but does reject the null when data are simulated under the ortholog conjecture (f)."}
 
 	g_pair_empirical = 
 		pairwise_summary %>% 
@@ -503,21 +460,11 @@ To test the hypothesis that ancient duplications that precede the oldest speciat
 				ylab( "Correlation Coefficient" ) +
 				ylim( 0, 1 ) +
 				ggtitle( "(a) Empirical, pairwise" ) +
-				theme(legend.position="none")
-
-	label_p = str_c( "Wilcoxon p=", signif( wilcox_test_result, 2 ) )
-	g_phylo_empirical = 
-		nodes_contrast %>%
-			ggplot( aes( x=pic, y=..density.., col=Event ) ) + 
-			geom_freqpoly( binwidth=.001, position="identity" ) +
-			xlab( "Phylogenetic Independent Contrast" ) +
-			ylab( "Density" ) +
-			xlim( 0, 0.05 ) + 
-			ylim( 0, 75 ) +
-			theme_classic() + 
-			ggtitle( "(b) Empirical, phylogenetic" ) +
-			annotate( "text", x = Inf, y = 20, hjust="right", vjust="top", label=label_p ) +
-			theme( legend.justification=c( 1, 1 ), legend.position=c( 1, 1 ) )
+				guides( colour = guide_legend( override.aes = list( shape = 15 ) ) ) +
+				theme( 
+				legend.justification=c( 1, 1 ), 
+				legend.position=c( 1, 1 ), 
+				legend.title=element_blank() )
 
 	g_pair_null = 
 		pairwise_sim_null_summary %>% 
@@ -535,22 +482,7 @@ To test the hypothesis that ancient duplications that precede the oldest speciat
 			ylab( "Correlation Coefficient" ) +
 			ylim( 0, 1 ) +
 			ggtitle( "(c) Null simulation, pairwise" ) +
-			theme( legend.position="none", axis.title.x=element_blank(), axis.title.y=element_blank() )
-	
-	
-	label_p_sim_null = str_c( "Wilcoxon p=", signif( wilcox_oc( nodes_sim_null_contrast ), 2 ) )
-	g_phylo_null = 
-		nodes_sim_null_contrast %>% 
-		ggplot( aes( x=pic, y=..density.., col=Event ) ) + 
-			geom_freqpoly( binwidth=.001, position="identity" ) +
-			xlab( "Phylogenetic Independent Contrast" ) +
-			ylab( "Density" ) +
-			xlim( 0, 0.05 ) + 
-			ylim( 0, 75 ) +
-			annotate( "text", x = Inf, y = 20, hjust="right", vjust="top", label=label_p_sim_null ) +
-			theme_classic() + 
-			ggtitle( "(d) Null simulation, phylogenetic" ) +
-			theme( legend.position="none", axis.title.x=element_blank(), axis.title.y=element_blank() )
+			theme( legend.position="none" )
 	
 	g_pair_oc = 
 		pairwise_sim_oc_summary %>% 
@@ -568,29 +500,27 @@ To test the hypothesis that ancient duplications that precede the oldest speciat
 			ylab( "Correlation Coefficient" ) +
 			ylim( 0, 1 ) +
 			ggtitle( "(e) OC simulation, pairwise" ) +
-			theme( legend.position="none", axis.title.x=element_blank(), axis.title.y=element_blank() )
-	
-	label_p_sim_oc = str_c( "Wilcoxon p=", signif( wilcox_oc( nodes_sim_oc_contrast ), 2 ) )
-	g_phylo_oc = 
-	nodes_sim_oc_contrast %>% 
-	ggplot( aes( x=pic, y=..density.., col=Event ) ) + 
-		geom_freqpoly( binwidth=.001, position="identity" ) +
-		xlab( "Phylogenetic Independent Contrast" ) +
-		ylab( "Density" ) +
-		xlim( 0, 0.05 ) + 
-		ylim( 0, 75 ) +
-		annotate( "text", x = Inf, y = 30, hjust="right", vjust="top", label=label_p_sim_oc ) +
-		theme_classic() + 
-		ggtitle( "(f) OC simulation, phylogenetic" ) +
-		theme( legend.position="none", axis.title.x=element_blank(), axis.title.y=element_blank() )
+			theme( legend.position="none" )
 
 	grid.arrange(
 		g_pair_empirical,
-		g_phylo_empirical,
-		g_pair_null,
-		g_phylo_null,
-		g_pair_oc,
-		g_phylo_oc,
+		make_contrast_plot(nodes_contrast),
+		# For the rest, put spaces in labels so you can't see them but alignment is 
+		# same as those with labels
+		g_pair_null + 
+			xlab( "  " ) + 
+			ylab( "  " ), 
+		make_contrast_plot(nodes_sim_null_contrast) + 
+			xlab( "  " ) + 
+			ylab( "  " ) + 
+			ggtitle( "(d) Null simulation, phylogenetic" ),
+		g_pair_oc + 
+			xlab( "  " ) + 
+			ylab( "  " ),
+		make_contrast_plot(nodes_sim_oc_contrast) + 
+			xlab( "  " ) + 
+			ylab( "  " ) + 
+			ggtitle( "(f) OC simulation, phylogenetic" ),
 		ncol = 2
 	)
 
@@ -598,15 +528,15 @@ To test the hypothesis that ancient duplications that precede the oldest speciat
 ```
 
 
-The KMRR study did investigate the impact of node age on correlation, but in a different way. In their Figure 2, they grouped orthologs and paralogs according to the ENSEMBL node name of their most recent common ancestor, and plotted the correlation of Tau for each of these groups by the node age. They found that across the investigated range of node ages, ortholog pairs have higher Tau correlation than paralogs. We confirmed that we can replicate this result (Figure 3a). There are several difficulties with interpreting this plot, though. First, it does not just reflect the evolutionary processes that generated the data, it is also impacted by the phylogenies along which these processes acted. The expected covariance of traits that evolve under neutral processes is in fact defined by the phylogeny [@Grafen:1989um]. Second, the correlation for each group is based on multiple non-independent pairwise comparisons. 
+The KMRR study did investigate the impact of node age on correlation, but in a different way. In their Figure 2, they grouped orthologs and paralogs according to the ENSEMBL node name of their most recent common ancestor, and plotted the correlation of Tau for each of these groups by the node age. They found that across the investigated range of node ages, ortholog pairs have higher Tau correlation than paralogs. We confirmed that we can replicate this result (Figure 2a). There are several difficulties with interpreting this plot, though. First, it does not just reflect the evolutionary processes that generated the data, it is also impacted by the phylogenies along which these processes acted. The expected covariance of traits that evolve under neutral processes is in fact defined by the phylogeny [@Grafen:1989um]. Second, the correlation for each group is based on multiple non-independent pairwise comparisons. 
 
-To better understand this plot (Figure 3b), we performed a couple simulations of Tau on the calibrated gene trees and then regenerated the figures. We did not modify the gene tree topologies or their inferred histories of duplication and loss. First, we simulated the evolution of Tau under the null model that it evolves at the same rate following duplication and speciation events. Under the null model (Figure 3b), the plot of correlation coefficient to node age is very similar as for the observed data (Figure 3a). As in the original study, there is higher correlation coefficient across orthologs (`r signif( ortholog_r_sim_null, 2 )`) than paralogs (`r signif( paralog_r_sim_null, 2 )`) when not considering node age. Phylogenetic analysis of the data simulated under the null hypothesis (Figure 3d) do not reject the null hypothesis (Wilcoxon p = $`r wilcox_oc( nodes_sim_null_contrast )`$), as expected.
+To better understand this plot (Figure 2a), we performed a couple simulations of Tau on the calibrated gene trees and then regenerated the figures. We did not modify the gene tree topologies or their inferred histories of duplication and loss. First, we simulated the evolution of Tau under the null model that it evolves at the same rate following duplication and speciation events. Under the null model, the plot of correlation coefficient to node age is very similar as for the observed data (Figure 2c). As in the original study, there is higher correlation coefficient across orthologs (`r signif( ortholog_r_sim_null, 2 )`) than paralogs (`r signif( paralog_r_sim_null, 2 )`) when not considering node age. Phylogenetic analysis of the data simulated under the null hypothesis (Figure 2d) do not reject the null hypothesis (Wilcoxon p = $`r wilcox_oc( nodes_sim_null_contrast )`$), as expected.
 
-We next simulated the evolution of Tau under the ortholog conjecture, where the rate of evolution of Tau following duplication was `r dup_adjust` fold the rate following speciation. The pairwise results of this heterogeneous model (Figure 3e) are nearly indistinguishable from the results under the null model (Figure 3c), and also have a higher correlation coefficient for orthologs (`r signif( ortholog_r_sim_oc, 2 )`) than paralogs (`r signif( paralog_r_sim_oc, 2 )`). The phylogenetic analysis of the ortholog conjecture simulation (Figure 3f) does reject the null hypothesis (Wilcoxon p = $`r signif( wilcox_oc( nodes_sim_oc_contrast ), 2 )`$).
+We next simulated the evolution of Tau under the ortholog conjecture, where the rate of evolution of Tau following duplication was `r dup_adjust` fold the rate following speciation. The pairwise results of this heterogeneous model (Figure 2e) are nearly indistinguishable from the results under the null model (Figure 2c), and also have a higher correlation coefficient for orthologs (`r signif( ortholog_r_sim_oc, 2 )`) than paralogs (`r signif( paralog_r_sim_oc, 2 )`). The phylogenetic analysis of the ortholog conjecture simulation (Figure 2f) does reject the null hypothesis (Wilcoxon p = $`r signif( wilcox_oc( nodes_sim_oc_contrast ), 2 )`$).
 
 These simulations have several implications. The pairwise comparisons used by KMRR cannot distinguish between the null hypothesis and ortholog conjecture even when the evolution of expression is `r dup_adjust` fold higher following duplication than speciation. The pairwise results are strikingly similar under both hypotheses. These simulations also serve as a validation of phylogenetic methods as applied to this problem. Our phylogenetic analysis of independent contrasts does not reject the null hypothesis when data are simulated under the null model, and does reject the null hypothesis when the data are simulated under the ortholog conjecture. In contrast to pairwise methods, the phylogenetic analyses make testable predictions based on explicit hypotheses about evolutionary process.
 
-Their Figure 3 differs from their other analyses in that it presents independent changes in expression between triplets of genes. Each triplet has two paralogs that arose from a duplication event and one unduplicated homolog. They find that there is a tendency for the paralog with the lowest expression to have the highest Tau. From this they conclude that following duplication there is a common trajectory of evolutionary change, where one paralog evolves to have lower expression and also become more tissue specific. There is, however, a negative relationship between Tau and maximum expression across all genes (Supplementary Figure 7). A simpler explanation for this plot is that it reflects the global tendency for Tau to decrease with maximum expression. The null expectation for any two genes sampled at random is for one to have higher maximum expression and lower Tau, and the other to have lower maximum expression and higher Tau. This global pattern could be due to both biological factors and the technical details of how Tau is calculated.
+Their Figure 3 differs from their other analyses in that it presents independent changes in expression between triplets of genes. Each triplet has two paralogs that arose from a duplication event and one unduplicated homolog. They find that there is a tendency for the paralog with the lowest expression to have the highest Tau. From this they conclude that following duplication there is a common trajectory of evolutionary change, where one paralog evolves to have lower expression and also become more tissue specific. There is, however, a negative relationship between Tau and maximum expression across all genes (Supplementary Figure 6). A simpler explanation for this plot is that it reflects the global tendency for Tau to decrease with maximum expression. The null expectation for any two genes sampled at random is for one to have higher maximum expression and lower Tau, and the other to have lower maximum expression and higher Tau. This global pattern could be due to both biological factors and the technical details of how Tau is calculated.
 
 #### Implications for the ortholog conjecture
 
@@ -635,7 +565,7 @@ Levin *et al.* [@Levin:2016bp] arrived at this conclusion by making multiple pai
 
 We examined the matrix of pairwise comparisons used as the base for the KS tests and Figure 4d in *Levin et al.* [@Levin:2016bp], and thus as evidence to support the "inverse hourglass" model. We found several problems resulting from the use of multiple pairwise comparisons. The first problems are specific to this particular implementation of pairwise comparisons. We found that every data point was included twice because both reciprocal pairwise comparisons (which have the same values) were retained. For example, there is both a nematode to arthropod comparison and an arthropod to nematode comparison. As a consequence, there are 90 entries for the 45 pairwise comparisons, and by doubling the data the significance of the result appears stronger than it actually is. After removing the duplicate values, the p values are far less significant, 0.002 for the early-mid comparison and on the order of $10^{-6}$ for early-late. In addition, the test they used (KS test) is not appropriate for the hypothesis they seek to evaluate. The KS test does not just evaluate whether one distribution is greater than the other, it also tests whether the shape of the distributions are the same. In addition, the samples in this dataset are matched (*i.e.*, for each pairwise comparison there is a early, mid, and late expression value), which the KS test does not take into account. The Wilcoxon test is instead appropriate in this case. When applied to the de-duplicated data, the significance of this test is 0.02 for the early-mid comparison and on the order of $10^{-7}$ for early-late.
 
-Once we addressed the issues above with the implementation of pairwise comparisons, we were able to explore more general issues that can be a problem when making multiple pairwise comparisons between species. We found that all five of the lowest values in the mid phase distribution (Figure 4a) are for pairwise comparisons that include the ctenophore (comb jelly). When the nine pairwise comparisons that include the ctenophore are removed, there is no significant difference between the early phase and mid phase distributions (p = 0.14 for the early-mid comparison and p < $10^{-5}$ for the late-mid comparison) and no support for the inverse hourglass (Figure 4b). This highlights a well understood property of pairwise comparisons across species [@Felsenstein:1985ua; @Ackerly:1999iu]: evolutionary changes along a given branch, like those along the ctenophore branch, impact each of the multiple pairwise comparisons that includes that branch. The pairwise comparisons are therefore not independent - different pairwise comparisons are impacted by changes along some of the same branches (Figure 1a). This can give the impression of a general pattern across the tree that is instead specific to changes along one part of the tree. The number of comparisons impacted by each change depends on the structure of the phylogenetic tree, *i.e.* how the species are related to each other. Phylogenetic comparative methods were developed specifically to address this problem [@Felsenstein:1985ua]. 
+Once we addressed the issues above with the implementation of pairwise comparisons, we were able to explore more general issues that can be a problem when making multiple pairwise comparisons between species. We found that all five of the lowest values in the mid phase distribution (Figure 3a) are for pairwise comparisons that include the ctenophore (comb jelly). When the nine pairwise comparisons that include the ctenophore are removed, there is no significant difference between the early phase and mid phase distributions (p = 0.14 for the early-mid comparison and p < $10^{-5}$ for the late-mid comparison) and no support for the inverse hourglass (Figure 3b). This highlights a well understood property of pairwise comparisons across species [@Felsenstein:1985ua; @Ackerly:1999iu]: evolutionary changes along a given branch, like those along the ctenophore branch, impact each of the multiple pairwise comparisons that includes that branch. The pairwise comparisons are therefore not independent - different pairwise comparisons are impacted by changes along some of the same branches (Figure 1a). This can give the impression of a general pattern across the tree that is instead specific to changes along one part of the tree. The number of comparisons impacted by each change depends on the structure of the phylogenetic tree, *i.e.* how the species are related to each other. Phylogenetic comparative methods were developed specifically to address this problem [@Felsenstein:1985ua]. 
 
 While we demonstrate problems with pairwise comparisons that impacts the Levin *et al.* analysis, we did not perform a phylogenetic reanalysis of this study, as we did for the KMRR study. This is because the similarity metric computed in the pairwise comparisons of Levin *et al.* is not suitable for phylogenetic analysis. One issue with the similarity metric is that it is based on different genes for different species pairs, and therefore is not a trait whose evolution can be modeled across the phylogeny. A full phylogenetic reanalysis would be possible using upstream analysis products to re-derive new expression summary statistics. 
 
@@ -681,7 +611,7 @@ Levin *et al.* helpfully provided data and clarification on methods. We obtained
 
 ## Acknowledgments
 
-Thanks to Steve Haddock, Alex Damian Serrano, August Guang, Bruno Vellutini, and Zack Lewis for feedback on the manuscript. CWD's contribution was supported by the National Science Foundation (DEB-1256695 and the Waterman Award). AH was supported by the European Research Council Community’s Framework Program Horizon 2020 (2014–2020) ERC grant agreement 648861.
+Thanks to Steve Haddock, Alex Damian Serrano, August Guang, Bruno Vellutini, and Zack Lewis for feedback on the manuscript. Marc Robinson-Rechavi provided very helpful information about the KMRR analyses and valuable suggestions for our manuscript. CWD's contribution was supported by the National Science Foundation (DEB-1256695 and the Waterman Award). AH was supported by the European Research Council Community’s Framework Program Horizon 2020 (2014–2020) ERC grant agreement 648861.
 \pagebreak
 
 ## Supplementary Information
@@ -780,11 +710,11 @@ Thanks to Steve Haddock, Alex Damian Serrano, August Guang, Bruno Vellutini, and
 
 #### Investigation of potential ascertainment bias
 
-While the age of speciation nodes is constrained, duplication nodes can be much older and therefore have a wider range of ages (Supplementary Figure 6a). This is because many gene duplication events are older than the most recent common ancestor of the species in the study. There are also technical factors that can lead to an excess of duplication events deeper in the tree. Gene tree estimation errors errors, for example, tend to lead to the overestimation of deep duplications [@Hahn:2007cj]. If independent contrast values also tended to to be lower at greater node depth, it could interact with the preponderance of duplications at greater depth to create a pattern of lower contrasts associated with duplication events. To test for such an effect, we remove duplication nodes that are older than the oldest speciation node. Our results are unchanged and this reduced dataset does not reject the null hypothesis that the rate of evolution following duplications is the same as or less than the rate following speciation (Supplementary Figure 6b).
+While the age of speciation nodes is constrained, duplication nodes can be much older and therefore have a wider range of ages (Supplementary Figure 5a). This is because many gene duplication events are older than the most recent common ancestor of the species in the study. There are also technical factors that can lead to an excess of duplication events deeper in the tree. Gene tree estimation errors errors, for example, tend to lead to the overestimation of deep duplications [@Hahn:2007cj]. If independent contrast values also tended to to be lower at greater node depth, it could interact with the preponderance of duplications at greater depth to create a pattern of lower contrasts associated with duplication events. To test for such an effect, we remove duplication nodes that are older than the oldest speciation node. Our results are unchanged and this reduced dataset does not reject the null hypothesis that the rate of evolution following duplications is the same as or less than the rate following speciation (Supplementary Figure 5b).
 
-The independent contrast across a node is the amount of change observed between the daughter notes, scaled by the expected variance [@Felsenstein:1985ua]. The expected variance is principally determined by the lengths of the branches leading from the node to these daughters. The shorter the total length of the two branches leading to daughter nodes, the larger the contrast for a given observed difference. This is because the same difference across a shorter total branch length indicates a greater rate of evolutionary change. The expected variance of contrasts for speciation nodes is constrained by the branch lengths on the species tree, but the expected variance of contrasts for duplications has a much wider range (Figure 6c). This could lead to biases if the lengths of branches that descend from duplication nodes tend to be overestimated. We therefore examined only the contrasts that fell within in the range of expected variance seen for speciation contrasts, excluding duplication contrasts that fall outside of this range. This reanalysis does not reject the null hypothesis either (Figure 6d), indicating that branch length bias is not responsible for the result.
+The independent contrast across a node is the amount of change observed between the daughter notes, scaled by the expected variance [@Felsenstein:1985ua]. The expected variance is principally determined by the lengths of the branches leading from the node to these daughters. The shorter the total length of the two branches leading to daughter nodes, the larger the contrast for a given observed difference. This is because the same difference across a shorter total branch length indicates a greater rate of evolutionary change. The expected variance of contrasts for speciation nodes is constrained by the branch lengths on the species tree, but the expected variance of contrasts for duplications has a much wider range (Figure 5c). This could lead to biases if the lengths of branches that descend from duplication nodes tend to be overestimated. We therefore examined only the contrasts that fell within in the range of expected variance seen for speciation contrasts, excluding duplication contrasts that fall outside of this range. This reanalysis does not reject the null hypothesis either (Figure 5d), indicating that branch length bias is not responsible for the result.
 
-```{r ascertainment_plot, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE, dev="png", dpi=600, fig.cap="Investigation of possible ascertainment biases. (a) Magnitude of independent contrasts plotted against node age. Speciation nodes are calibrated to particular times, whereas duplication nodes have a wider range. (b) Density plot of contrasts for only the nodes that have an age less than or equal to the maximum age of speciation nodes. (c) Magnitude of independent contrasts plotted against expected variance, which is largely determined by branch lengths. Contrasts for speciation nodes have a narrower range of expected variance than do contrasts for duplication nodes. (d) Density plot of contrasts for only the nodes that have expected variance within the range of contrasts across speciation nodes."}
+```{r ascertainment_plot, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE, dev="png", dpi=600, fig.cap="Investigation of possible ascertainment biases. (a) Magnitude of independent contrasts plotted against node age. Speciation nodes are calibrated to particular times, whereas duplication nodes have a wider range. (b) Difference between density distributions of contrasts for only the nodes that have an age less than or equal to the maximum age of speciation nodes. (c) Magnitude of independent contrasts plotted against expected variance, which is largely determined by branch lengths. Contrasts for speciation nodes have a narrower range of expected variance than do contrasts for duplication nodes. (d) Difference between density distributions of contrasts for only the nodes that have expected variance within the range of contrasts across speciation nodes."}
 
 	g_age =
 		nodes_contrast %>%
@@ -844,9 +774,9 @@ The independent contrast across a node is the amount of change observed between 
 
 	grid.arrange(
 		g_age,
-		g_density_filtered_age,
+		make_contrast_plot( nodes_contrast_filtered_age ),
 		g_var_exp,
-		g_density_filtered_var,
+		make_contrast_plot( nodes_contrast_filtered_var ),
 		ncol = 2
 	)
 ```
@@ -908,7 +838,7 @@ We examined the sensitivity of our results to the specification of calibration d
 	
 ```
 
-There is a negative relationship between miximum expression and Tau for each gene (Supplementary Figure 7, $r^2=`r signif( tau_v_max_lm$r.squared, 3 )`$, $slope=`r signif( tau_v_max_lm$coefficients[2,1], 3 )`$, $p=`r signif( tau_v_max_lm$coefficients[2,4], 3 )`$).
+There is a negative relationship between miximum expression and Tau for each gene (Supplementary Figure 6, $r^2=`r signif( tau_v_max_lm$r.squared, 3 )`$, $slope=`r signif( tau_v_max_lm$coefficients[2,1], 3 )`$, $p=`r signif( tau_v_max_lm$coefficients[2,4], 3 )`$).
 
 
 \pagebreak
