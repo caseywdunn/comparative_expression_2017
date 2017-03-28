@@ -87,7 +87,7 @@ output:
 	
 	
 	# In simulation, the fold change in rate following duplication relative to speciation
-	dup_adjust = 5
+	dup_adjust = 2
 	
 ```
 
