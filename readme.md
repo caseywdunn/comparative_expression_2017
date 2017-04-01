@@ -23,6 +23,8 @@ The files in this repository include:
 
 ## Rerunning our analyses
 
+Run `install_dependencies.R` in R to install all dependencies needed to execute the manuscript.
+
 Run `manuscript.rmd`, the source code for our manuscript, with the R package `knitr`. You can do this in RStudio by clicking the "knit" button. This will regenerate the manuscript, with all results and plots.
 
 The `manuscript.rmd` file has all our code for running the KMRR reanalysis. The Levin analysis code, along with additional exploratory analyses not included in the manuscript, is in [reanalyses.rmd](./levin_etal/reanalyses.rmd). The results of these reanalyses can be viewed at [reanalyses.md](./levin_etal/reanalyses.md).
