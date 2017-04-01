@@ -35,7 +35,7 @@ output:
 	library( phytools )
 
 	# Set system computational parameters
-	cores = detectCores() - 1
+	cores = detectCores()
 	if ( cores < 1 ) {
 		cores = 1
 	}
