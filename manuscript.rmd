@@ -41,10 +41,11 @@ output:
 	}
 	set.seed( 23456 )
 	
-	# Name of the compara gene trees file. This is from 
+	# Name of the compara gene trees file. This was downloaded from 
 	# ftp://ftp.ensembl.org/pub/release-75/emf/ensembl-compara/homologies/
-	# but not included here due to its size. Put it in the kmrr/ directory
-	gene_tree_name = "Compara.75.protein.nhx.emf"
+	# and compressed with gz
+
+	gene_tree_name = "Compara.75.protein.nhx.emf.gz"
 	
 	# Files produced by KMRR Rscript.R with Tau values and other expression statistics
 	expression_file_names = c(
