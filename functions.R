@@ -180,6 +180,12 @@ drop_empty_tips = function( nhx, min_genes_with_expression ) {
 	remaining = length( nhx@phylo$tip.label ) - length( to_drop )
 	if( remaining >= min_genes_with_expression ){
 		pruned = treeio::drop.tip( nhx, to_drop )
+		
+		node_depth = ape::node.depth( pruned@phylo )
+		
+		# Add node depth
+		pruned@data$node_depth = node_depth
+		
 		return( pruned )
 	}
 	else{
@@ -393,10 +399,11 @@ add_model_parameters = function( nhx, ... ) {
 #' as a treeio::treedata object
 #' @param dup_adjust A multiplier for adjusting the branch lengths 
 #' following duplication to effectively change the rate following duplication
+#' @param a ancestral state for Tau. If not specified, use estimated value 
 #' @return A phylogenetic trees and simulated Tau values as a 
 #' treeio::treedata object
 #' @export
-sim_tau = function( nhx, dup_adjust=1 ) {
+sim_tau = function( nhx, dup_adjust=1, a=NA ) {
 	
 	phy = nhx@phylo
 	
@@ -411,12 +418,17 @@ sim_tau = function( nhx, dup_adjust=1 ) {
 	dup_edges = phy$edge[,1] %in% dup_nodes
 	phy$edge.length[ dup_edges ] = phy$edge.length[ dup_edges ] * dup_adjust
 	
+	
+	if( is.na( a ) ){
+		a = brownian_model$opt$z0
+	}
+	
 	# Simulate trait given the tree and parameter estimates
 	x = fastBM( 
 		phy, 
-		a=brownian_model$opt$z0, 
-		sig2=brownian_model$opt$sigsq, 
-		bounds=c(-Inf,Inf) 
+		a = a, 
+		sig2 = brownian_model$opt$sigsq, 
+		bounds = c(-Inf,Inf) 
 	) %>% abs()
 	
 	# Adjust the results so they fall between 0 and 1
@@ -502,7 +514,7 @@ get_pairwise_summary = function ( nhx ) {
 	# Merge data of this mrca to the node
 	D %<>% left_join(
 		nhx@data %>%
-			select( D, Event, node, node_age, label, pic ),
+			select( D, Event, node, node_depth, node_age, label, pic ),
 		by = c( "mrca" = "node")
 		
 	)
