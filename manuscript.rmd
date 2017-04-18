@@ -33,6 +33,7 @@ output:
 	library( gridExtra )
 	library( geiger )
 	library( phytools )
+	library( ggrepel )
 
 	# Set system computational parameters
 	cores = detectCores()
@@ -446,7 +447,7 @@ To test the hypothesis that ancient duplications that precede the oldest speciat
 ```
 
 
-```{r pairwise_and_phylo_plots, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE, fig.width=6.5, fig.height=6.5, fig.cap="Pairwise (left column - a, c, e) and phylogenetic (right column - b, d, f) analyses of the original data (first row - a, b), data simulated under the null hypothesis (second row - c, d), and data simulated under the ortholog conjecture (third row- e, f). In the pairwise plots, each circle indicates the correlation coefficient of Tau for a set of pairwise comparisons annotated with a specific node name (e.g, Primates) and event type (speciation or duplication, giving rise respectively to orthologs and paralogs). The phylogenetic plots show the difference between the density distributions for Tau phylogenetic contrasts for speciation and duplication events, where a value above 0 indicates an excess of speciation contrasts in the indicated interval. A horizontal line at 0 would indicate that the density distributions are identical. The top left pane (a) reproduces the pattern presented in Figure 2a of KMRR [@KryuchkovaMostacci:2016iw], which they took as evidence of the ortholog conjecture. The recovery of this same pairwise pattern under both simulations (c, e) indicates that it does not make distinct predictions that can test hyptheses about the evolution of expression. The phylogenetic analysis of the original data (b) does not show an excess of larger contrasts for duplication events and does not reject the null hypothesis, providing no support for the ortholog conjecture. The bottom right panes validate the phylogenetic approach by showing that it does not reject the null when data are simulated under the null (d), but does reject the null when data are simulated under the ortholog conjecture (f)."}
+```{r pairwise_and_phylo_plots, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE, fig.width=6.5, fig.height=6.5, fig.cap="Pairwise (left column - a, c, e) and phylogenetic (right column - b, d, f) analyses of the original data (first row - a, b), data simulated under the null hypothesis (second row - c, d), and data simulated under the ortholog conjecture (third row- e, f). In the pairwise plots, each point indicates the correlation coefficient of Tau for a set of pairwise comparisons annotated with a specific node name (e.g, Primates) and event type (speciation or duplication, giving rise respectively to orthologs and paralogs). The phylogenetic plots show the difference between the density distributions for Tau phylogenetic contrasts for speciation and duplication events, where a value above 0 indicates an excess of speciation contrasts in the indicated interval. A horizontal line at 0 would indicate that the density distributions are identical. The top left pane (a) reproduces the pattern presented in Figure 2a of KMRR [@KryuchkovaMostacci:2016iw] of higher correlation across speciation events than duplication events, which they took as evidence of the ortholog conjecture. The recovery of a similar  pattern under both simulations (c, e) indicates that it this pairwise approach does not make distinct testable predictions. The phylogenetic analysis of the original data (b) does not show an excess of larger contrasts for duplication events and does not reject the null hypothesis, providing no support for the ortholog conjecture. The bottom right panes validate the phylogenetic approach by showing that it does not reject the null when data are simulated under the null (d), but does reject the null when data are simulated under the ortholog conjecture (f)."}
 
 	g_pair_empirical = 
 		pairwise_summary %>% 
@@ -459,7 +460,7 @@ To test the hypothesis that ancient duplications that precede the oldest speciat
 			ggplot() + 
 				geom_point( aes( x=age, y=rho, col=Event ), size=3 ) +
 				theme_classic() +
-				xlab( "Node Age (million years)" ) +
+				xlab( "Clade Age (million years)" ) +
 				ylab( "Correlation Coefficient" ) +
 				ylim( 0, 1 ) +
 				ggtitle( "(a) Empirical, pairwise" ) +
@@ -471,7 +472,6 @@ To test the hypothesis that ancient duplications that precede the oldest speciat
 
 	g_pair_null = 
 		pairwise_sim_null_summary %>% 
-		filter( species_a == "homo_sapiens" | species_b == "homo_sapiens" ) %>% 
 		filter( ! is.na( D ) ) %>%
 		group_by( Event, label ) %>% 
 		summarise( cor.test( tau_a, tau_b )$estimate, n=n() ) %>% 
@@ -481,7 +481,7 @@ To test the hypothesis that ancient duplications that precede the oldest speciat
 		ggplot() + 
 			geom_point( aes( x=age, y=rho, col=Event ), size=3 ) +
 			theme_classic() +
-			xlab( "Node Age (million years)" ) +
+			xlab( "Clade Age (million years)" ) +
 			ylab( "Correlation Coefficient" ) +
 			ylim( 0, 1 ) +
 			ggtitle( "(c) Null simulation, pairwise" ) +
@@ -489,7 +489,6 @@ To test the hypothesis that ancient duplications that precede the oldest speciat
 	
 	g_pair_oc = 
 		pairwise_sim_oc_summary %>% 
-		filter( species_a == "homo_sapiens" | species_b == "homo_sapiens" ) %>% 
 		filter( ! is.na( D ) ) %>%
 		group_by( Event, label ) %>% 
 		summarise( cor.test( tau_a, tau_b )$estimate, n=n() ) %>% 
@@ -499,7 +498,7 @@ To test the hypothesis that ancient duplications that precede the oldest speciat
 		ggplot() + 
 			geom_point( aes( x=age, y=rho, col=Event ), size=3 ) +
 			theme_classic() +
-			xlab( "Node Age (million years)" ) +
+			xlab( "Clade Age (million years)" ) +
 			ylab( "Correlation Coefficient" ) +
 			ylim( 0, 1 ) +
 			ggtitle( "(e) OC simulation, pairwise" ) +
@@ -507,7 +506,8 @@ To test the hypothesis that ancient duplications that precede the oldest speciat
 
 	grid.arrange(
 		g_pair_empirical,
-		make_contrast_plot(nodes_contrast),
+		make_contrast_plot(nodes_contrast) + 
+			ggtitle( "(b) Empirical, phylogenetic" ),
 		# For the rest, put spaces in labels so you can't see them but alignment is 
 		# same as those with labels
 		g_pair_null + 
@@ -539,7 +539,66 @@ We next simulated the evolution of Tau under the ortholog conjecture, where the 
 
 These simulations have several implications. The pairwise comparisons used by KMRR cannot distinguish between the null hypothesis and ortholog conjecture even when the evolution of expression is `r dup_adjust` fold higher following duplication than speciation. The pairwise results are strikingly similar under both hypotheses. These simulations also serve as a validation of phylogenetic methods as applied to this problem. Our phylogenetic analysis of independent contrasts does not reject the null hypothesis when data are simulated under the null model, and does reject the null hypothesis when the data are simulated under the ortholog conjecture. In contrast to pairwise methods, the phylogenetic analyses make testable predictions based on explicit hypotheses about evolutionary process.
 
-Their Figure 3 differs from their other analyses in that it presents independent changes in expression between triplets of genes. Each triplet has two paralogs that arose from a duplication event and one unduplicated homolog. They find that there is a tendency for the paralog with the lowest expression to have the highest Tau. From this they conclude that following duplication there is a common trajectory of evolutionary change, where one paralog evolves to have lower expression and also become more tissue specific. There is, however, a negative relationship between Tau and maximum expression across all genes (Supplementary Figure 6). A simpler explanation for this plot is that it reflects the global tendency for Tau to decrease with maximum expression. The null expectation for any two genes sampled at random is for one to have higher maximum expression and lower Tau, and the other to have lower maximum expression and higher Tau. This global pattern could be due to both biological factors and the technical details of how Tau is calculated.
+```{r cor_structure, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+
+	# The threshold of allowed fractional devience of node age from clade age
+	age_window = 0.1
+
+	g_clade_age = pairwise_sim_null_summary %>% 
+		rename( clade = label ) %>% 
+		#filter( clade %in% speciation_clades ) %>%
+		left_join( calibration_times, clade=clade ) %>% 
+		filter( ! is.na( D ) ) %>%
+		ggplot( aes( x = age, y = node_age, col = Event ) ) +
+			geom_point( alpha = 0.1 ) +
+			xlab( "Clade Age (million years)" ) +
+			ylab( "Node Age (million years)" ) +
+			xlim( 0, 1000) +
+			ylim( 0, 1500 ) +
+			ggtitle( "A" ) +
+			theme_classic() +
+			theme( legend.position="none" )
+	
+	pairwise_sim_null_summary_sub = 
+		pairwise_sim_null_summary %>% 
+		filter( ! is.na( D ) ) %>% rename( clade = label ) %>% 
+		left_join( calibration_times, clade=clade ) %>% 
+		filter( node_age > ( ( 1 - age_window ) * age ) ) %>%
+		filter( node_age < ( ( 1 + age_window ) * age ) ) 
+	
+	g_sub = 
+		pairwise_sim_null_summary_sub %>%
+		group_by( Event, clade ) %>% 
+		summarise( cor.test( tau_a, tau_b )$estimate, n=n() ) %>% 
+		rename( rho=`cor.test(tau_a, tau_b)$estimate` ) %>%
+		left_join( calibration_times, clade=clade ) %>%
+		ggplot() + 
+			geom_point( aes( x=age, y=rho, col=Event ), size=3 ) +
+			theme_classic() +
+			xlab( "Clade Age (million years)" ) +
+			ylab( "Correlation Coefficient" ) +
+			xlim( 0, 1000) +
+			ylim( 0, 1 ) +
+			guides( colour = guide_legend( override.aes = list( shape = 15 ) ) ) +
+			theme( 
+				legend.justification=c( 1, 1 ), 
+				legend.position=c( 1, 1 ), 
+				legend.title=element_blank() ) +
+			ggtitle( "B" )
+	
+	n_dup_original = 
+		pairwise_sim_null_summary %>%
+		filter( Event=="Duplication" ) %>%
+		nrow()
+	
+	n_dup_remaining = 
+		pairwise_sim_null_summary_sub %>%
+		filter( Event=="Duplication" ) %>%
+		nrow()
+	
+```
+
+Since greater rates of expression evolution following duplication do not explain the lower correlation of Tau values in the pairwise comparison plots (Figure 2 A, C, E), this pattern must reflect some other property that is shared across these analyses. We found that the lower correlatations for duplication comparisons can in largely be explained by the greater variance in the age of duplication nodes. Each point in the pairwise correlation plot (Figure 2 A, C, E) summarizes multiple pairwise comparisons across nodes of a given event type (speciation or duplication, as indicated by color) and clade in the species tree (Theria, Mammalia, Amniota, etc..., as indicated by the age of the clade along the x axis). These clade names in turn are derived from the node annotations in the ENSEMBL Compara trees, which apply clade names to both speciation and duplication nodes. While speciation nodes in the gene trees have a clear correspondence to clades in the species trees, duplucation nodes do not since duplication can occur at any point along any branch in the species tree. Neighboring clade ages are therefore a very rough approximation of the age of duplication events. This is apparent when node ages derived from calibrated trees are plotted against the age of the clade annotations for each node (Supplementary Figure 6A). Because duplication events that are all annotated with the same clade name can occur at very different times, pairwise comparisons across these nodes capture evolutionary changes in Tau across very different different branch lengths. They therefore have lower correlation than pairwise comparisons made across speciation nodes. Of the `r n_dup_original` duplication nodes considered here, `r n_dup_remaining` have a node age (as determined by the time calibrated trees) within `r age_window * 100`% of their clade annotation. If only these duplication events closest to their annotated clades are retained, the pattern of lower correlation of Tau evolution for duplicaiton events disappears for the dataset simulated under the null model (Supplementary Figure 6B). This correction, though, comes at the high cost of discarding `r round( (n_dup_original - n_dup_remaining )/ n_dup_original * 100, 1 )`% of duplication nodes.
 
 #### Implications for the ortholog conjecture
 
@@ -822,6 +881,19 @@ The independent contrast across a node is the amount of change observed between 
 We examined the sensitivity of our results to the specification of calibration dates for the speciation nodes. In `r noised_replicate_n` reanalyses, we drew a new date for each calibration from a normal distribution with the mean of the original date and a standard deviation `r sd_fraction` times the original date. If any daughter nodes became older than their parent, we repeated the sampling until the dates were congruent with the topology. The minimum Wilcoxon p in these reanalyses was $`r min( as.numeric( unlist( p_noised ) ) )`$, *i.e.* none of them reject the null hypothesis that the rate of evolution of Tau is greater following duplication events than speciation events. This is consistent with the analysis that uses the calibration dates as specified, indicating that our results are robust to the selection of calibration times for speciation nodes.
 
 
+#### Origin of pairwise correlation plot structure
+
+```{r cor_structure_plot, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE, dev="png", dpi=600, fig.width=6.5, fig.height=6.5, fig.cap="Origin of pairwise correlation plot structure. (*A*) Each speciation and duplication node in the COMPARA trees is annotated with a clade name, and the age of that clade (shown on the x axis) is used as the age of the pairwise comparisons (Figure 2 A, C, E, KMRR[@KryuchkovaMostacci:2016iw] Figure 2). The clade ages have a clear correspondence to the speciation node ages (red). Duplication (blue) ages for nodes assigned to the same clade, however, have large variation in calibrated node age (y axis). This means that summaries of expression differences across duplication events represent evolutionary changes that occurred over a wide range of time scales. (*B*) When duplication nodes whose calibrated node age deviates more than 10% from their annotated clade age are removed from the data simulated under the null distribution, duplication comparisons no longer have a uniformly lower expression correlation than speciation comparisons."} 
+	
+	grid.arrange(
+		g_clade_age,
+		g_sub,
+		ncol = 1
+		)
+
+```
+
+
 #### Relationship between Tau and maximum expression
 
 ```{r Tau_v_max, cache=TRUE, echo=FALSE, warning=FALSE, dev="png", dpi=300, message=FALSE, fig.cap="Genes with higher maximum observed expression tend to have lower Tau. The blue line is the linear model for the relationship between the two."}
@@ -841,7 +913,7 @@ We examined the sensitivity of our results to the specification of calibration d
 	
 ```
 
-There is a negative relationship between miximum expression and Tau for each gene (Supplementary Figure 6, $r^2=`r signif( tau_v_max_lm$r.squared, 3 )`$, $slope=`r signif( tau_v_max_lm$coefficients[2,1], 3 )`$, $p=`r signif( tau_v_max_lm$coefficients[2,4], 3 )`$).
+Figure 3 if KMRR differs from their other analyses in that it presents independent changes in expression between triplets of genes. Each triplet has two paralogs that arose from a duplication event and one unduplicated homolog. They find that there is a tendency for the paralog with the lowest expression to have the highest Tau. From this they conclude that following duplication there is a common trajectory of evolutionary change, where one paralog evolves to have lower expression and also become more tissue specific. There is, however, a negative relationship between Tau and maximum expression across all genes (Supplementary Figure 7, $r^2=`r signif( tau_v_max_lm$r.squared, 3 )`$, $slope=`r signif( tau_v_max_lm$coefficients[2,1], 3 )`$, $p=`r signif( tau_v_max_lm$coefficients[2,4], 3 )`$). A simpler explanation for this plot is that it reflects the global tendency for Tau to decrease with maximum expression. The null expectation for any two genes sampled at random is for one to have higher maximum expression and lower Tau, and the other to have lower maximum expression and higher Tau. This global pattern could be due to both biological factors and the technical details of how Tau is calculated.
 
 
 \pagebreak
