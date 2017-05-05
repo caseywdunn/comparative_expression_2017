@@ -99,6 +99,8 @@ output:
 
 ```
 
+\hyphenation{analyzing}
+
 # Pairwise comparisons across species are problematic when analyzing functional genomic data
 
 Casey W. Dunn^1^*, Felipe Zapata^1,2^, Catriona Munro^1^, Stefan Siebert^1,3^, Andreas Hejnol^4^
