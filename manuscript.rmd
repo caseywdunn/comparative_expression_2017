@@ -330,6 +330,8 @@ We did not find increased evolutionary change in expression following duplicatio
 
 We next examined the possibility that ascertainment biases were differentially impacting the inference of expression evolution following duplication and speciation events. Such a bias might obscure support for the ortholog conjecture. We focused on two possible sources of bias, node depth and branch length. We found no evidence that either affected our results (*SI Appendix*, Figure 5). We also examined the sensitivity of the results to the calibration times applied to speciation events on the gene trees. This is important because it is expected that genes from separate species have a common ancestor older than the time at which the species diverged from each other [@Takahata:1989uh; @Degnan:2009hr]. There is also uncertainty associated with the timing of these speciation events. We added random noise to the calibration times in replicate analyses, and all still failed to reject the null hypothesis (*SI Appendix*).
 
+An additional concern is that within-species expression variation is not considered when making comparisons of tau across homologous genes. Neglecting within species variation is expected to mislead phylogenetic comparative analyses in some cases [@Ives:2007cw; Felsenstein:2008cl; Rohlfs:2015bd]. Since branch length describes expected trait variation [@Felsenstein:1985ua], within species variation can be modeled by extending the terminal branches of each gene phylogeny [@Ives:2007cw]. We modeled within-species variation by extending each terminal branch by 7 million years. This value was selected because it corresponds to the age of the clade Hominini (defined by the most recent common ancestor of humans and chimpanzees), the shallowest node in the phylogeny of examined species. This provides an opportunity to assess the impact that extreme within-species variation (*i.e.*, as large as the variance between humans and chimpanzees and their most recent common ancestor) would have on our findings. These analyses still do not reject the null hypothesis, and do not provide support for the ortholog conjecture in the presence of high within-species variance (*SI Appendix*, Figure 6).
+
 #### Understanding the incongruence between pairwise and phylogenetic methods
 
 ```{r pairwise, echo=FALSE, cache=TRUE, message=F, warning=F}
@@ -608,7 +610,7 @@ These simulations have several implications. The pairwise comparisons used by KM
 	
 ```
 
-Since greater rates of expression evolution following duplication do not explain the lower correlation of Tau values in the pairwise comparison plots (Figure 2 *A, C, E*), this pattern must reflect some other property that is shared across these analyses. We found that the lower correlations for duplication comparisons can largely be explained by the greater variance in the age of duplication nodes. Each point in the pairwise correlation plot (Figure 2 *A, C, E*) summarizes multiple pairwise comparisons across nodes of a given event type (speciation or duplication, as indicated by color) and clade in the species tree (Theria, Mammalia, Amniota, etc..., as indicated by the age of the clade along the x axis). These clade names in turn are derived from the node annotations in the ENSEMBL Compara trees, which apply clade names to both speciation and duplication nodes. While speciation nodes in the gene trees have a clear correspondence to clades in the species trees, duplication nodes do not since duplication can occur at any point along any branch in the species tree. Neighboring clade ages are therefore a very rough approximation of the age of duplication events. This is apparent when node ages derived from calibrated trees are plotted against the age of the clade annotations for each node (*SI Appendix*, Figure 6*A*). Because duplication events that are all annotated with the same clade name can occur at very different times, pairwise comparisons across these nodes capture evolutionary changes in Tau across very different different branch lengths. They therefore have lower correlation than pairwise comparisons made across speciation nodes. Of the `r n_dup_original` duplication nodes considered here, `r n_dup_remaining` have a node age (as determined by the time calibrated trees) within `r age_window * 100`% of their clade annotation. If only these duplication events closest to their annotated clade nodes are retained, the pattern of lower correlation of Tau evolution for duplication events disappears for the dataset simulated under the null model (*SI Appendix*, Figure 5*B*). This correction, though, comes at the high cost of discarding `r round( (n_dup_original - n_dup_remaining )/ n_dup_original * 100, 1 )`% of duplication nodes.
+Since greater rates of expression evolution following duplication do not explain the lower correlation of Tau values in the pairwise comparison plots (Figure 2 *A, C, E*), this pattern must reflect some other property that is shared across these analyses. We found that the lower correlations for duplication comparisons can largely be explained by the greater variance in the age of duplication nodes. Each point in the pairwise correlation plot (Figure 2 *A, C, E*) summarizes multiple pairwise comparisons across nodes of a given event type (speciation or duplication, as indicated by color) and clade in the species tree (Theria, Mammalia, Amniota, etc..., as indicated by the age of the clade along the x axis). These clade names in turn are derived from the node annotations in the ENSEMBL Compara trees, which apply clade names to both speciation and duplication nodes. While speciation nodes in the gene trees have a clear correspondence to clades in the species trees, duplication nodes do not since duplication can occur at any point along any branch in the species tree. Neighboring clade ages are therefore a very rough approximation of the age of duplication events. This is apparent when node ages derived from calibrated trees are plotted against the age of the clade annotations for each node (*SI Appendix*, Figure 7*A*). Because duplication events that are all annotated with the same clade name can occur at very different times, pairwise comparisons across these nodes capture evolutionary changes in Tau across very different different branch lengths. They therefore have lower correlation than pairwise comparisons made across speciation nodes. Of the `r n_dup_original` duplication nodes considered here, `r n_dup_remaining` have a node age (as determined by the time calibrated trees) within `r age_window * 100`% of their clade annotation. If only these duplication events closest to their annotated clade nodes are retained, the pattern of lower correlation of Tau evolution for duplication events disappears for the dataset simulated under the null model (*SI Appendix*, Figure 7*B*). This correction, though, comes at the high cost of discarding `r round( (n_dup_original - n_dup_remaining )/ n_dup_original * 100, 1 )`% of duplication nodes.
 
 #### Implications for the ortholog conjecture
 
@@ -841,6 +843,48 @@ The independent contrast across a node is the amount of change observed between 
 ```
 
 
+```{r within_species_variation, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE, dev="png", dpi=600, fig.width=6.5, fig.height=3, fig.cap="Investigation of within-species variation. These plots correspond to Fig. 2*A* and 2*B*, but with increased expected within-species variation modeled by increasing the terminal gene phylogeny branch lengths. The results are unchanged. (*A*) Pairwise comparisons still recover higher correlation across speciation events than duplication events. (*B*) There is not an excess of larger contrasts for duplication events and the analysis does not reject the null hypothesis. Modeling a large amount of within-species variation does not lead to support for the ortholog conjecture."}
+
+	x = calibration_times$age[calibration_times$clade == "Hominini"]
+	gene_trees_extended = mclapply( gene_trees_calibrated, extend_nhx, x=x, mc.cores=cores )
+	gene_trees_extended %<>% add_pics_to_trees()
+	nodes_extended_contrast = gene_trees_extended %>% summarize_contrasts()
+
+	pairwise_extended_summary = 
+			mclapply( gene_trees_extended, get_pairwise_summary, mc.cores=cores ) %>% 
+			bind_rows()
+
+	g_pair_extended = 
+		pairwise_extended_summary %>% 
+			filter( ! is.na( D ) ) %>%
+			group_by( Event, label ) %>% 
+			summarise( cor.test( tau_a, tau_b )$estimate, n=n() ) %>% 
+			rename( rho=`cor.test(tau_a, tau_b)$estimate` ) %>%
+			rename( clade = label ) %>% 
+			left_join( calibration_times, clade=clade ) %>%
+			ggplot() + 
+				geom_point( aes( x=age, y=rho, col=Event ), size=3 ) +
+				theme_classic() +
+				xlab( "Clade Age (million years)" ) +
+				ylab( "Correlation Coefficient" ) +
+				ylim( 0, 1 ) +
+				ggtitle( "A Pairwise" ) +
+				guides( colour = guide_legend( override.aes = list( shape = 15 ) ) ) +
+				theme( 
+				legend.justification=c( 1, 1 ), 
+				legend.position=c( 1, 1 ), 
+				legend.title=element_blank() )
+
+	grid.arrange(
+		g_pair_extended,
+		make_contrast_plot( nodes_extended_contrast ) + 
+			ggtitle( "B Phylogenetic" ),
+		ncol = 2
+	)
+```
+
+
+
 #### Investigation of sensitivity to calibration times
 
 ```{r calibration_sensitivity, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
@@ -910,7 +954,7 @@ We examined the sensitivity of our results to the specification of calibration d
 	
 ```
 
-KMRR [@KryuchkovaMostacci:2016iw] Figure 3 differs from their other analyses in that it presents independent changes in expression between triplets of genes. Each triplet has two paralogs that arose from a duplication event and one unduplicated homolog. They find that there is a tendency for the paralog with the lowest expression to have the highest Tau. From this they conclude that following duplication there is a common trajectory of evolutionary change, where one paralog evolves to have lower expression and also become more tissue specific. There is, however, a negative relationship between Tau and maximum expression across all genes (*SI Appendix* Figure 7, $r^2=`r signif( tau_v_max_lm$r.squared, 3 )`$, $slope=`r signif( tau_v_max_lm$coefficients[2,1], 3 )`$, $p=`r signif( tau_v_max_lm$coefficients[2,4], 3 )`$). A simpler explanation for their plot is that it reflects the global tendency for Tau to decrease with maximum expression. The null expectation for any two genes sampled at random is for one to have higher maximum expression and lower Tau, and the other to have lower maximum expression and higher Tau. This global pattern could be due to both biological factors and the technical details of how Tau is calculated.
+KMRR [@KryuchkovaMostacci:2016iw] Figure 3 differs from their other analyses in that it presents independent changes in expression between triplets of genes. Each triplet has two paralogs that arose from a duplication event and one unduplicated homolog. They find that there is a tendency for the paralog with the lowest expression to have the highest Tau. From this they conclude that following duplication there is a common trajectory of evolutionary change, where one paralog evolves to have lower expression and also become more tissue specific. There is, however, a negative relationship between Tau and maximum expression across all genes (*SI Appendix* Figure 8, $r^2=`r signif( tau_v_max_lm$r.squared, 3 )`$, $slope=`r signif( tau_v_max_lm$coefficients[2,1], 3 )`$, $p=`r signif( tau_v_max_lm$coefficients[2,4], 3 )`$). A simpler explanation for their plot is that it reflects the global tendency for Tau to decrease with maximum expression. The null expectation for any two genes sampled at random is for one to have higher maximum expression and lower Tau, and the other to have lower maximum expression and higher Tau. This global pattern could be due to both biological factors and the technical details of how Tau is calculated.
 
 
 \pagebreak

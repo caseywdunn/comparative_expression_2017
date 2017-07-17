@@ -590,3 +590,14 @@ make_contrast_plot = function( nodes_contrast, mode="diff" ){
 	ggcontrasts
 	
 }
+
+#' Extends each terminal branch by specified length
+#' 
+#' @param nhx A phylogenetic tree as a treeio::treedata object
+#' @param x Amount to extend each branch by
+#' @return A phylogenetic tree as a treeio::treedata object
+#' @export
+extend_nhx = function( nhx, x ){
+  nhx@phylo = hutan::extend_terminal_branches( nhx@phylo, x )
+  return( nhx )
+}
