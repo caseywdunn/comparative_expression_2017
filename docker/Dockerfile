@@ -2,7 +2,7 @@ FROM rocker/tidyverse
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
-    libtiff-devel
+    libtiff5-dev
 
 
 RUN install2.r --error \
