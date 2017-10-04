@@ -3,9 +3,9 @@ FROM rocker/tidyverse
 RUN R -e "source('https://bioconductor.org/biocLite.R')" \
   && install2.r --error \
     --deps TRUE \
-    ggtree \ # bioconductor
-    treeio \ # bioconductor
-    ape \    # Rest are CRAN
+    ggtree \
+    treeio \
+    ape \
     digest \
     geiger \
     ggrepel \
