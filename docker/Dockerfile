@@ -2,7 +2,8 @@ FROM rocker/tidyverse
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
-    libtiff5-dev
+  libfftw3-dev \
+  libtiff5-dev
 
 
 RUN install2.r --error \
