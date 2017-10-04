@@ -15,5 +15,5 @@ RUN install2.r --error \
     ape \
     geiger \
     ggrepel \
-    phytools
+    phytools \
   && Rscript -e "library(devtools); devtools::install_github('caseywdunn/hutan')"
