@@ -26,16 +26,17 @@ output:
 	library( hutan ) # devtools::install_github("caseywdunn/hutan")
 
 	# The rest can be installed from CRAN
-	library( tidyverse )
-	library( magrittr )
-	library( stringr )
-	library( parallel )
 	library( ape )
-	library( digest )
-	library( gridExtra )
-	library( geiger )
-	library( phytools )
-	library( ggrepel )
+  library( digest )
+  library( geiger )
+  library( ggrepel )
+  library( gridExtra )
+	library( magrittr )
+  library( parallel )
+  library( phytools )
+	library( stringr )
+  library( tidyverse )
+	
 
 	# Set system computational parameters
 	cores = detectCores()
