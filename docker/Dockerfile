@@ -18,7 +18,6 @@ RUN install2.r --error \
     ggrepel \
     gridExtra \
     magrittr \
-    parallel \
     phytools \
     stringr \
     tidyverse \
