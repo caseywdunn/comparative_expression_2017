@@ -13,12 +13,7 @@ RUN install2.r --error \
     ggtree \
     treeio \
     ape \
-    digest \
     geiger \
     ggrepel \
-    gridExtra \
-    magrittr \
-    phytools \
-    stringr \
-    tidyverse \
+    phytools
   && Rscript -e "library(devtools); devtools::install_github('caseywdunn/hutan')"
