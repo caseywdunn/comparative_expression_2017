@@ -1,5 +1,10 @@
 FROM rocker/tidyverse
 
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    libtiff-devel
+
+
 RUN install2.r --error \
     --deps TRUE \
     -r 'http://cran.rstudio.com' \
