@@ -52,4 +52,7 @@ To run the container interactively, eg to debug it, you can instead run:
 
 ## Use
 
-Point your browser to port 8787 at the appropriate ip address. You can then clone and run the manuscript.
+Point your browser to port 8787 at the appropriate ip address. Sign in with username `rstudio` and password `rstudio`.
+
+Select File > Create Project... > Version control > git, and enter `https://github.com/caseywdunn/comparative_expression_2017.git` for the Repository URL. You can now select your branch and execute the manuscript.
+
