@@ -5,7 +5,9 @@ RUN apt-get update \
   libfftw3-dev \
   libtiff5-dev \
   libglu1-mesa-dev \
-  texstudio
+  lmodern \
+  texlive-latex-extra \
+  texlive-fonts-recommended
 
 
 RUN install2.r --error \
