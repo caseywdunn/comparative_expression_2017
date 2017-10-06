@@ -5,16 +5,6 @@ analyses. Not yet tested.
 
 ## Host system
 
-SMRTlink needs a big computer. Much bigger than laptops and most desktops. Here are the system requirements at present:
-
-
-    The recommended and minimum configurations are:
-       Total Physical Memory:        64 GB (recommended), 32 GB (minimum)
-       Total Number of Processors:   32    (recommended), 16    (minimum)
-       Minimum open files limit   ('ulimit -n'):  8192  (required)
-       Minimum user process limit ('ulimit -u'):  8192  (required)
-
-Having less than the required limits will result in a warning, and by default installation will not complete if there are any warnings. 
 
 ### Amazon Web Services
 
