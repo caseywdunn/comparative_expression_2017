@@ -10,9 +10,10 @@ output:
 ```{r setup, cache=TRUE, message=F, echo=FALSE, warning=F}
 
 	knitr::opts_chunk$set( 
-	  echo = TRUE,
-    dev="tiff", 
-    dpi=1200,
+	echo = TRUE,
+    dev="png", 
+    # dev.args=list( compression="lzw" ), # for tiff
+    dpi=600,
     cache=TRUE
   )
 
@@ -28,15 +29,15 @@ output:
 
 	# The rest can be installed from CRAN
 	library( ape )
-  library( digest )
-  library( geiger )
-  library( ggrepel )
-  library( gridExtra )
+	library( digest )
+	library( geiger )
+	library( ggrepel )
+	library( gridExtra )
 	library( magrittr )
-  library( parallel )
-  library( phytools )
+	library( parallel )
+	library( phytools )
 	library( stringr )
-  library( tidyverse )
+	library( tidyverse )
 	
 
 	# Set system computational parameters
@@ -463,7 +464,7 @@ To test the hypothesis that ancient duplications that precede the oldest speciat
 ```
 
 
-```{r Fig_2, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6.5, dev="quartz_pdf", fig.cap="Pairwise (left column - *A, C, E*) and phylogenetic (right column - *B, D, F*) analyses of the original data (first row - *A, B*), data simulated under the null hypothesis (second row - *C, D*), and data simulated under the ortholog conjecture (third row- *E, F*). In the pairwise plots, each point indicates the correlation coefficient of Tau for a set of pairwise comparisons annotated with a specific node name (e.g, Primates) and event type (speciation or duplication, giving rise respectively to orthologs and paralogs). The phylogenetic plots show the difference between the density distributions for Tau phylogenetic contrasts for speciation and duplication events, where a value above 0 indicates an excess of speciation contrasts in the indicated interval. A horizontal line at 0 would indicate that the density distributions are identical. The top left pane (*A*) reproduces the pattern presented in Fig. 2*A* of KMRR [@KryuchkovaMostacci:2016iw] of higher correlation across speciation events than duplication events, which they took as evidence of the ortholog conjecture. The recovery of a similar  pattern under both simulations (*C, E*) indicates that this pairwise approach does not make distinct testable predictions. The phylogenetic analysis of the original data (*B*) does not show an excess of larger contrasts for duplication events and does not reject the null hypothesis, providing no support for the ortholog conjecture. The bottom right panes validate the phylogenetic approach by showing that it does not reject the null when data are simulated under the null (*D*), but does reject the null when data are simulated under the ortholog conjecture (*F*)."}
+```{r Fig_2, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6.5, fig.cap="Pairwise (left column - *A, C, E*) and phylogenetic (right column - *B, D, F*) analyses of the original data (first row - *A, B*), data simulated under the null hypothesis (second row - *C, D*), and data simulated under the ortholog conjecture (third row- *E, F*). In the pairwise plots, each point indicates the correlation coefficient of Tau for a set of pairwise comparisons annotated with a specific node name (e.g, Primates) and event type (speciation or duplication, giving rise respectively to orthologs and paralogs). The phylogenetic plots show the difference between the density distributions for Tau phylogenetic contrasts for speciation and duplication events, where a value above 0 indicates an excess of speciation contrasts in the indicated interval. A horizontal line at 0 would indicate that the density distributions are identical. The top left pane (*A*) reproduces the pattern presented in Fig. 2*A* of KMRR [@KryuchkovaMostacci:2016iw] of higher correlation across speciation events than duplication events, which they took as evidence of the ortholog conjecture. The recovery of a similar  pattern under both simulations (*C, E*) indicates that this pairwise approach does not make distinct testable predictions. The phylogenetic analysis of the original data (*B*) does not show an excess of larger contrasts for duplication events and does not reject the null hypothesis, providing no support for the ortholog conjecture. The bottom right panes validate the phylogenetic approach by showing that it does not reject the null when data are simulated under the null (*D*), but does reject the null when data are simulated under the ortholog conjecture (*F*)."}
 
 	g_pair_empirical = 
 		pairwise_summary %>% 
@@ -764,7 +765,7 @@ Thanks to Steve Haddock, Alex Damian Serrano, August Guang, Bruno Vellutini, Zac
 
 ```
 
-```{r Fig_S1, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE, eval=TRUE, dev="quartz_pdf", fig.width=7, fig.height=6.5, fig.cap="One of the gene trees from the phylogenetic analysis. The value of Tau (expression specificity) is indicated by the sizes of the circles at the tips of the tree. Whether an internal node is a speciation or duplication is indicated by color. Speciation nodes are labeled by clade name. Branch lengths are scaled to time. The blue number is the independent contrast for each node."}
+```{r Fig_S1, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE, eval=TRUE, fig.width=7, fig.height=6.5, fig.cap="One of the gene trees from the phylogenetic analysis. The value of Tau (expression specificity) is indicated by the sizes of the circles at the tips of the tree. Whether an internal node is a speciation or duplication is indicated by color. Speciation nodes are labeled by clade name. Branch lengths are scaled to time. The blue number is the independent contrast for each node."}
 
 	ntips = lapply( gene_trees_pic, function(x) length( x@phylo$tip.label ))
 	to_show = which( ntips < 20 & ntips >15 )[1:8]
@@ -799,7 +800,7 @@ While the age of speciation nodes is constrained, duplication nodes can be much 
 
 The independent contrast across a node is the amount of change observed between the daughter nodes, scaled by the expected variance [@Felsenstein:1985ua]. The expected variance is principally determined by the lengths of the branches leading from the node to these daughters. The shorter the total length of the two branches leading to daughter nodes, the larger the contrast for a given observed difference. This is because the same difference across a shorter total branch length indicates a greater rate of evolutionary change. The expected variance of contrasts for speciation nodes is constrained by the branch lengths on the species tree, but the expected variance of contrasts for duplications has a much wider range (*SI Appendix*, Fig. 5*C*). This could lead to biases if the lengths of branches that descend from duplication nodes tend to be overestimated. We therefore examined only the contrasts that fell within in the range of expected variance seen for speciation contrasts, excluding duplication contrasts that fall outside of this range. This reanalysis does not reject the null hypothesis either (*SI Appendix*, Fig. 5*D*), indicating that branch length bias is not responsible for the result.
 
-```{r Fig_S2, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6.5, dev="tiff", dev.args=list( compression="lzw" ), fig.cap="Investigation of possible ascertainment biases. (*A*) Magnitude of independent contrasts plotted against node age. Speciation nodes are calibrated to particular times, whereas duplication nodes have a wider range. (*B*) Difference between density distributions of contrasts for only the nodes that have an age less than or equal to the maximum age of speciation nodes. (*C*) Magnitude of independent contrasts plotted against expected variance, which is largely determined by branch lengths. Contrasts for speciation nodes have a narrower range of expected variance than do contrasts for duplication nodes. (*D*) Difference between density distributions of contrasts for only the nodes that have expected variance within the range of contrasts across speciation nodes."}
+```{r Fig_S2, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=6.5, fig.cap="Investigation of possible ascertainment biases. (*A*) Magnitude of independent contrasts plotted against node age. Speciation nodes are calibrated to particular times, whereas duplication nodes have a wider range. (*B*) Difference between density distributions of contrasts for only the nodes that have an age less than or equal to the maximum age of speciation nodes. (*C*) Magnitude of independent contrasts plotted against expected variance, which is largely determined by branch lengths. Contrasts for speciation nodes have a narrower range of expected variance than do contrasts for duplication nodes. (*D*) Difference between density distributions of contrasts for only the nodes that have expected variance within the range of contrasts across speciation nodes."}
 
 	g_age =
 		nodes_contrast %>%
@@ -838,7 +839,7 @@ The independent contrast across a node is the amount of change observed between 
 ```
 
 
-```{r Fig_S3, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE, dev="quartz_pdf", fig.width=7, fig.height=3, fig.cap="Investigation of the potential impact of within-species variance. These plots correspond to Fig. 2*A* and 2*B*, but with increased expected within-species variation modeled by increasing the terminal gene phylogeny branch lengths. (*A*) Pairwise comparisons still recover higher correlation across speciation events than duplication events. (*B*) There is not an excess of larger contrasts for duplication events and the analysis does not reject the null hypothesis. Modeling a large amount of within-species variation does not lead to support for the ortholog conjecture."}
+```{r Fig_S3, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=3, fig.cap="Investigation of the potential impact of within-species variance. These plots correspond to Fig. 2*A* and 2*B*, but with increased expected within-species variation modeled by increasing the terminal gene phylogeny branch lengths. (*A*) Pairwise comparisons still recover higher correlation across speciation events than duplication events. (*B*) There is not an excess of larger contrasts for duplication events and the analysis does not reject the null hypothesis. Modeling a large amount of within-species variation does not lead to support for the ortholog conjecture."}
 
 	x = calibration_times$age[calibration_times$clade == "Hominini"]
 	gene_trees_extended = mclapply( gene_trees_calibrated, extend_nhx, x=x, mc.cores=cores )
@@ -919,7 +920,7 @@ We examined the sensitivity of our results to the specification of calibration d
 
 #### Origin of pairwise correlation plot structure
 
-```{r Fig_S4, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=3, dev.args=list( compression="lzw" ), fig.cap="Origin of pairwise correlation plot structure. (*A*) Each speciation and duplication node in the COMPARA trees is annotated with a clade name, and the age of that clade (shown on the x axis) is used as the age of the pairwise comparisons (Fig. 2 *A, C, E*, KMRR [@KryuchkovaMostacci:2016iw] Fig. 2). The clade ages have a clear correspondence to the speciation node ages (red). Duplication (blue) ages for nodes assigned to the same clade, however, have large variation in calibrated node age (y axis). This means that summaries of expression differences across duplication events represent evolutionary changes that occurred over a wide range of time scales. (*B*) When duplication nodes whose calibrated node age deviates more than 10% from their annotated clade age are removed from the data simulated under the null distribution, duplication comparisons no longer have a uniformly lower expression correlation than speciation comparisons."} 
+```{r Fig_S4, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE, fig.width=7, fig.height=3, fig.cap="Origin of pairwise correlation plot structure. (*A*) Each speciation and duplication node in the COMPARA trees is annotated with a clade name, and the age of that clade (shown on the x axis) is used as the age of the pairwise comparisons (Fig. 2 *A, C, E*, KMRR [@KryuchkovaMostacci:2016iw] Fig. 2). The clade ages have a clear correspondence to the speciation node ages (red). Duplication (blue) ages for nodes assigned to the same clade, however, have large variation in calibrated node age (y axis). This means that summaries of expression differences across duplication events represent evolutionary changes that occurred over a wide range of time scales. (*B*) When duplication nodes whose calibrated node age deviates more than 10% from their annotated clade age are removed from the data simulated under the null distribution, duplication comparisons no longer have a uniformly lower expression correlation than speciation comparisons."} 
 	
 	grid.arrange(
 		g_clade_age,
@@ -932,7 +933,7 @@ We examined the sensitivity of our results to the specification of calibration d
 
 #### Relationship between Tau and maximum expression
 
-```{r Tau_v_max, cache=TRUE, echo=FALSE, warning=FALSE, fig.width=3.42, fig.height=3.42, dev.args=list( compression="lzw" ), message=FALSE, fig.cap="Genes with higher maximum observed expression tend to have lower Tau. The blue line is the linear model for the relationship between the two."}
+```{r Tau_v_max, cache=TRUE, echo=FALSE, warning=FALSE, fig.width=3.42, fig.height=3.42, message=FALSE, fig.cap="Genes with higher maximum observed expression tend to have lower Tau. The blue line is the linear model for the relationship between the two."}
 
 	nodes_tips = nodes_all %>% filter( ! is.na( species ) )
 	max_expression = nodes_tips %>% select( contains("Averaged") ) %>% apply( 1, FUN=max, na.rm=TRUE )
