@@ -12,7 +12,8 @@ output:
 	knitr::opts_chunk$set( 
 	  echo = TRUE,
     dev="tiff", 
-    dpi=1200
+    dpi=1200,
+    cache=TRUE
   )
 
 ```
@@ -959,6 +960,10 @@ This manuscript was computed on `r format( Sys.time(), "%a %b %d %X %Y" )` with 
 
 ```{r session_summary, echo=FALSE, comment=NA}
 	sessionInfo()
+```
+
+```{r wrap_up, echo=FALSE}
+	save.image()
 ```
 
 \pagebreak
