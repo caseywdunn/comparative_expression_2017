@@ -63,7 +63,7 @@ From within the container, you can for example do the following:
 To knit the manuscript:
 
     git checkout revision # change branches
-    nohup Rscript -e "library(knitr); knit('manuscript.rmd')" & 
+    nohup Rscript -e "library(rmarkdown); render('manuscript.rmd')" &
 
 Or, to run all the code at the R console (so you can dig into particular variables, for example):
 
