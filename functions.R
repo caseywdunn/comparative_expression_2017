@@ -1,3 +1,16 @@
+
+#' Create a string from a p.value
+#' 
+#' @param x htest object, like that returned from cor.test()
+#' @param digits the number of significant digits
+#' @return A character object
+#' @export
+format_p = function ( x, digits=3 ){
+		fp <- format.pval( x$p.value, digits = max(1L, digits - 3L) )
+	out = if(substr(fp, 1L, 1L) == "<") fp else paste("=",fp)
+		return( out )
+}
+
 #' Parses nhx text to a treeio::treedata object
 #' 
 #' @param tree_text Character string repressenting nhx tree

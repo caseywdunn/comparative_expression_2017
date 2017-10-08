@@ -349,25 +349,19 @@ An additional concern is that within-species expression variation is not conside
 	# Calculate some summary statistics 
 	ortholog_r = 
 		pairwise_summary %>% 
-		filter( D=="N" ) %>% 
-		select( tau_a, tau_b ) %>% 
-		cor( ) %>% 
-		.[ 1, 2 ]
+		filter( D=="N" ) %$% 
+		cor.test( tau_a, tau_b ) 
 	
 	paralog_r = 
 		pairwise_summary %>% 
-		filter( D=="Y" ) %>% 
-		select( tau_a, tau_b ) %>% 
-		cor( ) %>% 
-		.[ 1, 2 ]
+		filter( D=="Y" ) %$% 
+		cor.test( tau_a, tau_b )
 	
 	paralog_subset_r = 
 		pairwise_summary %>% 
 		filter( D=="Y" ) %>% 
-		filter( node_age <= max_speciation_age ) %>% 
-		select( tau_a, tau_b ) %>% 
-		cor( ) %>% 
-		.[ 1, 2 ]
+		filter( node_age <= max_speciation_age ) %$% 
+		cor.test( tau_a, tau_b )
 	
 	ortholog_distance_mean = 
 		pairwise_summary %>% 
@@ -386,11 +380,11 @@ An additional concern is that within-species expression variation is not conside
 ```
 
 
-In order to better understand why our phylogenetic analysis supports a different conclusion (*i.e.*, no support for the ortholog conjecture) than the published analysis of KMRR [@KryuchkovaMostacci:2016iw] (*i.e.*, strong support for the ortholog conjecture), we first checked to make sure we could reproduce their result based on pairwise analyses. This is important since we are only looking at a subset of the data they considered, the Brawand *et al.* 2011 [@Brawand:2011du] dataset for gene trees that could be successfully time calibrated. In their Fig. 1 [@KryuchkovaMostacci:2016iw], they present a higher Tau correlation coefficient between ortholog pairs than paralog pairs. We find the same here, with correlation coefficients of `r signif( ortholog_r, 2)` for orthologs and `r signif( paralog_r, 2)` for paralogs. 
+In order to better understand why our phylogenetic analysis supports a different conclusion (*i.e.*, no support for the ortholog conjecture) than the published analysis of KMRR [@KryuchkovaMostacci:2016iw] (*i.e.*, strong support for the ortholog conjecture), we first checked to make sure we could reproduce their result based on pairwise analyses. This is important since we are only looking at a subset of the data they considered, the Brawand *et al.* 2011 [@Brawand:2011du] dataset for gene trees that could be successfully time calibrated. In their Fig. 1 [@KryuchkovaMostacci:2016iw], they present a higher Tau correlation coefficient between ortholog pairs than paralog pairs. We find the same here, with correlation coefficients of `r signif( ortholog_r$estimate, 2)` (p `r format_p(ortholog_r)`) for orthologs and `r signif( paralog_r$estimate, 2)` (p `r format_p( paralog_r )`) for paralogs. 
 
 Why is it that pairwise methods and phylogenetic methods lead to opposite conclusions? One reason is that multiple pairwise comparisons repeatedly sample the same evolutionary changes and in so doing violate statistical assumptions of independence, whereas phylogenetic comparative methods make multiple independent comparisons across non-overlapping branches of the tree. The other reason is that pairwise comparisons and phylogenetic comparative methods describe different things. Pairwise comparisons describe contemporary patterns, while phylogenetic methods infer historical processes [@OMeara:2012gq]. There need not be a different process of evolution following speciation and duplication for paralogs to be more different than orthologs. Any difference could be due to the structure of the gene phylogenies alone. If paralogs tend to be more distantly related to each other than orthologs, then there would be more time for differences to accumulate even if the rate of change is the same between the two. This is, in fact, the case for these data. While the mean distance (*i.e.*, total branch length) between orthologs is `r round( ortholog_distance_mean, 1 )` million years, the mean distance between paralogs is `r round( paralog_distance_mean, 1 )` million years. This is because the oldest speciation event is by definition the most recent common ancestor of the species included in the study, but many gene families underwent duplication before this time.
 
-To test the hypothesis that ancient duplications that precede the oldest speciation event (*SI Appendix*, Fig. 5*A*) impact the lower correlation of Tau between paralogs than between orthologs, we removed them. When we consider only the duplication events the same age or younger than the oldest speciation event (*SI Appendix*, Fig. 5*B*), the paralog correlation coefficient increases from `r signif( paralog_r, 2)` to `r signif( paralog_subset_r, 2)`. This is much closer to the ortholog correlation of `r signif( ortholog_r, 2) `. 
+To test the hypothesis that ancient duplications that precede the oldest speciation event (*SI Appendix*, Fig. 5*A*) impact the lower correlation of Tau between paralogs than between orthologs, we removed them. When we consider only the duplication events the same age or younger than the oldest speciation event (*SI Appendix*, Fig. 5*B*), the paralog correlation coefficient increases from `r signif( paralog_r$estimate, 2)` to `r signif( paralog_subset_r$estimate, 2)` (p `r format_p(paralog_subset_r)`). This is much closer to the ortholog correlation of `r signif( ortholog_r$estimate, 2) `. 
 
 
 ```{r estimate_tau_model, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
@@ -418,17 +412,13 @@ To test the hypothesis that ancient duplications that precede the oldest speciat
 	# Calculate some summary statistics 
 	ortholog_r_sim_null = 
 		pairwise_sim_null_summary %>% 
-		filter( D=="N" ) %>% 
-		select( tau_a, tau_b ) %>% 
-		cor( ) %>% 
-		.[ 1, 2 ]
+		filter( D=="N" ) %$% 
+		cor.test( tau_a, tau_b ) 
 	
 	paralog_r_sim_null = 
 		pairwise_sim_null_summary %>% 
-		filter( D=="Y" ) %>% 
-		select( tau_a, tau_b ) %>% 
-		cor( ) %>% 
-		.[ 1, 2 ]
+		filter( D=="Y" ) %$% 
+		cor.test( tau_a, tau_b )
 
 ```
 
@@ -449,17 +439,13 @@ To test the hypothesis that ancient duplications that precede the oldest speciat
 	
 	ortholog_r_sim_oc = 
 		pairwise_sim_oc_summary %>% 
-		filter( D=="N" ) %>% 
-		select( tau_a, tau_b ) %>% 
-		cor( ) %>% 
-		.[ 1, 2 ]
+		filter( D=="N" ) %$% 
+		cor.test( tau_a, tau_b ) 
 	
 	paralog_r_sim_oc = 
 		pairwise_sim_oc_summary %>% 
-		filter( D=="Y" ) %>% 
-		select( tau_a, tau_b ) %>% 
-		cor( ) %>% 
-		.[ 1, 2 ]
+		filter( D=="Y" ) %$% 
+		cor.test( tau_a, tau_b ) 
 	
 ```
 
@@ -550,9 +536,9 @@ To test the hypothesis that ancient duplications that precede the oldest speciat
 
 The KMRR study did investigate the impact of node age on correlation, but in a different way. In their Fig. 2 [@KryuchkovaMostacci:2016iw], they grouped orthologs and paralogs according to the ENSEMBL node name of their most recent common ancestor, and plotted the correlation of Tau for each of these groups by the node age. They found that across the investigated range of node ages, ortholog pairs have higher Tau correlation than paralogs. We confirmed that we can replicate this result (Fig. 2*A*). There are several difficulties with interpreting this plot, though. First, it does not just reflect the evolutionary processes that generated the data, it is also impacted by the phylogenies along which these processes acted. The expected covariance of traits that evolve under neutral processes is in fact defined by the phylogeny [@Grafen:1989um]. Second, the correlation for each group is based on multiple non-independent pairwise comparisons. Third, instead of using the actual age of duplication events, the age of an adjacent named node in the species tree is used.
 
-To better understand this plot (Fig. 2*A*), we performed simulations of Tau on the calibrated gene trees. We did not modify the gene tree topologies or their inferred histories of duplication and loss. First, we simulated the evolution of Tau under the null model that it evolves at the same rate following duplication and speciation events. Under the null model, the plot of correlation coefficient to node age (Fig. 2*C*) is very similar as for the observed data (Fig. 2*A*). As in the original study, there is higher correlation coefficient across orthologs (`r signif( ortholog_r_sim_null, 2 )`) than paralogs (`r signif( paralog_r_sim_null, 2 )`) when not considering node age. Phylogenetic analysis of the data simulated under the null hypothesis (Fig. 2*D*) do not reject the null hypothesis (Wilcoxon p = $`r wilcox_oc( nodes_sim_null_contrast ) %>% round( 3 )`$), as expected.
+To better understand this plot (Fig. 2*A*), we performed simulations of Tau on the calibrated gene trees. We did not modify the gene tree topologies or their inferred histories of duplication and loss. First, we simulated the evolution of Tau under the null model that it evolves at the same rate following duplication and speciation events. Under the null model, the plot of correlation coefficient to node age (Fig. 2*C*) is very similar as for the observed data (Fig. 2*A*). As in the original study, there is higher correlation coefficient across orthologs (`r signif( ortholog_r_sim_null$estimate, 2 )`, p `r format_p(ortholog_r_sim_null)`) than paralogs (`r signif( paralog_r_sim_null$estimate, 2 )`, p `r format_p(paralog_r_sim_null)`) when not considering node age. Phylogenetic analysis of the data simulated under the null hypothesis (Fig. 2*D*) do not reject the null hypothesis (Wilcoxon p = $`r wilcox_oc( nodes_sim_null_contrast ) %>% round( 3 )`$), as expected.
 
-We next simulated the evolution of Tau under the ortholog conjecture, where the rate of evolution of Tau following duplication was `r dup_adjust` fold the rate following speciation. The pairwise results of this heterogeneous model (Fig. 2*E*) are nearly indistinguishable from the results under the null model (Fig. 2*C*), and also have a higher correlation coefficient for orthologs (`r signif( ortholog_r_sim_oc, 2 )`) than paralogs (`r signif( paralog_r_sim_oc, 2 )`). The phylogenetic analysis of the ortholog conjecture simulation (Fig. 2*F*) does reject the null hypothesis (Wilcoxon p = $`r signif( wilcox_oc( nodes_sim_oc_contrast ), 2 )`$).
+We next simulated the evolution of Tau under the ortholog conjecture, where the rate of evolution of Tau following duplication was `r dup_adjust` fold the rate following speciation. The pairwise results of this heterogeneous model (Fig. 2*E*) are nearly indistinguishable from the results under the null model (Fig. 2*C*), and also have a higher correlation coefficient for orthologs (`r signif( ortholog_r_sim_oc$estimate, 2 )`, p `r format_p( ortholog_r_sim_oc )`) than paralogs (`r signif( paralog_r_sim_oc$estimate, 2 )`, p `r format_p( paralog_r_sim_oc )`). The phylogenetic analysis of the ortholog conjecture simulation (Fig. 2*F*) does reject the null hypothesis (Wilcoxon p = $`r signif( wilcox_oc( nodes_sim_oc_contrast ), 2 )`$).
 
 These simulations have several implications. The pairwise comparisons used by KMRR cannot distinguish between the null hypothesis and ortholog conjecture. The pairwise results are strikingly similar under both hypotheses (Fig. 2*C*, 2*E*). These simulations also serve to validate the phylogenetic methods applied to this problem. As expected, our phylogenetic analysis of independent contrasts does not reject the null hypothesis when data are simulated under the null model, and does reject the null hypothesis when the data are simulated under the ortholog conjecture. In contrast to pairwise methods, the phylogenetic analyses can test explicit predictions based on hypotheses about evolutionary process.
 
