@@ -180,6 +180,10 @@ For each internal node in each gene tree, we calculated the phylogenetic indepen
 	# Read in the tree file as a vector of strings, one per line
 	lines = readLines( gene_tree_name )
 
+  lines = str_replace(lines, " \\(\\d+ of \\d+\\)","")
+  
+  lines=str_replace(lines,"^(.* .* .* .* .* .* .* .* )(.*) (.*)$", "\\1\\2_\\3")
+
 	# Isolate strings that are trees
 	# These start with (
 	tree_lines = lines[ grepl( "^\\(", lines, perl = TRUE ) ]
