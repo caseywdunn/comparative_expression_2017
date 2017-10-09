@@ -180,10 +180,6 @@ For each internal node in each gene tree, we calculated the phylogenetic indepen
 	# Read in the tree file as a vector of strings, one per line
 	lines = readLines( gene_tree_name )
 
-  lines = str_replace(lines, " \\(\\d+ of \\d+\\)","")
-  
-  lines=str_replace(lines,"^(.* .* .* .* .* .* .* .* )(.*) (.*)$", "\\1\\2_\\3")
-
 	# Isolate strings that are trees
 	# These start with (
 	tree_lines = lines[ grepl( "^\\(", lines, perl = TRUE ) ]
@@ -198,6 +194,8 @@ For each internal node in each gene tree, we calculated the phylogenetic indepen
 	# These have the species names, which are not in the trees themselves
 	tip_annotations = 
 		lines[ grepl( "^SEQ", lines, perl = TRUE ) ] %>%	# Get lines that start with SEQ
+	  str_replace( " \\(\\d+ of \\d+\\)", "" ) %>%      # Remove instances of '(1 of 2)' and '(2 of 2)'
+	  str_replace( "(([^ ]+ ){8})([^ ]+) ([^ ]+)", "\\1\\3_\\4" ) %>%      # Get rid of spaces in last field of some entries
 		str_c( collapse="\n" ) %>%												# Combine them into one string
 		read_delim( delim=" ", col_names = FALSE ) %>% 		# Read string as tibble
 		select( 2, 8 ) %>%																# Select the columns with species and gene ID
