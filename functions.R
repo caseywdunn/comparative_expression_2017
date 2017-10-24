@@ -344,7 +344,7 @@ summarize_trees = function( gene_trees_pic ) {
 					n_tips = length( x ),
 					tau_mean = mean( x ),
 					tau_var = var( x ),
-					K = phylosig( phy, x, method="K" ),
+					K = phytools::phylosig( phy, x, method="K" ),
 					z0_bm = nhx@phylo$model_bm$opt$z0,
 					z0_ou = nhx@phylo$model_ou$opt$z0,
 					sigsq_bm = nhx@phylo$model_bm$opt$sigsq,

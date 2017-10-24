@@ -190,7 +190,7 @@ For each internal node in each gene tree, we calculated the phylogenetic indepen
 	gene_trees = mclapply( tree_lines, parse_gene_trees, mc.cores=cores )
 	
 	# Uncomment for development to look at a subset of gene trees
-	gene_trees = gene_trees[1:100]
+	# gene_trees = gene_trees[1:100]
 	
 	n_gene_trees = length( gene_trees )
 	
