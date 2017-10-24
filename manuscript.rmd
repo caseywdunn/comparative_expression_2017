@@ -11,7 +11,10 @@ output:
 
 ```{r setup, cache=TRUE, message=F, echo=FALSE, warning=F}
 
-	knitr::opts_chunk$set( echo = TRUE )
+	knitr::opts_chunk$set( 
+		echo = TRUE,
+		cache = TRUE
+	)
 
 ```
 
@@ -179,6 +182,9 @@ For each internal node in each gene tree, we calculated the phylogenetic indepen
 	# for node names
 	gene_trees = mclapply( tree_lines, parse_gene_trees, mc.cores=cores )
 	
+	# Uncomment for development to look at a subset of gene trees
+	gene_trees = gene_trees[1:100]
+	
 	n_gene_trees = length( gene_trees )
 	
 	# Parse the tree annotations, these are lines that start with SEQ
@@ -267,6 +273,13 @@ For each internal node in each gene tree, we calculated the phylogenetic indepen
 	
 ```
 
+```{r estimate_tau_model, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+	# Estimate model parameters and add them to the tree objects
+	# Subcalls to fitContinuous() are parallel, so don't use mclapply here
+	# This takes a while, so do it once here and reuse the values as needed
+	gene_trees_calibrated = lapply( gene_trees_calibrated, add_model_parameters )
+```
+
 ```{r trees_to_contrasts, cache=TRUE, echo=FALSE, message=F, warning=F}
 
 	# Calculate the contrasts from the trees and associated expression data
@@ -274,6 +287,9 @@ For each internal node in each gene tree, we calculated the phylogenetic indepen
 
 	# Collect all the contrasts in a single tibble
 	nodes_contrast = summarize_contrasts( gene_trees_pic )
+	
+	# Collect all the tree statistics in a single tibble
+	tree_summary = summarize_trees( gene_trees_pic )
 	
 	# Test if the mean rank of duplication pics is greater than speciation pics
 	wilcox_test_result = wilcox_oc( nodes_contrast )
@@ -383,13 +399,6 @@ Why is it that pairwise methods and phylogenetic methods lead to opposite conclu
 
 To test the hypothesis that ancient duplications that precede the oldest speciation event (*SI Appendix*, Figure 5*A*) impact the lower correlation of Tau between paralogs than between orthologs, we removed them. When we consider only the duplication events the same age or younger than the oldest speciation event (*SI Appendix*, Figure 5*B*), the paralog correlation coefficient increases from `r signif( paralog_r, 2)` to `r signif( paralog_subset_r, 2)`. This is much closer to the ortholog correlation of `r signif( ortholog_r, 2) `. 
 
-
-```{r estimate_tau_model, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
-	# Estimate model parameters and add them to the tree objects
-	# Subcalls to fitContinuous() are parallel, so don't use mclapply here
-	# This takes a while, so do it once here and reuse the values as needed
-	gene_trees_calibrated = lapply( gene_trees_calibrated, add_model_parameters )
-```
 
 ```{r simulations_null, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
 
