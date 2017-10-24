@@ -322,6 +322,47 @@ summarize_contrasts = function( gene_trees_pic ) {
 }
 
 
+#' Prepare summary statistics for each tree
+#' 
+#' @param gene_trees A list of phylogenetic trees with pics
+#' as treeio::treedata objects 
+#' @return A tibble with combined data
+#' @export
+summarize_trees = function( gene_trees_pic ) {
+	
+	tree_summary = 
+		lapply( 
+			gene_trees_pic, 
+			function( nhx ){
+				tags = nhx@data
+				phy = nhx@phylo
+				x = nhx@data$Tau[1:length(phy$tip.label)]
+				names( x ) = phy$tip.label
+				
+				tibble(
+					gene = digest( nhx ),
+					n_tips = length( x ),
+					tau_mean = mean( x ),
+					tau_var = var( x ),
+					K = phylosig( phy, x, method="K" ),
+					z0_bm = nhx@phylo$model_bm$opt$z0,
+					z0_ou = nhx@phylo$model_ou$opt$z0,
+					sigsq_bm = nhx@phylo$model_bm$opt$sigsq,
+					sigsq_ou = nhx@phylo$model_ou$opt$sigsq,
+					alpha_ou = nhx@phylo$model_ou$opt$alpha,
+					aic_bm = nhx@phylo$model_bm$opt$aic,
+					aic_ou = nhx@phylo$model_ou$opt$aic,
+					lnL_bm = nhx@phylo$model_bm$opt$lnL,
+					lnL_ou = nhx@phylo$model_ou$opt$lnL
+				)
+			}
+		) %>%
+		bind_rows()
+	
+	return( tree_summary )
+}
+
+
 #' Calibrate a list of gene trees given a set of speciation node dates
 #' 
 #' @param gene_trees_pruned A list of phylogenetic trees as treeio::treedata objects 
@@ -394,10 +435,12 @@ add_model_parameters = function( nhx, ... ) {
 	phy = nhx@phylo
 	tau_original = nhx@data$Tau [ 1:length( phy$tip.label ) ]
 	names( tau_original ) = phy$tip.label
-	brownian_model = fitContinuous( phy, tau_original, ... )
-	
-	nhx@phylo$model$opt$z0 = brownian_model$opt$z0
-	nhx@phylo$model$opt$sigsq = brownian_model$opt$sigsq
+
+	brownian_model = fitContinuous( phy, tau_original, model="BM", ... )
+	nhx@phylo$model_bm$opt = brownian_model$opt
+
+	ou_model = fitContinuous( phy, tau_original, model="OU", ... )
+	nhx@phylo$model_ou$opt = ou_model$opt	
 	
 	return( nhx )
 }
@@ -421,7 +464,7 @@ sim_tau = function( nhx, dup_adjust=1, a=NA ) {
 	phy = nhx@phylo
 	
 	# Get parameter estimates
-	brownian_model = nhx@phylo$model
+	brownian_model = nhx@phylo$model_bm
 	
 	# Adjust length of branches that descend from duplication events. 
 	# This is how we implement heterogeneous rates after duplication 
@@ -614,3 +657,4 @@ extend_nhx = function( nhx, x ){
   nhx@phylo = hutan::extend_terminal_branches( nhx@phylo, x )
   return( nhx )
 }
+
