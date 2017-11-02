@@ -464,10 +464,27 @@ add_model_parameters = function( nhx, ... ) {
 	tau_original = nhx@data$Tau [ 1:length( phy$tip.label ) ]
 	names( tau_original ) = phy$tip.label
 
-	brownian_model = fitContinuous( phy, tau_original, model="BM", ... )
+	# Set bounds on fitContinuous per manual, as unbond searches
+	# can get stuck. These bounds were selected according to 
+	# observed estimates on runs when no fitContinuous calls
+	# got stuck. 
+
+	brownian_model = fitContinuous( 
+		phy, 
+		tau_original, 
+		model="BM", 
+		bounds=list(sigsq=c(0.0, 1.0)),
+		... 
+	)
 	nhx@phylo$model_bm$opt = brownian_model$opt
 
-	ou_model = fitContinuous( phy, tau_original, model="OU", ... )
+	ou_model = fitContinuous( 
+		phy, 
+		tau_original, 
+		model="OU", 
+		bounds=list(sigsq=c(0.0, 1.0), alpha=c(0.0, 3.0)),
+		... 
+	)
 	nhx@phylo$model_ou$opt = ou_model$opt	
 	
 	return( nhx )
