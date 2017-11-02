@@ -284,9 +284,12 @@ For each internal node in each gene tree, we calculated the phylogenetic indepen
 
 ```{r estimate_tau_model, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
 	# Estimate model parameters and add them to the tree objects
-	# Subcalls to fitContinuous() are parallel, so don't use mclapply here
 	# This takes a while, so do it once here and reuse the values as needed
-	gene_trees_calibrated = lapply( gene_trees_calibrated, add_model_parameters )
+	gene_trees_calibrated = mclapply( 
+		gene_trees_calibrated, 
+		add_model_parameters, 
+		mc.cores=cores 
+	)
 ```
 
 ```{r trees_to_contrasts, cache=TRUE, echo=FALSE, message=F, warning=F}
