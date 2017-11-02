@@ -788,6 +788,60 @@ Thanks to Steve Haddock, Alex Damian Serrano, August Guang, Bruno Vellutini, Zac
 	print( example_trees[[6]] )
 ```
 
+#### Model selection and sensitivity
+
+```{r phylogenetic_signal, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+
+	k_thresh = quantile( tree_summary$K, na.rm=TRUE )[3] # third quantile is the median
+	k_percentile = names(k_thresh)
+	genes_pass_k = tree_summary$gene[ tree_summary$K > k_thresh ]
+
+	nodes_contrast_filtered_k = 
+		nodes_contrast %>% 
+			filter( gene %in% genes_pass_k )
+	
+	wilcox_test_result_k = wilcox_oc( nodes_contrast_filtered_k )
+
+```
+
+We removed the `r k_percentile` of genes with the lowest phylogenetic signal, corresponding to a K cutoff for retained genes of greater than `r signif( k_thresh, 3)`. Repeating the phylogenetic analyses on this subset of genes with strongest phylogenetic signal for Tau still do not reject the null hypothesis (Wilcoxon p = $`r  wilcox_test_result_k %>% round( 3 )`$). 
+
+
+```{r model_selection, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+
+	dAIC_thresh = 2
+	AIC_min = pmin( tree_summary$aic_bm, tree_summary$aic_ou )
+	tree_summary$dAIC = tree_summary$aic_ou - tree_summary$aic_bm
+	tree_summary$dAIC_bm = tree_summary$aic_bm - AIC_min
+	tree_summary$dAIC_ou = tree_summary$aic_ou - AIC_min
+	genes_pass_bm = tree_summary$gene[ tree_summary$dAIC_bm < dAIC_thresh ]
+	genes_pass_ou = tree_summary$gene[ tree_summary$dAIC_ou < dAIC_thresh ]
+
+	nodes_contrast_filtered_bm = 
+		nodes_contrast %>% 
+			filter( gene %in% genes_pass_bm )
+	
+	wilcox_test_result_bm = wilcox_oc( nodes_contrast_filtered_bm )
+
+```
+
+Of the `r nrow(tree_summary)` genes considered, and a $\Delta$AIC threshold of `r dAIC_thresh`, `r sum(tree_summary$dAIC_bm < dAIC_thresh & tree_summary$dAIC_ou >= dAIC_thresh)` have $\Delta$AIC less than the threshold only for Brownian Motion (BM), `r sum(tree_summary$dAIC_bm >= dAIC_thresh & tree_summary$dAIC_ou < dAIC_thresh)` have $\Delta$AIC less than the threshold only for Ornstein Uhlenbeck (OU), and `r sum(tree_summary$dAIC_bm < dAIC_thresh & tree_summary$dAIC_ou < dAIC_thresh)` have $\Delta$AIC less than the threshold for both models. That gives a total of `r sum( tree_summary$dAIC_bm < dAIC_thresh )` genes that have $\Delta$AIC less than the threshold for BM and `r sum( tree_summary$dAIC_ou < dAIC_thresh )` genes that have $\Delta$AIC less than the threshold for OU. 
+
+Repeating the BM phylogenetic analyses on the subset of `r sum( tree_summary$dAIC_bm < dAIC_thresh )` genes that have $\Delta$AIC less than the threshold for BM still does not reject the null hypothesis (Wilcoxon p = $`r  wilcox_test_result_bm %>% round( 3 )`$).
+
+```{r model_ou, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+
+	# Get the trees that pass AIC criteria for OU
+	gene_trees_pic_digests = lapply( gene_trees_pic, digest )
+	gene_trees_pic_ou = gene_trees_pic[ gene_trees_pic_digests %in% genes_pass_ou ]
+
+	# Replace the BM pics with OU pics
+	gene_trees_pic_ou %<>% add_pics_to_trees( model_method="OU" )
+	nodes_ou_contrast = gene_trees_pic_ou %>% summarize_contrasts()
+	wilcox_ou = wilcox_oc( nodes_ou_contrast )
+
+```
+
 
 #### Investigation of potential ascertainment bias
 

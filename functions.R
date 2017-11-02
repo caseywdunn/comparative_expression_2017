@@ -248,9 +248,10 @@ calibrate_tree = function ( nhx, calibration_times, ... ) {
 #' 
 #' @param nhx A phylogenetic tree as a treeio::treedata object, with a 
 #' column @data$Tau containing expression data
+#' @param model_method The model of trait evolution. Can be one of c("BM", "OU")
 #' @return A treeio::treedata object, with new @data columns pic and var_exp
 #' @export
-pic.nhx = function( nhx ) {
+pic.nhx = function( nhx, model_method="BM" ) {
 	
 	tau = nhx@data$Tau[ is.tip.nhx( nhx ) ]
 	
@@ -259,8 +260,29 @@ pic.nhx = function( nhx ) {
 	}
 	
 	# Calculate the contrasts
-	p = pic( tau, nhx@phylo, var.contrasts=TRUE )
+	if ( model_method=="BM" ){
+		p = ape::pic( 
+			tau, 
+			nhx@phylo, 
+			var.contrasts=TRUE 
+		)
+	} else if ( model_method=="OU" ){
+		p = hutan::picx( 
+			tau, 
+			nhx@phylo, 
+			var.contrasts=TRUE , 
+			model_method="OU", 
+			model_parameters=nhx@phylo$model_ou, 
+			n_replicates=25 
+		)
+	} else {
+		stop("ERROR: Invalid model_method")
+	}
 	
+	# Remove previous values if they exist
+	nhx@data$pic = NULL
+	nhx@data$var_exp = NULL
+
 	# Add the results back to the @data slot, padding the rows that correspond to 
 	# tips with NA
 	nhx@data$pic = c( rep( NA, length( nhx@phylo$tip.label ) ), p[ ,1 ] )
@@ -274,14 +296,20 @@ pic.nhx = function( nhx ) {
 #' 
 #' @param gene_trees_calibrated A list of time calibrated phylogenetic trees 
 #' as treeio::treedata objects 
+#' @param model_method The model of trait evolution. Can be one of c("BM", "OU")
 #' @return A list of time phylogenetic trees with pics 
 #' as treeio::treedata objects
 #' @export
-add_pics_to_trees = function( gene_trees_calibrated ) {
+add_pics_to_trees = function( gene_trees_calibrated, model_method="BM" ) {
 	
 	# Calculate independent contrasts for Tau on each tree, storing the results 
 	# back into the @data slot of the tree objects
-	gene_trees_pic = mclapply( gene_trees_calibrated, pic.nhx, mc.cores=cores )
+	gene_trees_pic = mclapply( 
+		gene_trees_calibrated, 
+		pic.nhx, 
+		model_method=model_method, 
+		mc.cores=cores 
+	)
 	
 	return( gene_trees_pic )
 }
