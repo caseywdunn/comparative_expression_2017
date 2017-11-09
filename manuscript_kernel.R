@@ -18,14 +18,16 @@
 	library( phytools )
 	library( stringr )
 	library( tidyverse )
-	
+
+	source( "functions.R" )	
+	set.seed( 23456 )
+
 
 	# Set system computational parameters
 	cores = detectCores()
 	if ( cores < 1 ) {
 		cores = 1
 	}
-	set.seed( 23456 )
 	
 	# Name of the compara gene trees file. This was downloaded from 
 	# ftp://ftp.ensembl.org/pub/release-75/emf/ensembl-compara/homologies/
@@ -75,11 +77,6 @@
 	
 	# In simulation, the fold change in rate following duplication relative to speciation
 	dup_adjust = 2
-	
-
-## ----define_functions, echo=FALSE, message=F, warning=F------------------
-	
-	source( "functions.R" )
 
 
 ## ----load_trees, echo=FALSE, cache=TRUE, message=F, warning=F------------
@@ -407,7 +404,16 @@
 	
 	p_noised = lapply( nodes_contrast_noised_list, wilcox_oc )
 
-	
+
+## ----Fig_S3             -------------------------------------------------
+	x = calibration_times$age[calibration_times$clade == "Hominini"]
+	gene_trees_extended = mclapply( gene_trees_calibrated, extend_nhx, x=x, mc.cores=cores )
+	gene_trees_extended %<>% add_pics_to_trees()
+	nodes_extended_contrast = gene_trees_extended %>% summarize_contrasts()
+
+	pairwise_extended_summary = 
+			mclapply( gene_trees_extended, get_pairwise_summary, mc.cores=cores ) %>% 
+			bind_rows()
 
 ## ----session_summary, echo=FALSE, comment=NA-----------------------------
 	session_info_kernel = sessionInfo()

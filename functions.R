@@ -467,13 +467,15 @@ add_model_parameters = function( nhx, ... ) {
 	# Set bounds on fitContinuous per manual, as unbond searches
 	# can get stuck. These bounds were selected according to 
 	# observed estimates on runs when no fitContinuous calls
-	# got stuck. 
+	# got stuck. Set ncores=1 so that can wrap in mclapply 
+	# without problems.
 
 	brownian_model = fitContinuous( 
 		phy, 
 		tau_original, 
 		model="BM", 
 		bounds=list(sigsq=c(0.0, 1.0)),
+		ncores=1
 		... 
 	)
 	nhx@phylo$model_bm$opt = brownian_model$opt
@@ -483,6 +485,7 @@ add_model_parameters = function( nhx, ... ) {
 		tau_original, 
 		model="OU", 
 		bounds=list(sigsq=c(0.0, 1.0), alpha=c(0.0, 3.0)),
+		ncores=1
 		... 
 	)
 	nhx@phylo$model_ou$opt = ou_model$opt	
