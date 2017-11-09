@@ -475,7 +475,7 @@ add_model_parameters = function( nhx, ... ) {
 		tau_original, 
 		model="BM", 
 		bounds=list(sigsq=c(0.0, 1.0)),
-		ncores=1
+		ncores=1,
 		... 
 	)
 	nhx@phylo$model_bm$opt = brownian_model$opt
