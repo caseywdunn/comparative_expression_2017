@@ -485,7 +485,7 @@ add_model_parameters = function( nhx, ... ) {
 		tau_original, 
 		model="OU", 
 		bounds=list(sigsq=c(0.0, 1.0), alpha=c(0.0, 3.0)),
-		ncores=1
+		ncores=1,
 		... 
 	)
 	nhx@phylo$model_ou$opt = ou_model$opt	
