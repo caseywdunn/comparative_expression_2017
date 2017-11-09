@@ -182,6 +182,7 @@
 	# Time calibrate all speciation nodes to the same years
 	gene_trees_calibrated = calibrate_trees( gene_trees_pruned, calibration_times, model="correlated" )
 	
+	save.image("manuscript_checkpoint_calibrate_trees.RData")
 
 ## ----estimate_tau_model, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE----
 	# Estimate model parameters and add them to the tree objects
