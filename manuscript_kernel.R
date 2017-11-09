@@ -15,6 +15,8 @@
 	library( gridExtra )
 	library( magrittr )
 	library( parallel )
+	library( foreach )
+	library( doParallel )
 	library( phytools )
 	library( stringr )
 	library( tidyverse )
@@ -28,6 +30,9 @@
 	if ( cores < 1 ) {
 		cores = 1
 	}
+
+	# Register parallel workers for %dopar%
+	registerDoParallel( cores-1 )
 	
 	# Name of the compara gene trees file. This was downloaded from 
 	# ftp://ftp.ensembl.org/pub/release-75/emf/ensembl-compara/homologies/
@@ -184,11 +189,9 @@
 ## ----estimate_tau_model, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE----
 	# Estimate model parameters and add them to the tree objects
 	# This takes a while, so do it once here and reuse the values as needed
-	gene_trees_calibrated = mclapply( 
-		gene_trees_calibrated, 
-		add_model_parameters, 
-		mc.cores=cores 
-	)
+	
+	gene_trees_calibrated = 
+		foreach( nhx=gene_trees_calibrated ) %dopar% add_model_parameters( nhx )
 
 ## ----trees_to_contrasts, cache=TRUE, echo=FALSE, message=F, warning=F----
 
