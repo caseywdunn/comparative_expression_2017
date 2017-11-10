@@ -440,8 +440,8 @@
 	commit_kernel = system("git log | head -n 1", intern=TRUE) %>% str_replace("commit ", "")
 
 ## ----wrap_up, echo=FALSE-------------------------------------------------
-	save.image("manuscript.RData")
 
 	time_stop = Sys.time()
 	time_run = time_stop - time_start
-
+	
+	save.image("manuscript.RData")
