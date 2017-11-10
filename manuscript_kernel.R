@@ -1,6 +1,7 @@
 
 ## ----preliminaries, echo=FALSE, message=F, warning=F---------------------
-
+	
+	time_start = Sys.time()
 	# The following should be installed from github with the specified 
 	# devtools command. You will need to install devtools first.
 	library( treeio ) # devtools::install_github("GuangchuangYu/treeio")
@@ -205,7 +206,8 @@
 	
 	# Test if the mean rank of duplication pics is greater than speciation pics
 	wilcox_test_result = wilcox_oc( nodes_contrast )
-	
+
+	save.image("manuscript_checkpoint_contrasts.RData")
 
 ## ----ascertainment, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE----
 
@@ -281,6 +283,7 @@
 		.[["distance"]] %>% 
 		mean()
 	
+	save.image("manuscript_checkpoint_pairwise.RData")
 
 	
 
@@ -338,6 +341,7 @@
 		filter( D=="Y" ) %$% 
 		cor.test( tau_a, tau_b ) 
 
+	save.image("manuscript_checkpoint_calibrate_simulations.RData")
 
 ## ----phylogenetic_signal, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE----
 
@@ -379,6 +383,8 @@
 	gene_trees_pic_ou %<>% add_pics_to_trees( model_method="OU" )
 	nodes_ou_contrast = gene_trees_pic_ou %>% summarize_contrasts()
 	wilcox_ou = wilcox_oc( nodes_ou_contrast )
+
+	save.image("manuscript_checkpoint_models.RData")
 
 
 ## ----calibration_sensitivity, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE----
@@ -432,4 +438,7 @@
 
 ## ----wrap_up, echo=FALSE-------------------------------------------------
 	save.image("manuscript.RData")
+
+	time_stop = Sys.time()
+	time_run = time_stop - time_start
 
