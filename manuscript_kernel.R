@@ -301,12 +301,14 @@
 	# Calculate pairwise comparisons
 	pairwise_sim_null_summary = foreach( tree=gene_trees_sim_null ) %dopar% 
 		get_pairwise_summary( tree )
+
+	pairwise_sim_null_summary %<>% bind_rows()
 	
 	# Calculate some summary statistics 
 	ortholog_r_sim_null = 
 		pairwise_sim_null_summary %>% 
 		filter( D=="N" ) %$% 
-		cor.test( tau_a, tau_b ) 
+		cor.test( tau_a, tau_b )
 	
 	paralog_r_sim_null = 
 		pairwise_sim_null_summary %>% 
@@ -341,7 +343,7 @@
 		filter( D=="Y" ) %$% 
 		cor.test( tau_a, tau_b ) 
 
-	save.image("manuscript_checkpoint_calibrate_simulations.RData")
+	save.image("manuscript_checkpoint_simulations.RData")
 
 ## ----phylogenetic_signal, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE----
 
@@ -372,6 +374,7 @@
 	
 	wilcox_test_result_bm = wilcox_oc( nodes_contrast_filtered_bm )
 
+	save.image("manuscript_checkpoint_model_selection.RData")
 
 ## ----model_ou, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE------
 
@@ -384,7 +387,7 @@
 	nodes_ou_contrast = gene_trees_pic_ou %>% summarize_contrasts()
 	wilcox_ou = wilcox_oc( nodes_ou_contrast )
 
-	save.image("manuscript_checkpoint_models.RData")
+	save.image("manuscript_checkpoint_model_ou.RData")
 
 
 ## ----calibration_sensitivity, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE----

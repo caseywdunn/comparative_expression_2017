@@ -272,8 +272,7 @@ pic.nhx = function( nhx, model_method="BM" ) {
 			nhx@phylo, 
 			var.contrasts=TRUE , 
 			model_method="OU", 
-			model_parameters=nhx@phylo$model_ou, 
-			n_replicates=25 
+			model_parameters=nhx@phylo$model_ou
 		)
 	} else {
 		stop("ERROR: Invalid model_method")
