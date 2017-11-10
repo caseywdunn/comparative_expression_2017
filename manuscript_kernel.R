@@ -14,7 +14,6 @@
 	library( ggrepel )
 	library( gridExtra )
 	library( magrittr )
-	library( parallel )
 	library( foreach )
 	library( doParallel )
 	library( phytools )
@@ -26,13 +25,13 @@
 
 
 	# Set system computational parameters
-	cores = detectCores()
+	cores = detectCores() - 1
 	if ( cores < 1 ) {
 		cores = 1
 	}
 
 	# Register parallel workers for %dopar%
-	registerDoParallel( cores-1 )
+	registerDoParallel( cores )
 	
 	# Name of the compara gene trees file. This was downloaded from 
 	# ftp://ftp.ensembl.org/pub/release-75/emf/ensembl-compara/homologies/
@@ -70,14 +69,16 @@
 				"Simiiformes", "Primates", "Amniota", "Vertebrata", "Eutheria", 
 				"Bilateria", "Catarrhini", "Chordata", "Euteleostomi", 
 				"Haplorrhini", "Hominidae", "Opisthokonta", "Sarcopterygii", 
-				"Tetrapoda", "Theria", "Murinae", "Sciurognathi", "Rodentia", "Glires", "Hominini"
+				"Tetrapoda", "Theria", "Murinae", "Sciurognathi", "Rodentia", 
+				"Glires", "Hominini"
 		),
 		stringsAsFactors=FALSE
 	)
 	
 	# The calibration times used for speciation nodes
 	focal_calibrations_clades = 
-		c( "Hominini", "Homininae", "Catarrhini", "Euarchontoglires", "Theria", "Mammalia", "Amniota" )
+		c( "Hominini", "Homininae", "Catarrhini", "Euarchontoglires", "Theria", 
+			"Mammalia", "Amniota" )
 	
 	
 	# In simulation, the fold change in rate following duplication relative to speciation
@@ -95,7 +96,8 @@
 
 	# Parse each string to a treeio::treedata object, adding a label column 
 	# for node names
-	gene_trees = mclapply( tree_lines, parse_gene_trees, mc.cores=cores )
+	gene_trees = foreach( tree_line=tree_lines ) %dopar%
+		parse_gene_trees( tree_line )
 	
 	# Uncomment for development to look at a subset of gene trees
 	# gene_trees = gene_trees[1:100]
@@ -141,26 +143,23 @@
 
 	# Annotate each tree by joining the corresponding expression data to the 
 	# @data object. This maps the expression data to the tree tips
-	gene_trees_annotated = mclapply(
-		gene_trees,
-		function( tree ){
-			tree@data %<>% left_join( expression, by = c( "G" = "Ensembl.Gene.ID" ) )
-			
-			return( tree )
-		}, 
-		mc.cores=cores
-	)
+
+	add_expression_to_tree = function( tree ){
+		tree@data %<>% 
+			left_join( expression, by = c( "G" = "Ensembl.Gene.ID" ) )
+		return( tree )
+	}
+	gene_trees_annotated = foreach( tree=gene_trees ) %dopar% 
+		add_expression_to_tree( tree )
+
 
 	# Free up memory
 	rm( gene_trees )
 
 	# Remove tips from the trees that do not have expression data
-	gene_trees_pruned = mclapply( 
-		gene_trees_annotated, 
-		drop_empty_tips, 
-		min_genes_with_expression=min_genes_with_expression,
-		mc.cores=cores 
-	)
+	gene_trees_pruned = foreach( tree=gene_trees_annotated ) %dopar% 
+		drop_empty_tips( tree, min_genes_with_expression=min_genes_with_expression )
+
 	
 	# Free up memory
 	rm( gene_trees_annotated )
@@ -248,9 +247,10 @@
 ## ----pairwise, echo=FALSE, cache=TRUE, message=F, warning=F--------------
 
 	# Build a tibble of all pairwise comparisons between tips
-	pairwise_summary = 
-		mclapply( gene_trees_pic, get_pairwise_summary, mc.cores=cores ) %>% 
-		bind_rows()
+	pairwise_summary = foreach( tree=gene_trees_pic ) %dopar% 
+		get_pairwise_summary( tree ) 
+	
+	pairwise_summary %<>% bind_rows()
 	
 	# Calculate some summary statistics 
 	ortholog_r = 
@@ -288,16 +288,16 @@
 
 	# Replace the actual Tau values with simulated Tau values, using the parameters 
 	# estimated for each tree
-	gene_trees_sim_null = mclapply( gene_trees_calibrated, sim_tau, mc.cores=cores )
+	gene_trees_sim_null = foreach( tree=gene_trees_calibrated ) %dopar% 
+		sim_tau( tree )
 	
 	# Perform contrasts 
 	gene_trees_sim_null %<>% add_pics_to_trees()
 	nodes_sim_null_contrast = gene_trees_sim_null %>% summarize_contrasts()
 	
 	# Calculate pairwise comparisons
-	pairwise_sim_null_summary = 
-		mclapply( gene_trees_sim_null, get_pairwise_summary, mc.cores=cores ) %>% 
-		bind_rows()
+	pairwise_sim_null_summary = foreach( tree=gene_trees_sim_null ) %dopar% 
+		get_pairwise_summary( tree )
 	
 	# Calculate some summary statistics 
 	ortholog_r_sim_null = 
@@ -314,17 +314,20 @@
 ## ----simulations_oc, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE----
 
 	# Replace the actual Tau values with simulated Tau values
-	gene_trees_sim_oc = lapply( gene_trees_calibrated, sim_tau, dup_adjust=dup_adjust )
-	
-	# Calculate contrasts 
+	gene_trees_sim_oc = foreach( tree=gene_trees_calibrated ) %dopar% 
+		sim_tau( tree, dup_adjust=dup_adjust )
+
+	# Perform contrasts 
 	gene_trees_sim_oc %<>% add_pics_to_trees()
 	nodes_sim_oc_contrast = gene_trees_sim_oc %>% summarize_contrasts()
 	
 	# Calculate pairwise comparisons 
-	pairwise_sim_oc_summary = 
-		mclapply( gene_trees_sim_oc, get_pairwise_summary, mc.cores=cores ) %>% 
-		bind_rows()
-	
+	pairwise_sim_oc_summary = foreach( tree=gene_trees_sim_oc ) %dopar% 
+		get_pairwise_summary( tree )
+
+	pairwise_sim_oc_summary %<>% bind_rows()
+
+	# Calculate some summary statistics
 	ortholog_r_sim_oc = 
 		pairwise_sim_oc_summary %>% 
 		filter( D=="N" ) %$% 
@@ -410,13 +413,16 @@
 
 ## ----Fig_S3             -------------------------------------------------
 	x = calibration_times$age[calibration_times$clade == "Hominini"]
-	gene_trees_extended = mclapply( gene_trees_calibrated, extend_nhx, x=x, mc.cores=cores )
+	gene_trees_extended = foreach( tree=gene_trees_calibrated ) %dopar% 
+		extend_nhx( tree, x=x )
+
 	gene_trees_extended %<>% add_pics_to_trees()
 	nodes_extended_contrast = gene_trees_extended %>% summarize_contrasts()
 
-	pairwise_extended_summary = 
-			mclapply( gene_trees_extended, get_pairwise_summary, mc.cores=cores ) %>% 
-			bind_rows()
+	pairwise_extended_summary = foreach( tree=gene_trees_extended ) %dopar% 
+		get_pairwise_summary( tree )
+
+	pairwise_extended_summary %<>% bind_rows()
 
 ## ----session_summary, echo=FALSE, comment=NA-----------------------------
 	session_info_kernel = sessionInfo()

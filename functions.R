@@ -304,12 +304,8 @@ add_pics_to_trees = function( gene_trees_calibrated, model_method="BM" ) {
 	
 	# Calculate independent contrasts for Tau on each tree, storing the results 
 	# back into the @data slot of the tree objects
-	gene_trees_pic = mclapply( 
-		gene_trees_calibrated, 
-		pic.nhx, 
-		model_method=model_method, 
-		mc.cores=cores 
-	)
+	gene_trees_pic = foreach( tree=gene_trees_calibrated ) %dopar% 
+		pic.nhx( tree, model_method=model_method )
 	
 	return( gene_trees_pic )
 }
@@ -403,27 +399,17 @@ summarize_trees = function( gene_trees_pic ) {
 #' @export
 calibrate_trees = function( gene_trees_pruned, calibration_times, ... ) {
 	# Make the trees ultrametric and calibrate the speciation nodes to 
-	# specified times
-	gene_trees_calibrated = 
-		mclapply( 
-			gene_trees_pruned,
-			calibrate_tree, 
-			calibration_times=calibration_times,
-			...,
-			mc.cores=cores
-		)
-	
+	# specified times	
+	gene_trees_calibrated = foreach( tree=gene_trees_pruned ) %dopar% 
+		calibrate_tree( tree, calibration_times=calibration_times, ... )
+
 	# Remove trees that could not be successfully calibrated
 	gene_trees_calibrated = gene_trees_calibrated[ ! is.na( gene_trees_calibrated ) ]
 	
 	# Parse the calibrated node ages from the internal @phylo object and store them with the 
 	# corresponding rows in the @data object
-	gene_trees_calibrated = 
-		mclapply( 
-			gene_trees_calibrated, 
-			store_node_age, 
-			mc.cores=cores 
-		)
+	gene_trees_calibrated = foreach( tree=gene_trees_calibrated ) %dopar% 
+		store_node_age( tree )
 	
 	return( gene_trees_calibrated )
 }
@@ -467,8 +453,8 @@ add_model_parameters = function( nhx, ... ) {
 	# Set bounds on fitContinuous per manual, as unbond searches
 	# can get stuck. These bounds were selected according to 
 	# observed estimates on runs when no fitContinuous calls
-	# got stuck. Set ncores=1 so that can wrap in mclapply 
-	# without problems.
+	# got stuck. Set ncores=1 so that can wrap in parallel 
+	# code without problems.
 
 	brownian_model = fitContinuous( 
 		phy, 

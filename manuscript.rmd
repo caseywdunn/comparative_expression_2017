@@ -35,7 +35,6 @@ output:
 	library( ggrepel )
 	library( gridExtra )
 	library( magrittr )
-	library( parallel )
 	library( phytools )
 	library( stringr )
 	library( tidyverse )

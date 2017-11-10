@@ -6,8 +6,10 @@ RUN apt-get update \
   libtiff5-dev \
   libglu1-mesa-dev \
   lmodern \
+  procps \
   texlive-latex-extra \
-  texlive-fonts-recommended
+  texlive-fonts-recommended \
+  vim
 
 
 RUN install2.r --error \
@@ -17,6 +19,8 @@ RUN install2.r --error \
     ggtree \
     treeio \
     ape \
+    doParallel \
+    foreach \
     geiger \
     ggrepel \
     phytools \
