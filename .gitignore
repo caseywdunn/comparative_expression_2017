@@ -3,3 +3,4 @@ kmrr/*
 .Rhistory
 .RData
 manuscript_files/figure-latex/
+.Rproj.user
