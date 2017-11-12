@@ -347,7 +347,7 @@
 
 ## ----phylogenetic_signal, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE----
 
-	k_thresh = quantile( tree_summary$K, na.rm=TRUE )[3] # third quantile is the median
+	k_thresh = quantile( tree_summary$K, na.rm=TRUE )[4] # third quantile is the median, fourth is 75% quartile
 	k_percentile = names(k_thresh)
 	genes_pass_k = tree_summary$gene[ tree_summary$K > k_thresh ]
 
