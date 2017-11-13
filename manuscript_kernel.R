@@ -8,7 +8,6 @@
 # The code presented here is roughly in the order of the analyses presented 
 # in the manuscript, though there are exceptions
 
-
 ## Preliminaries
 	
 	time_start = Sys.time()
@@ -43,10 +42,13 @@
 	# Register parallel workers for %dopar%
 	registerDoParallel( cores )
 
+
 ## Set parameters
 
-	# In simulation, the fold change in rate following duplication relative to speciation
+	# In simulation, the fold change in rate following duplication 
+	# relative to speciation
 	dup_adjust = 2
+
 
 ## Load data for KMRR analyses
 
@@ -56,7 +58,8 @@
 
 	gene_tree_name = "Compara.75.protein.nhx.emf.gz"
 	
-	# Files produced by KMRR Rscript.R with Tau values and other expression statistics
+	# Files produced by KMRR Rscript.R with Tau values and other 
+	# expression statistics
 	expression_file_names = c(
 		"ChickenBrawandTScomparisonTable_9_6chPC.txt", 
 		"ChimpBrawandTScomparisonTable_9_6cmPC.txt", 
@@ -72,15 +75,16 @@
 	expression_file_names %<>% paste( kmrr_directory, ., sep="" )
 	gene_tree_name %<>% paste( kmrr_directory, ., sep="" )
 	
-	# The minimum number of genes with expression data that a gene needs to have to be considered
+	# The minimum number of genes with expression data that a gene 
+	# needs to have to be considered
 	min_genes_with_expression = 4
 	
-
-	# These clade dates are from the KMRR code, they got them from http://timetree.org/
+	# These clade dates are from the KMRR code, they got them 
+	# from http://timetree.org/
 	calibration_times = data.frame(
 		age =
-			c( 20, 92, 167, 9, 42, 74, 296, 535, 104, 937, 29, 722, 441, 65, 15, 1215, 
-				414, 371, 162, 25, 74, 77, 86, 7 ), 
+			c( 20, 92, 167, 9, 42, 74, 296, 535, 104, 937, 29, 722, 441, 65, 
+				15, 1215, 414, 371, 162, 25, 74, 77, 86, 7 ), 
 		clade = 
 			c("Hominoidea", "Euarchontoglires", "Mammalia", "Homininae", 
 				"Simiiformes", "Primates", "Amniota", "Vertebrata", "Eutheria", 
@@ -117,12 +121,12 @@
 	# Parse the tree annotations, these are lines that start with SEQ
 	# These have the species names, which are not in the trees themselves
 	tip_annotations = 
-		lines[ grepl( "^SEQ", lines, perl = TRUE ) ] %>%	# Get lines that start with SEQ
-	  str_replace( " \\(\\d+ of \\d+\\)", "" ) %>%      # Remove instances of '(1 of 2)' and '(2 of 2)'
-	  str_replace( "(([^ ]+ ){8})([^ ]+) ([^ ]+)", "\\1\\3_\\4" ) %>%      # Get rid of spaces in last field of some entries
-		str_c( collapse="\n" ) %>%												# Combine them into one string
-		read_delim( delim=" ", col_names = FALSE ) %>% 		# Read string as tibble
-		select( 2, 8 ) %>%																# Select the columns with species and gene ID
+		lines[ grepl( "^SEQ", lines, perl = TRUE ) ] %>%				# Get lines that start with SEQ
+		str_replace( " \\(\\d+ of \\d+\\)", "" ) %>%					# Remove instances of '(1 of 2)' and '(2 of 2)'
+		str_replace( "(([^ ]+ ){8})([^ ]+) ([^ ]+)", "\\1\\3_\\4" ) %>% # Get rid of spaces in last field of some entries
+		str_c( collapse="\n" ) %>%										# Combine them into one string
+		read_delim( delim=" ", col_names = FALSE ) %>% 					# Read string as tibble
+		select( 2, 8 ) %>%												# Select the columns with species and gene ID
 		rename( Ensembl.Gene.ID = X8 ) %>%
 		rename( species = X2 )
 	
@@ -164,12 +168,16 @@
 
 	# Remove tips from the trees that do not have expression data
 	gene_trees_pruned = foreach( tree=gene_trees_annotated ) %dopar% 
-		drop_empty_tips( tree, min_genes_with_expression=min_genes_with_expression )
+		drop_empty_tips( 
+			tree, 
+			min_genes_with_expression=min_genes_with_expression 
+		)
 
 	# Free up memory
 	rm( gene_trees_annotated )
 
-	# Remove trees with less than min_genes_with_expression tips with expression data
+	# Remove trees with less than min_genes_with_expression tips with 
+	# expression data
 	gene_trees_pruned = gene_trees_pruned[ ! is.na( gene_trees_pruned ) ]
 	
 	n_removed_for_no_speciation = length( gene_trees_pruned )
@@ -187,14 +195,19 @@
 	gene_trees_pruned = lapply( gene_trees_pruned, fix_hominini )
 
 
-## Calibrate the gene trees so that the same speciation events have the same
+## Calibrate the gene trees so that the same speciation events have the same 
 ## ages across all trees. This makes the branch lengths comparable across 
 ## and within trees.
 
 	gene_trees_calibrated = 
-		calibrate_trees( gene_trees_pruned, calibration_times, model="correlated" )
+		calibrate_trees( 
+			gene_trees_pruned, 
+			calibration_times, 
+			model="correlated"
+		)
 	
 	save.image( "manuscript_checkpoint_calibrate_trees.RData" )
+
 
 ## Estimate model parameters for the evolution of Tau and add them to the 
 ## tree objects. This takes a while, so do it once here and reuse the 
@@ -203,6 +216,7 @@
 	gene_trees_calibrated = 
 		foreach( nhx=gene_trees_calibrated ) %dopar% 
 			add_model_parameters( nhx )
+
 
 ## Calculate contrasts and summarize contrasts, tree statistics
 
@@ -219,6 +233,7 @@
 	tree_summary = summarize_trees( gene_trees_pic )
 
 	save.image("manuscript_checkpoint_contrasts.RData")
+
 
 ## Examine potential ascertainment biases
 
@@ -255,7 +270,6 @@
 	
 	wilcox_filtered_var = wilcox_oc( nodes_contrast_filtered_var )
 
-	
 
 ## Summarize pairwise comparisons to compare to original KMRR results
 
@@ -296,13 +310,12 @@
 	
 	save.image("manuscript_checkpoint_pairwise.RData")
 
-	
 
 ## Simulate data under the null hypothesis that there is no difference
 ## in the rate of change in Tau following duplication vs speciation
 
-	# Replace the actual Tau values with simulated Tau values, using the parameters 
-	# estimated for each tree
+	# Replace the actual Tau values with simulated Tau values, using the 
+	# parameters estimated for each tree
 	gene_trees_sim_null = foreach( tree=gene_trees_calibrated ) %dopar% 
 		sim_tau( tree )
 	
@@ -361,8 +374,10 @@
 
 ## Examine the phylgoenetic signal of Tau with Blomberg's K
 
-	k_thresh = quantile( tree_summary$K, na.rm=TRUE )[4] # third quantile is the median, fourth is 75% quartile
+	# third quantile is the median, fourth is 75% quartile
+	k_thresh = quantile( tree_summary$K, na.rm=TRUE )[4] 
 	k_percentile = names(k_thresh)
+
 	genes_pass_k = tree_summary$gene[ tree_summary$K > k_thresh ]
 
 	nodes_contrast_filtered_k = 
@@ -397,7 +412,8 @@
 
 	# Get the trees that pass AIC criteria for OU
 	gene_trees_pic_digests = lapply( gene_trees_pic, digest )
-	gene_trees_pic_ou = gene_trees_pic[ gene_trees_pic_digests %in% genes_pass_ou ]
+	gene_trees_pic_ou = 
+		gene_trees_pic[ gene_trees_pic_digests %in% genes_pass_ou ]
 
 	# Replace the BM pics with OU pics
 	gene_trees_pic_ou %<>% add_pics_to_trees( model_method="OU" )
@@ -438,13 +454,14 @@
 	p_noised = lapply( nodes_contrast_noised_list, wilcox_oc )
 
 
-## Examine the potential effects of with species variation by extending terminal 
-## branch lengths
+## Examine the potential effects of with species variation by extending 
+## terminal branch lengths
 	x = calibration_times$age[calibration_times$clade == "Hominini"]
 	gene_trees_extended = foreach( tree=gene_trees_calibrated ) %dopar% 
 		extend_nhx( tree, x=x )
 
 	gene_trees_extended %<>% add_pics_to_trees()
+
 	nodes_extended_contrast = gene_trees_extended %>% summarize_contrasts()
 
 	pairwise_extended_summary = foreach( tree=gene_trees_extended ) %dopar% 
@@ -456,7 +473,9 @@
 	session_info_kernel = sessionInfo()
 	system_time_kernel = Sys.time()
 
-	commit_kernel = system("git log | head -n 1", intern=TRUE) %>% str_replace("commit ", "")
+	commit_kernel = 
+		system("git log | head -n 1", intern=TRUE) %>% 
+		str_replace("commit ", "")
 
 	time_stop = Sys.time()
 	time_run = time_stop - time_start
