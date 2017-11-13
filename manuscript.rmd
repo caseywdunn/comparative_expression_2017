@@ -386,6 +386,11 @@ Thanks to Steve Haddock, Alex Damian Serrano, August Guang, Bruno Vellutini, Zac
 
 ## Supplementary Information
 
+\setcounter{figure}{0}
+\makeatletter 
+\renewcommand{\thefigure}{S\@arabic\c@figure}
+\makeatother
+
 ### KMRR Analyses
 
 
