@@ -1,5 +1,15 @@
+# The computationally intensive analyses for the manuscript 
+# presented at https://github.com/caseywdunn/comparative_expression_2017 .
+#
+# Executing this code generates manuscript.rmd, which contains analysis 
+# results. That file is then read by manuscript.rmd for rendering and 
+# presentation of the results.
+# 
+# The code presented here is roughly in the order of the analyses presented 
+# in the manuscript, though there are exceptions
 
-## ----preliminaries, echo=FALSE, message=F, warning=F---------------------
+
+## Preliminaries
 	
 	time_start = Sys.time()
 	# The following should be installed from github with the specified 
@@ -24,7 +34,6 @@
 	source( "functions.R" )	
 	set.seed( 23456 )
 
-
 	# Set system computational parameters
 	cores = detectCores() - 1
 	if ( cores < 1 ) {
@@ -33,7 +42,14 @@
 
 	# Register parallel workers for %dopar%
 	registerDoParallel( cores )
-	
+
+## Set parameters
+
+	# In simulation, the fold change in rate following duplication relative to speciation
+	dup_adjust = 2
+
+## Load data for KMRR analyses
+
 	# Name of the compara gene trees file. This was downloaded from 
 	# ftp://ftp.ensembl.org/pub/release-75/emf/ensembl-compara/homologies/
 	# and compressed with gz
@@ -80,15 +96,8 @@
 	focal_calibrations_clades = 
 		c( "Hominini", "Homininae", "Catarrhini", "Euarchontoglires", "Theria", 
 			"Mammalia", "Amniota" )
-	
-	
-	# In simulation, the fold change in rate following duplication relative to speciation
-	dup_adjust = 2
 
-
-## ----load_trees, echo=FALSE, cache=TRUE, message=F, warning=F------------
-
-	# Read in the tree file as a vector of strings, one per line
+	# Read in the gene tree file as a vector of strings, one per line
 	lines = readLines( gene_tree_name )
 
 	# Isolate strings that are trees
@@ -120,9 +129,6 @@
 	# Remove the large string objects to free up memory
 	rm( lines )
 	rm( tree_lines )
-	
-
-## ----load_expression, echo=FALSE, message=F, warning=F-------------------
 
 	# Read the expression data for each species and combine into a single tibble,
 	# adding the species names from tip_annotations
@@ -140,7 +146,7 @@
 	rm( tip_annotations )
 
 
-## ----add_expression_to_trees, echo=FALSE, cache=TRUE, message=F, warning=F----
+## Add the expression data to the tips of the trees
 
 	# Annotate each tree by joining the corresponding expression data to the 
 	# @data object. This maps the expression data to the tree tips
@@ -153,7 +159,6 @@
 	gene_trees_annotated = foreach( tree=gene_trees ) %dopar% 
 		add_expression_to_tree( tree )
 
-
 	# Free up memory
 	rm( gene_trees )
 
@@ -161,7 +166,6 @@
 	gene_trees_pruned = foreach( tree=gene_trees_annotated ) %dopar% 
 		drop_empty_tips( tree, min_genes_with_expression=min_genes_with_expression )
 
-	
 	# Free up memory
 	rm( gene_trees_annotated )
 
@@ -171,45 +175,52 @@
 	n_removed_for_no_speciation = length( gene_trees_pruned )
 	
 	# Remove trees with no speciation events
-	gene_trees_pruned = gene_trees_pruned[ unlist( lapply( gene_trees_pruned, get_n_speciation ) ) > 0 ]
+	gene_trees_pruned = 
+		gene_trees_pruned[ 
+			unlist( lapply( gene_trees_pruned, get_n_speciation ) ) > 0 
+		]
 	
-	n_removed_for_no_speciation = n_removed_for_no_speciation - length( gene_trees_pruned )
+	n_removed_for_no_speciation = 
+		n_removed_for_no_speciation - length( gene_trees_pruned )
 	
 	# fix clade names
 	gene_trees_pruned = lapply( gene_trees_pruned, fix_hominini )
 
 
-## ----calibrate_trees, echo=FALSE, cache=TRUE, message=F, warning=F-------
+## Calibrate the gene trees so that the same speciation events have the same
+## ages across all trees. This makes the branch lengths comparable across 
+## and within trees.
 
-	# Time calibrate all speciation nodes to the same years
-	gene_trees_calibrated = calibrate_trees( gene_trees_pruned, calibration_times, model="correlated" )
+	gene_trees_calibrated = 
+		calibrate_trees( gene_trees_pruned, calibration_times, model="correlated" )
 	
-	save.image("manuscript_checkpoint_calibrate_trees.RData")
+	save.image( "manuscript_checkpoint_calibrate_trees.RData" )
 
-## ----estimate_tau_model, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE----
-	# Estimate model parameters and add them to the tree objects
-	# This takes a while, so do it once here and reuse the values as needed
+## Estimate model parameters for the evolution of Tau and add them to the 
+## tree objects. This takes a while, so do it once here and reuse the 
+## values as needed.
 	
 	gene_trees_calibrated = 
-		foreach( nhx=gene_trees_calibrated ) %dopar% add_model_parameters( nhx )
+		foreach( nhx=gene_trees_calibrated ) %dopar% 
+			add_model_parameters( nhx )
 
-## ----trees_to_contrasts, cache=TRUE, echo=FALSE, message=F, warning=F----
+## Calculate contrasts and summarize contrasts, tree statistics
 
 	# Calculate the contrasts from the trees and associated expression data
 	gene_trees_pic = add_pics_to_trees( gene_trees_calibrated )
 
-	# Collect all the contrasts in a single tibble
+	# Collect all the contrasts in a single tibble, one row per contrast
 	nodes_contrast = summarize_contrasts( gene_trees_pic )
-	
-	# Collect all the tree statistics in a single tibble
-	tree_summary = summarize_trees( gene_trees_pic )
 	
 	# Test if the mean rank of duplication pics is greater than speciation pics
 	wilcox_test_result = wilcox_oc( nodes_contrast )
 
+	# Collect tree statistics in a single tibble, one row per tree
+	tree_summary = summarize_trees( gene_trees_pic )
+
 	save.image("manuscript_checkpoint_contrasts.RData")
 
-## ----ascertainment, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE----
+## Examine potential ascertainment biases
 
 	# Examine by node age
 
@@ -246,7 +257,7 @@
 
 	
 
-## ----pairwise, echo=FALSE, cache=TRUE, message=F, warning=F--------------
+## Summarize pairwise comparisons to compare to original KMRR results
 
 	# Build a tibble of all pairwise comparisons between tips
 	pairwise_summary = foreach( tree=gene_trees_pic ) %dopar% 
@@ -287,7 +298,8 @@
 
 	
 
-## ----simulations_null, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE----
+## Simulate data under the null hypothesis that there is no difference
+## in the rate of change in Tau following duplication vs speciation
 
 	# Replace the actual Tau values with simulated Tau values, using the parameters 
 	# estimated for each tree
@@ -316,7 +328,8 @@
 		cor.test( tau_a, tau_b )
 
 
-## ----simulations_oc, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE----
+## Simulate data under the OC hypothesis that there is an elevated rate of 
+## change in Tau following duplication relative to speciation
 
 	# Replace the actual Tau values with simulated Tau values
 	gene_trees_sim_oc = foreach( tree=gene_trees_calibrated ) %dopar% 
@@ -345,7 +358,8 @@
 
 	save.image("manuscript_checkpoint_simulations.RData")
 
-## ----phylogenetic_signal, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE----
+
+## Examine the phylgoenetic signal of Tau with Blomberg's K
 
 	k_thresh = quantile( tree_summary$K, na.rm=TRUE )[4] # third quantile is the median, fourth is 75% quartile
 	k_percentile = names(k_thresh)
@@ -358,7 +372,9 @@
 	wilcox_test_result_k = wilcox_oc( nodes_contrast_filtered_k )
 
 
-## ----model_selection, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE----
+## Examine the relative fit of BM and OU models with AIC, reexamine 
+## the subset of genes that AIC determines BM is a relatively good 
+## fit for.
 
 	dAIC_thresh = 2
 	AIC_min = pmin( tree_summary$aic_bm, tree_summary$aic_ou )
@@ -376,7 +392,8 @@
 
 	save.image("manuscript_checkpoint_model_selection.RData")
 
-## ----model_ou, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE------
+## Reexamine the subset of genes that AIC determines OU is a relatively good 
+## fit for under an approximated OU pic, using the picx function from hutan
 
 	# Get the trees that pass AIC criteria for OU
 	gene_trees_pic_digests = lapply( gene_trees_pic, digest )
@@ -390,7 +407,8 @@
 	save.image("manuscript_checkpoint_model_ou.RData")
 
 
-## ----calibration_sensitivity, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE----
+## Examine the sensitivity to calibration times by conducting relpicate
+## analyses after adding noise to calibration dates
 
 	noised_replicate_n = 10
 	sd_fraction = 0.2
@@ -420,7 +438,8 @@
 	p_noised = lapply( nodes_contrast_noised_list, wilcox_oc )
 
 
-## ----Fig_S3             -------------------------------------------------
+## Examine the potential effects of with species variation by extending terminal 
+## branch lengths
 	x = calibration_times$age[calibration_times$clade == "Hominini"]
 	gene_trees_extended = foreach( tree=gene_trees_calibrated ) %dopar% 
 		extend_nhx( tree, x=x )
@@ -433,15 +452,15 @@
 
 	pairwise_extended_summary %<>% bind_rows()
 
-## ----session_summary, echo=FALSE, comment=NA-----------------------------
+## Record information about the session
 	session_info_kernel = sessionInfo()
 	system_time_kernel = Sys.time()
 
 	commit_kernel = system("git log | head -n 1", intern=TRUE) %>% str_replace("commit ", "")
 
-## ----wrap_up, echo=FALSE-------------------------------------------------
-
 	time_stop = Sys.time()
 	time_run = time_stop - time_start
-	
+
+## Write the results to prepare them for manuscript.rmd
+
 	save.image("manuscript.RData")
