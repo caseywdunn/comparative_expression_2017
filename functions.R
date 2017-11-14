@@ -678,7 +678,7 @@ get_pairwise_summary = function ( nhx ) {
 make_contrast_plot = function( nodes_contrast, mode="diff" ){
 	
 	wilcox_test_result = wilcox_oc( nodes_contrast )
-	label_p = str_c( "Wilcoxon p=", signif( wilcox_test_result, 2 ) )
+	label_p = str_c( "Wilcoxon P=", signif( wilcox_test_result, 2 ) )
 	
 	if( mode == "freqpoly" ){
 		ggcontrasts = nodes_contrast %>%
