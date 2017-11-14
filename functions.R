@@ -344,6 +344,58 @@ summarize_contrasts = function( gene_trees_pic ) {
 	return( nodes_contrast )
 }
 
+#' Summarize edge data and properties of a single tree
+#' 
+#' @param gene_trees A phylogenetic tree
+#' as treeio::treedata object
+#' @return A tibble with edge data
+summarize_nhx_edges = function( nhx ){
+	tags = nhx@data
+	phy = nhx@phylo
+	edge_length = phy$edge.length
+	
+	tau_tips = nhx@data$Tau[1:length(phy$tip.label)]
+	tau_internal = ace( tau_tips, phy, method="pic" )$ace
+	tau = c( tau_tips, tau_internal )
+	tau_on_edges = sapply( phy$edge, function(x){ tau[x] })
+	dim( tau_on_edges ) = dim( phy$edge )
+	tau_parent = tau_on_edges[ , 1 ]
+	tau_child = tau_on_edges[ , 2 ]
+	
+	event_type = as.character( tags$Event )
+	event_type[1:length(phy$tip.label)] = "Tip"
+	events_on_edges = sapply( phy$edge, function(x){ event_type[x] })
+	dim( events_on_edges ) = dim( phy$edge )
+	
+	scaled_change = (tau_child - tau_parent) / sqrt( edge_length )
+	
+	tibble(
+		gene = digest( nhx ),
+		edge_length = edge_length,
+		tau_parent = tau_parent,
+		tau_child = tau_child,
+		event_parent = events_on_edges[ , 1 ],
+		event_child = events_on_edges[ , 2 ],
+		scaled_change = scaled_change
+	)
+
+}
+
+#' Summarize edge data and properties of a single tree
+#' 
+#' @param gene_trees A list of phylogenetic trees 
+#' as treeio::treedata objects 
+#' @return A tibble with combined edge data
+#' @export
+summarize_edges = function( gene_trees ){
+
+	edge_summaries = foreach( tree=gene_trees ) %dopar% 
+		summarize_nhx_edges( tree )
+
+	return( edge_summaries %>% bind_rows() )
+
+}
+
 
 #' Prepare summary statistics for each tree
 #' 
