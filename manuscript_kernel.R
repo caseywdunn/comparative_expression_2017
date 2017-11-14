@@ -232,6 +232,9 @@
 	# Collect tree statistics in a single tibble, one row per tree
 	tree_summary = summarize_trees( gene_trees_pic )
 
+	# Collect edge statistics in a single tibble, one row per edge
+	edge_summary = summarize_edges( gene_trees_pic )
+
 	save.image("manuscript_checkpoint_contrasts.RData")
 
 
