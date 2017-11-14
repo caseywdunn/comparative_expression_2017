@@ -22,7 +22,7 @@ output:
 
 ```
 
-```{r preliminaries}
+```{r preliminaries, cache=FALSE}
 
 	# The following should be installed from github with the specified 
 	# devtools command. You will need to install devtools first.
@@ -159,7 +159,7 @@ To test the hypothesis that ancient duplications that precede the oldest speciat
 				xlab( "Clade Age (million years)" ) +
 				ylab( "Correlation Coefficient" ) +
 				ylim( 0, 1 ) +
-				ggtitle( "A Empirical, pairwise" ) +
+				ggtitle( "A    Empirical, pairwise" ) +
 				guides( colour = guide_legend( override.aes = list( shape = 15 ) ) ) +
 				theme( 
 				legend.justification=c( 1, 1 ), 
@@ -180,7 +180,7 @@ To test the hypothesis that ancient duplications that precede the oldest speciat
 			xlab( "Clade Age (million years)" ) +
 			ylab( "Correlation Coefficient" ) +
 			ylim( 0, 1 ) +
-			ggtitle( "C Null simulation, pairwise" ) +
+			ggtitle( "C    Null simulation, pairwise" ) +
 			theme( legend.position="none" )
 	
 	g_pair_oc = 
@@ -197,13 +197,13 @@ To test the hypothesis that ancient duplications that precede the oldest speciat
 			xlab( "Clade Age (million years)" ) +
 			ylab( "Correlation Coefficient" ) +
 			ylim( 0, 1 ) +
-			ggtitle( "E OC simulation, pairwise" ) +
+			ggtitle( "E    OC simulation, pairwise" ) +
 			theme( legend.position="none" )
 
 	grid.arrange(
 		g_pair_empirical,
 		make_contrast_plot(nodes_contrast) + 
-			ggtitle( "B Empirical, phylogenetic" ),
+			ggtitle( "B    Empirical, phylogenetic" ),
 		# For the rest, put spaces in labels so you can't see them but alignment is 
 		# same as those with labels
 		g_pair_null + 
@@ -212,14 +212,14 @@ To test the hypothesis that ancient duplications that precede the oldest speciat
 		make_contrast_plot(nodes_sim_null_contrast) + 
 			xlab( "  " ) + 
 			ylab( "  " ) + 
-			ggtitle( "D Null simulation, phylogenetic" ),
+			ggtitle( "D    Null simulation, phylogenetic" ),
 		g_pair_oc + 
 			xlab( "  " ) + 
 			ylab( "  " ),
 		make_contrast_plot(nodes_sim_oc_contrast) + 
 			xlab( "  " ) + 
 			ylab( "  " ) + 
-			ggtitle( "F OC simulation, phylogenetic" ),
+			ggtitle( "F    OC simulation, phylogenetic" ),
 		ncol = 2
 	)
 
@@ -319,7 +319,7 @@ Levin *et al.* [@Levin:2016bp] analyzed gene expression through the course of em
 Levin *et al.* [@Levin:2016bp] arrived at this conclusion by making multiple pairwise comparisons of ortholog expression data sampled throughout the course of embryonic development. For each species pair, they identified the orthologs shared by these species. This list of shared genes was different from species pair to species pair. They characterized each of these orthologs in each species as having expression that peaks in early, mid, or late temporal phase of development. They then calculated a similarity score for each temporal phase for each species pair based on the fraction of genes that exhibited the same patterns in each species. The distributions of similarity scores are plotted in their Fig. 4d [@Levin:2016bp], and their Kolmogorov-Smirnov (KS) tests indicated that the early distribution and late distribution were each significantly different from mid distribution (P < $10^{-6}$ and P < $10^{-12}$, respectively). This is the support they presented for the inverse hourglass model.
 
 
-#### Reexamination of pairwise comparisons
+#### Pairwise comparisons oversample lineage-specific changes
 
 We examined the matrix of pairwise comparisons used as the base for the KS tests and Fig. 4d in *Levin et al.* [@Levin:2016bp], and thus as support for the "inverse hourglass" model. We found several problems resulting from the use of multiple pairwise comparisons. The first problems are specific to this particular implementation of pairwise comparisons. We found that every data point was included twice because both reciprocal pairwise comparisons (which have the same values) were retained. For example, there is both a nematode to arthropod comparison and an arthropod to nematode comparison. As a consequence, there are 90 entries for the 45 pairwise comparisons, and by doubling the data the significance of the result appears stronger than it actually is. After removing the duplicate values, the p values are far less significant, 0.002 for the early-mid comparison and on the order of $10^{-6}$ for early-late. In addition, the test they used (KS test) is not appropriate for the hypothesis they seek to evaluate. The KS test does not just evaluate whether one distribution is greater than the other, it also tests whether the shape of the distributions are the same. In addition, the samples in this dataset are matched (*i.e.*, for each pairwise comparison there is a early, mid, and late expression value), which the KS test does not take into account. The Wilcoxon test is instead appropriate in this case. When applied to the de-duplicated data, the significance of this test is 0.02 for the early-mid comparison and on the order of $10^{-7}$ for early-late.
 
@@ -389,6 +389,7 @@ Thanks to Steve Haddock, Alex Damian Serrano, August Guang, Bruno Vellutini, Zac
 \setcounter{figure}{0}
 \makeatletter 
 \renewcommand{\thefigure}{S\@arabic\c@figure}
+\renewcommand{\thetable}{S\@arabic\c@table}
 \makeatother
 
 ### KMRR Analyses
@@ -509,7 +510,7 @@ Thanks to Steve Haddock, Alex Damian Serrano, August Guang, Bruno Vellutini, Zac
 
 ```
 
-The gene trees considered here vary widely in their phylogenetic signal for Tau according to Blomberg's $K$ [@Blomberg:2003jg] (*SI Appendix*, Fig. S2). $K$ describes the tendancy for closely related tips to resemble each other, where $K=0$ indicates that close relatives resemble each other no more than they do distant relatives and $K=1$ indicates that the data have strong phylogenetic signal. To rule out the possibility that gene trees with little phylogenetic signal were diluting support for the Ortholog Conjecture, we removed the `r k_percentile` of genes with the lowest phylogenetic signal, corresponding to a $K$ cutoff for retained genes of greater than `r signif( k_thresh, 3)`. Repeating the phylogenetic analyses on this subset of genes with strongest phylogenetic signal for Tau still do not reject the null hypothesis (Wilcoxon p = $`r  wilcox_test_result_k %>% round( 3 )`$). This indicates that our inability to reject the null hypothesis with phylogenetic methods is not due to a lack of phylogenetic signal.
+The gene trees considered here vary widely in their phylogenetic signal for Tau according to Blomberg's $K$ [@Blomberg:2003jg] (*SI Appendix*, Fig. S2). $K$ describes the tendancy for closely related tips to resemble each other, where $K=0$ indicates that close relatives resemble each other no more than they do distant relatives and $K=1$ indicates that the data have strong phylogenetic signal. To examine the possibility that gene trees with little phylogenetic signal were diluting support for the Ortholog Conjecture, we removed the `r k_percentile` of genes with the lowest phylogenetic signal, corresponding to a $K$ cutoff for retained genes of greater than `r signif( k_thresh, 3)`. Repeating the phylogenetic analyses on this subset of genes with strongest phylogenetic signal for Tau still do not reject the null hypothesis (Wilcoxon p = $`r  wilcox_test_result_k %>% round( 3 )`$). This indicates that gene trees with little phylogenetic signal are not obscuring support for the Ortholog Conjecture in genes with greater phylogenetic signal.
 
 Phylogenetic independent contrasts (PICs) are based on a Brownian Motion (BM) model of character evolution [@Felsenstein:1985ua]. PICs could fail to reject the null hypothesis if BM is not a good model for the evolution of Tau on the gene phylogenies. We therefore compared the fit of BM to the more complex Ornstein Uhlenbeck (OU) model of evolution with the Akaike Information Criterion (AIC) [@Akaike:1974ih; Posada:2004ix]. 
 
