@@ -159,7 +159,7 @@ To test the hypothesis that ancient duplications that precede the oldest speciat
 				xlab( "Clade Age (million years)" ) +
 				ylab( "Correlation Coefficient" ) +
 				ylim( 0, 1 ) +
-				ggtitle( "A    Empirical, pairwise" ) +
+				ggtitle( "A      Empirical, pairwise" ) +
 				guides( colour = guide_legend( override.aes = list( shape = 15 ) ) ) +
 				theme( 
 				legend.justification=c( 1, 1 ), 
@@ -180,7 +180,7 @@ To test the hypothesis that ancient duplications that precede the oldest speciat
 			xlab( "Clade Age (million years)" ) +
 			ylab( "Correlation Coefficient" ) +
 			ylim( 0, 1 ) +
-			ggtitle( "C    Null simulation, pairwise" ) +
+			ggtitle( "C      Null simulation, pairwise" ) +
 			theme( legend.position="none" )
 	
 	g_pair_oc = 
@@ -197,13 +197,13 @@ To test the hypothesis that ancient duplications that precede the oldest speciat
 			xlab( "Clade Age (million years)" ) +
 			ylab( "Correlation Coefficient" ) +
 			ylim( 0, 1 ) +
-			ggtitle( "E    OC simulation, pairwise" ) +
+			ggtitle( "E      OC simulation, pairwise" ) +
 			theme( legend.position="none" )
 
 	grid.arrange(
 		g_pair_empirical,
 		make_contrast_plot(nodes_contrast) + 
-			ggtitle( "B    Empirical, phylogenetic" ),
+			ggtitle( "B      Empirical, phylogenetic" ),
 		# For the rest, put spaces in labels so you can't see them but alignment is 
 		# same as those with labels
 		g_pair_null + 
@@ -212,14 +212,14 @@ To test the hypothesis that ancient duplications that precede the oldest speciat
 		make_contrast_plot(nodes_sim_null_contrast) + 
 			xlab( "  " ) + 
 			ylab( "  " ) + 
-			ggtitle( "D    Null simulation, phylogenetic" ),
+			ggtitle( "D      Null simulation, phylogenetic" ),
 		g_pair_oc + 
 			xlab( "  " ) + 
 			ylab( "  " ),
 		make_contrast_plot(nodes_sim_oc_contrast) + 
 			xlab( "  " ) + 
 			ylab( "  " ) + 
-			ggtitle( "F    OC simulation, phylogenetic" ),
+			ggtitle( "F      OC simulation, phylogenetic" ),
 		ncol = 2
 	)
 
