@@ -610,9 +610,6 @@ The independent contrast across a node is the amount of change observed between 
 
 We examined the sensitivity of our results to the specification of calibration dates for the speciation nodes. In `r noised_replicate_n` reanalyses, we drew a new date for each calibration from a normal distribution with the mean of the original date and a standard deviation `r sd_fraction` times the original date. If any daughter nodes became older than their parent, we repeated the sampling until the dates were congruent with the topology. The minimum Wilcoxon $P$ in these reanalyses was $`r min( as.numeric( unlist( p_noised ) ) )`$, *i.e.* none of them reject the null hypothesis that the rate of evolution of tau is greater following duplication events than speciation events. This is consistent with the analysis that uses the calibration dates as specified, indicating that our results are robust to the selection of calibration times for speciation nodes.
 
-
-#### Origin of pairwise correlation plot structure
-
 ```{r Fig_S5, fig.width=7, fig.height=3, fig.cap="Origin of pairwise correlation plot structure. (*A*) Each speciation and duplication node in the COMPARA trees is annotated with a clade name, and the age of that clade (shown on the x axis) is used as the age of the pairwise comparisons (Fig. 2 *A, C, E*, KMRR [@KryuchkovaMostacci:2016iw] Fig. 2). The clade ages have a clear correspondence to the speciation node ages (red). Duplication (blue) ages for nodes assigned to the same clade, however, have large variation in calibrated node age (y axis). This means that summaries of expression differences across duplication events represent evolutionary changes that occurred over a wide range of time scales. (*B*) When duplication nodes whose calibrated node age deviates more than 10% from their annotated clade age are removed from the data simulated under the null distribution, duplication comparisons no longer have a uniformly lower expression correlation than speciation comparisons."} 
 	
 	grid.arrange(
@@ -650,7 +647,7 @@ KMRR [@KryuchkovaMostacci:2016iw] Fig. 3 differs from their other analyses in th
 
 ### Software versions
 
-These analyses were computed on `r format( system_time_kernel, "%a %b %d %X %Y" )` with the following R package versions.
+These analyses were computed on `r format( system_time_kernel, "%a %b %d %X %Y" )` with the following R package versions. The total run time of these analyses was `r time_run %>% as.numeric() %>% round( 2 )` hours on a `r cores+1` core machine.
 
 ```{r session_summary, comment=NA}
 	session_info_kernel
