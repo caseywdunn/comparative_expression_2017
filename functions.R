@@ -301,7 +301,7 @@ pic.nhx = function( nhx, model_method="BM" ) {
 #' @export
 add_pics_to_trees = function( gene_trees_calibrated, model_method="BM" ) {
 	
-	# Calculate independent contrasts for Tau on each tree, storing the results 
+	# Calculate independent contrasts for tau on each tree, storing the results 
 	# back into the @data slot of the tree objects
 	gene_trees_pic = foreach( tree=gene_trees_calibrated ) %dopar% 
 		pic.nhx( tree, model_method=model_method )
@@ -486,10 +486,10 @@ wilcox_oc = function( nodes_contrast ) {
 }
 
 
-#' Estimate Tau evolution parameters from a tree::treedata tree
+#' Estimate tau evolution parameters from a tree::treedata tree
 #' and add them back into the tree object.
 #' 
-#' @param nhx A phylogenetic tree and associated Tau values 
+#' @param nhx A phylogenetic tree and associated tau values 
 #' as a treeio::treedata object
 #' @param ... Additional arguments to pass to geiger::fitContinuous()
 #' @return A phylogenetic trees as a treeio::treedata object, 
@@ -531,17 +531,17 @@ add_model_parameters = function( nhx, ... ) {
 }
 
 
-#' Simulate Tau on a tree::treedata. Existing observed values are
+#' Simulate tau on a tree::treedata. Existing observed values are
 #' fit to a brownian model to estimate parameters. These parameters
 #' are then used to replace the original values with similated 
 #' values.
 #' 
-#' @param nhx A phylogenetic tree and associated Tau values 
+#' @param nhx A phylogenetic tree and associated tau values 
 #' as a treeio::treedata object
 #' @param dup_adjust A multiplier for adjusting the branch lengths 
 #' following duplication to effectively change the rate following duplication
-#' @param a ancestral state for Tau. If not specified, use estimated value 
-#' @return A phylogenetic trees and simulated Tau values as a 
+#' @param a ancestral state for tau. If not specified, use estimated value 
+#' @return A phylogenetic trees and simulated tau values as a 
 #' treeio::treedata object
 #' @export
 sim_tau = function( nhx, dup_adjust=1, a=NA ) {
