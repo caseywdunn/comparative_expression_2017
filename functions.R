@@ -367,7 +367,7 @@ summarize_nhx_edges = function( nhx ){
 	events_on_edges = sapply( phy$edge, function(x){ event_type[x] })
 	dim( events_on_edges ) = dim( phy$edge )
 	
-	scaled_change = (tau_child - tau_parent) / sqrt( edge_length )
+	scaled_change = (tau_child - tau_parent) / edge_length
 	
 	tibble(
 		gene = digest( nhx ),
