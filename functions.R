@@ -1,3 +1,16 @@
+
+#' Create a string from a p.value
+#' 
+#' @param x htest object, like that returned from cor.test()
+#' @param digits the number of significant digits
+#' @return A character object
+#' @export
+format_p = function ( x, digits=3 ){
+		fp <- format.pval( x$p.value, digits = max(1L, digits - 3L) )
+	out = if(substr(fp, 1L, 1L) == "<") fp else paste("=",fp)
+		return( out )
+}
+
 #' Parses nhx text to a treeio::treedata object
 #' 
 #' @param tree_text Character string repressenting nhx tree
@@ -235,9 +248,10 @@ calibrate_tree = function ( nhx, calibration_times, ... ) {
 #' 
 #' @param nhx A phylogenetic tree as a treeio::treedata object, with a 
 #' column @data$Tau containing expression data
+#' @param model_method The model of trait evolution. Can be one of c("BM", "OU")
 #' @return A treeio::treedata object, with new @data columns pic and var_exp
 #' @export
-pic.nhx = function( nhx ) {
+pic.nhx = function( nhx, model_method="BM" ) {
 	
 	tau = nhx@data$Tau[ is.tip.nhx( nhx ) ]
 	
@@ -246,8 +260,28 @@ pic.nhx = function( nhx ) {
 	}
 	
 	# Calculate the contrasts
-	p = pic( tau, nhx@phylo, var.contrasts=TRUE )
+	if ( model_method=="BM" ){
+		p = ape::pic( 
+			tau, 
+			nhx@phylo, 
+			var.contrasts=TRUE 
+		)
+	} else if ( model_method=="OU" ){
+		p = hutan::picx( 
+			tau, 
+			nhx@phylo, 
+			var.contrasts=TRUE , 
+			model_method="OU", 
+			model_parameters=nhx@phylo$model_ou
+		)
+	} else {
+		stop("ERROR: Invalid model_method")
+	}
 	
+	# Remove previous values if they exist
+	nhx@data$pic = NULL
+	nhx@data$var_exp = NULL
+
 	# Add the results back to the @data slot, padding the rows that correspond to 
 	# tips with NA
 	nhx@data$pic = c( rep( NA, length( nhx@phylo$tip.label ) ), p[ ,1 ] )
@@ -261,14 +295,16 @@ pic.nhx = function( nhx ) {
 #' 
 #' @param gene_trees_calibrated A list of time calibrated phylogenetic trees 
 #' as treeio::treedata objects 
+#' @param model_method The model of trait evolution. Can be one of c("BM", "OU")
 #' @return A list of time phylogenetic trees with pics 
 #' as treeio::treedata objects
 #' @export
-add_pics_to_trees = function( gene_trees_calibrated ) {
+add_pics_to_trees = function( gene_trees_calibrated, model_method="BM" ) {
 	
-	# Calculate independent contrasts for Tau on each tree, storing the results 
+	# Calculate independent contrasts for tau on each tree, storing the results 
 	# back into the @data slot of the tree objects
-	gene_trees_pic = mclapply( gene_trees_calibrated, pic.nhx, mc.cores=cores )
+	gene_trees_pic = foreach( tree=gene_trees_calibrated ) %dopar% 
+		pic.nhx( tree, model_method=model_method )
 	
 	return( gene_trees_pic )
 }
@@ -308,6 +344,58 @@ summarize_contrasts = function( gene_trees_pic ) {
 	return( nodes_contrast )
 }
 
+#' Summarize edge data and properties of a single tree
+#' 
+#' @param gene_trees A phylogenetic tree
+#' as treeio::treedata object
+#' @return A tibble with edge data
+summarize_nhx_edges = function( nhx ){
+	tags = nhx@data
+	phy = nhx@phylo
+	edge_length = phy$edge.length
+	
+	tau_tips = nhx@data$Tau[1:length(phy$tip.label)]
+	tau_internal = ace( tau_tips, phy, method="pic" )$ace
+	tau = c( tau_tips, tau_internal )
+	tau_on_edges = sapply( phy$edge, function(x){ tau[x] })
+	dim( tau_on_edges ) = dim( phy$edge )
+	tau_parent = tau_on_edges[ , 1 ]
+	tau_child = tau_on_edges[ , 2 ]
+	
+	event_type = as.character( tags$Event )
+	event_type[1:length(phy$tip.label)] = "Tip"
+	events_on_edges = sapply( phy$edge, function(x){ event_type[x] })
+	dim( events_on_edges ) = dim( phy$edge )
+	
+	scaled_change = (tau_child - tau_parent) / edge_length
+	
+	tibble(
+		gene = digest( nhx ),
+		edge_length = edge_length,
+		tau_parent = tau_parent,
+		tau_child = tau_child,
+		event_parent = events_on_edges[ , 1 ],
+		event_child = events_on_edges[ , 2 ],
+		scaled_change = scaled_change
+	)
+
+}
+
+#' Summarize edge data and properties of a single tree
+#' 
+#' @param gene_trees A list of phylogenetic trees 
+#' as treeio::treedata objects 
+#' @return A tibble with combined edge data
+#' @export
+summarize_edges = function( gene_trees ){
+
+	edge_summaries = foreach( tree=gene_trees ) %dopar% 
+		summarize_nhx_edges( tree )
+
+	return( edge_summaries %>% bind_rows() )
+
+}
+
 
 #' Prepare summary statistics for each tree
 #' 
@@ -331,7 +419,7 @@ summarize_trees = function( gene_trees_pic ) {
 					n_tips = length( x ),
 					tau_mean = mean( x ),
 					tau_var = var( x ),
-					K = phylosig( phy, x, method="K" ),
+					K = phytools::phylosig( phy, x, method="K" ),
 					z0_bm = nhx@phylo$model_bm$opt$z0,
 					z0_ou = nhx@phylo$model_ou$opt$z0,
 					sigsq_bm = nhx@phylo$model_bm$opt$sigsq,
@@ -362,27 +450,17 @@ summarize_trees = function( gene_trees_pic ) {
 #' @export
 calibrate_trees = function( gene_trees_pruned, calibration_times, ... ) {
 	# Make the trees ultrametric and calibrate the speciation nodes to 
-	# specified times
-	gene_trees_calibrated = 
-		mclapply( 
-			gene_trees_pruned,
-			calibrate_tree, 
-			calibration_times=calibration_times,
-			...,
-			mc.cores=cores
-		)
-	
+	# specified times	
+	gene_trees_calibrated = foreach( tree=gene_trees_pruned ) %dopar% 
+		calibrate_tree( tree, calibration_times=calibration_times, ... )
+
 	# Remove trees that could not be successfully calibrated
 	gene_trees_calibrated = gene_trees_calibrated[ ! is.na( gene_trees_calibrated ) ]
 	
 	# Parse the calibrated node ages from the internal @phylo object and store them with the 
 	# corresponding rows in the @data object
-	gene_trees_calibrated = 
-		mclapply( 
-			gene_trees_calibrated, 
-			store_node_age, 
-			mc.cores=cores 
-		)
+	gene_trees_calibrated = foreach( tree=gene_trees_calibrated ) %dopar% 
+		store_node_age( tree )
 	
 	return( gene_trees_calibrated )
 }
@@ -408,10 +486,10 @@ wilcox_oc = function( nodes_contrast ) {
 }
 
 
-#' Estimate Tau evolution parameters from a tree::treedata tree
+#' Estimate tau evolution parameters from a tree::treedata tree
 #' and add them back into the tree object.
 #' 
-#' @param nhx A phylogenetic tree and associated Tau values 
+#' @param nhx A phylogenetic tree and associated tau values 
 #' as a treeio::treedata object
 #' @param ... Additional arguments to pass to geiger::fitContinuous()
 #' @return A phylogenetic trees as a treeio::treedata object, 
@@ -423,27 +501,47 @@ add_model_parameters = function( nhx, ... ) {
 	tau_original = nhx@data$Tau [ 1:length( phy$tip.label ) ]
 	names( tau_original ) = phy$tip.label
 
-	brownian_model = fitContinuous( phy, tau_original, model="BM", ... )
+	# Set bounds on fitContinuous per manual, as unbond searches
+	# can get stuck. These bounds were selected according to 
+	# observed estimates on runs when no fitContinuous calls
+	# got stuck. Set ncores=1 so that can wrap in parallel 
+	# code without problems.
+
+	brownian_model = fitContinuous( 
+		phy, 
+		tau_original, 
+		model="BM", 
+		bounds=list(sigsq=c(0.0, 1.0)),
+		ncores=1,
+		... 
+	)
 	nhx@phylo$model_bm$opt = brownian_model$opt
 
-	ou_model = fitContinuous( phy, tau_original, model="OU", ... )
+	ou_model = fitContinuous( 
+		phy, 
+		tau_original, 
+		model="OU", 
+		bounds=list(sigsq=c(0.0, 1.0), alpha=c(0.0, 3.0)),
+		ncores=1,
+		... 
+	)
 	nhx@phylo$model_ou$opt = ou_model$opt	
 	
 	return( nhx )
 }
 
 
-#' Simulate Tau on a tree::treedata. Existing observed values are
+#' Simulate tau on a tree::treedata. Existing observed values are
 #' fit to a brownian model to estimate parameters. These parameters
 #' are then used to replace the original values with similated 
 #' values.
 #' 
-#' @param nhx A phylogenetic tree and associated Tau values 
+#' @param nhx A phylogenetic tree and associated tau values 
 #' as a treeio::treedata object
 #' @param dup_adjust A multiplier for adjusting the branch lengths 
 #' following duplication to effectively change the rate following duplication
-#' @param a ancestral state for Tau. If not specified, use estimated value 
-#' @return A phylogenetic trees and simulated Tau values as a 
+#' @param a ancestral state for tau. If not specified, use estimated value 
+#' @return A phylogenetic trees and simulated tau values as a 
 #' treeio::treedata object
 #' @export
 sim_tau = function( nhx, dup_adjust=1, a=NA ) {
@@ -580,7 +678,7 @@ get_pairwise_summary = function ( nhx ) {
 make_contrast_plot = function( nodes_contrast, mode="diff" ){
 	
 	wilcox_test_result = wilcox_oc( nodes_contrast )
-	label_p = str_c( "Wilcoxon p=", signif( wilcox_test_result, 2 ) )
+	label_p = str_c( "Wilcoxon P=", signif( wilcox_test_result, 2 ) )
 	
 	if( mode == "freqpoly" ){
 		ggcontrasts = nodes_contrast %>%
@@ -634,4 +732,14 @@ make_contrast_plot = function( nodes_contrast, mode="diff" ){
 	
 }
 
+#' Extends each terminal branch by specified length
+#' 
+#' @param nhx A phylogenetic tree as a treeio::treedata object
+#' @param x Amount to extend each branch by
+#' @return A phylogenetic tree as a treeio::treedata object
+#' @export
+extend_nhx = function( nhx, x ){
+  nhx@phylo = hutan::extend_terminal_branches( nhx@phylo, x )
+  return( nhx )
+}
 

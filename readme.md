@@ -1,6 +1,6 @@
 ## Introduction
 
-This respository contains files associated with our reanalysis of two
+This repository contains files associated with our analysis of two
 previously published comparative gene expression studies:
 
 > Levin M, Anavy L, Cole AG, Winter E, Mostov N, Khair S, Senderovich N, Kovalev E, Silver DH, Feder M, et al. 2016. The mid-developmental transition and the evolution of animal body plans. Nature 531: 637-641. [doi:10.1038/nature16994](http://dx.doi.org/10.1038/nature16994)
@@ -11,23 +11,32 @@ The files in this repository include:
 
 - [manuscript.pdf](./manuscript.pdf?raw=true) The rendered manuscript. It is the simplest way to view our manuscript, including the computed results and figures.
 
-- [manuscript.rmd](./manuscript.rmd) The manuscript text and source code for our reanalysis. This is the file we edited as we wrote the manuscript.
+- [manuscript.rmd](./manuscript.rmd) The manuscript text and source code for presenting our analyses. It executes relatively quickly (a few minutes on a standard laptop) since computationally intensive analysis steps are all in manuscript_kernel.R .
 
-- [functions.R](./functions.R) Custom functions required to execute the manuscript.
+- [manuscript_kernel.R](./manuscript_kernel.R) The heavy lifting on the more computationally intensive analyses. It needs to be executed before running manuscript.rmd to generate the file manuscript.RData with intermediate results.
 
-- [kmrr](./kmrr) The folder with the data and original code from Kryuchkova-Mostacci Robinson-Rechavi 2016, as well as the products of this code that are needed to run our reanalyses.
+- [functions.R](./functions.R) Custom functions required to run our analyses.
+
+- [kmrr](./kmrr) The folder with the data and original code from Kryuchkova-Mostacci Robinson-Rechavi 2016, as well as the products of their code that are needed to run our analyses.
 
 - [kmrr/Compara.75.protein.nhx.emf.gz](./kmrr/Compara.75.protein.nhx.emf.gz) The Compara gene tree file, from ftp://ftp.ensembl.org/pub/release-75/emf/ensembl-compara/homologies/
 
-- [levin_etal](./levin_etal) The folder with data provided by the authors of Levin et al. 2016, as well as our annotations of their analysis and the code we used to explore their results.
+- [levin_etal](./levin_etal) The folder with data provided by the authors of Levin et al. 2016, as well as our annotations of their analysis and the code we used to explore their results ([reanalyses.rmd](./levin_etal/reanalyses.rmd)). The results of these analyses can be viewed at [reanalyses.md](./levin_etal/reanalyses.md).
 
 ## Rerunning our analyses
 
-Run `install_dependencies.R` in R to install all dependencies needed to execute the manuscript.
+We run the analyses in a [Docker](https://gist.github.com/caseywdunn/34aac3d1993f9b3340496e9294239d3d) container with all the R dependencies needed by our code. Please see the [docker](./docker) folder for more information on building the docker image and running the container. Alternatively, you could run it directly on your computer after installing the dependencies yourself.
 
-Run `manuscript.rmd`, the source code for our manuscript, with the R package `knitr`. You can do this in RStudio by clicking the "knit" button. This will regenerate the manuscript, with all results and plots.
+The manuscript is typically executed in two steps. First, run [manuscript_kernel.R](./manuscript_kernel.R). This code includes the most computationally intensive steps, and outputs the file `manuscript.RData` with intermediate results. Next, knit [manuscript.rmd](./manuscript.rmd). This reads in the intermediate results from `manuscript.RData`, formats them for presentation, and integrates them with the text in a combined document. 
 
-The `manuscript.rmd` file has all our code for running the KMRR reanalysis. The Levin analysis code, along with additional exploratory analyses not included in the manuscript, is in [reanalyses.rmd](./levin_etal/reanalyses.rmd). The results of these reanalyses can be viewed at [reanalyses.md](./levin_etal/reanalyses.md).
+These two steps can be executed with:
+
+    nohup Rscript manuscript_kernel.R &
+    Rscript -e "library(rmarkdown); render('manuscript.rmd')"
+
+The first step takes about an hour and a half in a docker container on an [Amazon Web Services EC2 m4.16xlarge instance](https://aws.amazon.com/ec2/instance-types/), which has 64 cores and 256 GB RAM. About 2GB RAM per core are required.
+
+You can executed [manuscript_kernel.R](./manuscript_kernel.R) on a cluster or in the cloud, and then move the `manuscript.RData` to another computer (such as your laptop) to execute manuscript.rmd and generate the final pdf.
 
 ## Development
 
