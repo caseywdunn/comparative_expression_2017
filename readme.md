@@ -1,7 +1,10 @@
 ## Introduction
 
-This repository contains files associated with our analysis of two
-previously published comparative gene expression studies:
+This repository contains files associated with our manuscript:
+
+> Dunn, CW, F Zapata, C Munro, S Siebert, A Hejnol (2018) Pairwise comparisons across species are problematic when analyzing functional genomic data. PNAS. [doi:10.1073/pnas.1707515115](http://dx.doi.org/10.1073/pnas.1707515115).
+
+It presents reanalyses of two previously published comparative gene expression studies:
 
 > Levin M, Anavy L, Cole AG, Winter E, Mostov N, Khair S, Senderovich N, Kovalev E, Silver DH, Feder M, et al. 2016. The mid-developmental transition and the evolution of animal body plans. Nature 531: 637-641. [doi:10.1038/nature16994](http://dx.doi.org/10.1038/nature16994)
 
@@ -27,7 +30,7 @@ The files in this repository include:
 
 We run the analyses in a [Docker](https://gist.github.com/caseywdunn/34aac3d1993f9b3340496e9294239d3d) container with all the R dependencies needed by our code. Please see the [docker](./docker) folder for more information on building the docker image and running the container. Alternatively, you could run it directly on your computer after installing the dependencies yourself.
 
-The manuscript is typically executed in two steps. First, run [manuscript_kernel.R](./manuscript_kernel.R). This code includes the most computationally intensive steps, and outputs the file `manuscript.RData` with intermediate results. Next, knit [manuscript.rmd](./manuscript.rmd). This reads in the intermediate results from `manuscript.RData`, formats them for presentation, and integrates them with the text in a combined document. 
+The manuscript is typically executed in two steps. First, run [manuscript_kernel.R](./manuscript_kernel.R). This code includes the most computationally intensive steps, and outputs the file `manuscript.RData` with intermediate results. Next, knit [manuscript.rmd](./manuscript.rmd). This reads in the intermediate results from `manuscript.RData`, formats them for presentation, and integrates them with the text in a combined document.
 
 These two steps can be executed with:
 

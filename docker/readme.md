@@ -1,7 +1,6 @@
 # Dockerfile
 
-A provisional Dockerfile for installing all dependencies needed to run the 
-analyses. Not yet fully tested.
+A Dockerfile for installing all dependencies needed to run the analyses.
 
 See [my cheat sheet](https://gist.github.com/caseywdunn/34aac3d1993f9b3340496e9294239d3d) for more about Docker.
 
@@ -31,11 +30,31 @@ Your Amazon machine is now ready to build and run the SMRTLink Docker container.
 
 ## Build
 
-To build the docker container, execute (where `master` can be substituted with any git branch you want to build):
+### New image with the Dockerfile
+
+To build the docker image, execute (where `master` can be substituted with any git branch you want to build):
 
     docker build https://github.com/caseywdunn/comparative_expression_2017.git#master:docker
 
-If all goes well this will finish with the line `Successfully built [id]`, where `[id]` is the image ID for the image you just built. 
+If all goes well this will finish with the line `Successfully built [id]`, where `[id]` is the image ID for the image you just built.
+
+### Pull the already built image
+
+Rather than build the image with the Dockerfile, you can pull the image we build:
+
+    docker pull dunnlab/comparative_expression_2017
+
+`dunnlab/comparative_expression_2017` is the image ID you will use below.
+
+This docker image that is a snapshot of the container in which we ran the
+final published analyses. It therefore includes not only the dependencies
+needed to run the analyses, but the analysis code and all result files
+as well. You could use this image to inspect the published analyses without
+rerunning them yourself, or you could rerun the analyses in the exact same
+environment as the analyses we published.
+
+More information on the image is available at
+https://hub.docker.com/r/dunnlab/comparative_expression_2017/.
 
 ## Run and use
 
